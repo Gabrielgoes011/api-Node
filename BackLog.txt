@@ -1,0 +1,47 @@
+# Próximos Passos e Melhorias (Backlog)
+
+Este arquivo serve como um guia para as próximas funcionalidades e melhorias a serem implementadas na API.
+
+---
+
+### Fase 1: Estrutura e Cadastro Completo
+
+-   **[ x] Atualizar Banco de Dados:**
+    -   Adicionar a coluna `adm` (BOOLEAN NOT NULL DEFAULT 0) na tabela `TabUserCred` no arquivo `script.sql`.
+    -   **Importante:** Atualizar a lógica de criação automática de tabelas no `app.js` para refletir essa nova coluna.
+
+-   **[ x] Melhorar Cadastro de Usuário (`POST /users`):**
+    -   Refatorar a rota para que, ao criar um usuário, os dados sejam inseridos nas duas tabelas (`TabUser` e `TabUserCred`) usando uma **transação** para garantir a consistência dos dados (ou tudo é salvo, ou nada é).
+    -   Implementar criptografia para a senha antes de salvá-la no banco (ex: usando a biblioteca `bcrypt`). A senha nunca deve ser salva em texto puro.
+    -   Ajustar a rota para receber a `senha` no corpo da requisição.
+
+### Fase 2: Autenticação e Permissões
+
+-   **[ ] Implementar Login (`POST /login`):**
+    -   Criar uma nova rota que recebe `email` e `password`.
+    -   Verificar as credenciais no banco comparando a senha enviada com a senha criptografada (usando `bcrypt.compare`).
+    -   Se as credenciais forem válidas, gerar e retornar um **token de autenticação** (ex: JWT - JSON Web Token) contendo o `id` e a flag `adm` do usuário.
+
+-   **[ ] Controle de Acesso (Middleware de Autorização):**
+    -   Criar um *middleware* que intercepta requisições para rotas protegidas.
+    -   O middleware deve ler o token JWT do cabeçalho `Authorization`.
+    -   Ele deve validar o token e, se for válido, extrair os dados do usuário (id, adm) e anexá-los ao objeto `req` (ex: `req.user`).
+    -   **Usuários ADM (`req.user.adm === true`):** Podem acessar todas as rotas (criar, listar, atualizar, deletar).
+    -   **Usuários Comuns (`req.user.adm === false`):** Podem apenas listar todos os usuários (`GET /users`) e visualizar um usuário específico (`GET /users/:id`).
+
+### Fase 3: Funcionalidades CRUD Adicionais (Rotas de Admin)
+
+-   **[ ] Atualizar Cadastro (`PUT /users/:id`):**
+    -   Criar a rota para permitir que um administrador atualize os dados de um usuário na tabela `TabUser`.
+
+-   **[ ] Excluir Usuário (`DELETE /users/:id`):**
+    -   Criar a rota para permitir que um administrador exclua um usuário.
+    -   **Decisão de design:** Definir se será uma exclusão física (remover o registro das tabelas `TabUser` e `TabUserCred`) ou lógica (alterar o campo `ativo` para `0` na `TabUserCred`). A exclusão lógica é geralmente mais segura.
+
+### Melhorias Gerais e Refatoração
+
+-   **[ ] Refatorar Estrutura do Projeto:**
+    -   Mover a lógica de cada rota para arquivos separados em uma pasta `src/controllers`.
+    -   Mover as validações e o middleware de autenticação para uma pasta `src/middlewares`.
+    -   Isso deixará o arquivo `app.js` muito mais limpo, responsável apenas pela configuração do servidor e definição das rotas.
+-   **[ ] Padronizar Respostas de Erro:** Em vez de retornar texto simples (`res.send('...')`), retornar sempre um objeto JSON (ex: `res.status(400).json({ error: 'Mensagem de erro' })`).
