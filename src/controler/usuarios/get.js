@@ -20,21 +20,22 @@ export async function listarUsuarios () {
     `);
   }
 
-
- export async function buscaUserId (req, res, id) {
+//exporta a função buscaUserId
+ export async function buscaUserId (id) {
+  //busca usuario pelo id
   try {
       const db = await openDb(); //abre a conexão com o banco de dados
-      const userID = await db.get(
+      const userId = await db.get(
            `SELECT id
            FROM TabUser
            WHERE id = ? `, [id]
            ); //busca o usuario pelo id
-
-      //se não econtrar o usuário
-      if (!userID) {
-         return res.status(404).send('Usuário não encontrado !');
-       }
-    } catch (error) {
+          
+          //se encontrar, retorna o objeto, senão retorna null
+          return userId || null;  
+          
+      //caso ocorra um erro, captura e retorna erro 500
+      } catch (error) {
         console.error('Erro ao buscar o usuário pelo ID:', error);
         return res.status(500).send('Erro interno do servidor');
     }  

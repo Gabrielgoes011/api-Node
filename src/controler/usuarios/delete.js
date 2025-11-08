@@ -5,11 +5,12 @@ import { buscaUserId } from "./get.js";
 export async function deleteUser (req, res) {
     const idUser = req.params.id; //pega o id da requisição
     const existeUser = await buscaUserId(idUser); //vai na função verificar se o id existe no banco
-
+    
+    //verifica se o usuário existe
     if (!existeUser) {
         return res.status(404).json({error: 'Usuário não encontrado !'});
     }
-
+    
     const db = await openDb(); //abre a conexão com o banco de dados
     try { 
         //inicia transação
@@ -28,7 +29,7 @@ export async function deleteUser (req, res) {
     );
     //confirma a transação
      await db.run('COMMIT TRANSACTION')
-     return  res.json({message: 'Usuário deletado com sucesso !'});
+     return  res.json({status: 'success', message: 'Usuário deletado com sucesso !'});
 
     } catch (error) {
         await db.run('ROLLBACK'); //desfaz a transação
