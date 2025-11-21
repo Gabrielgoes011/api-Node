@@ -41,24 +41,8 @@ app.get('/users/dash/count', async function(req, res) {
 /*---------------------------------------------------------------------------------------------------*/
 
 //get busca um usuario pelo id na rota /user/:id
-app.get('/users/:id', async function(req, res) {
-    const id = req.params.id; //pega o id da requisição
-    const db = await openDb(); //abre a conexão com o banco de dados
-    const users = await db.all(
-        `SELECT id, nome, idade, email
-         FROM TabUser
-         WHERE id = ${id} `
-        ); //busca os usuarios
-    //se não econtrar o usuário
-    if (users.length === 0) {
-        return res.status(404).send('Usuário não encontrado !');
-    }
-    if (id < 1) {
-        return res.status(400).send('O Id nao foi informado!');
-    }
-    res.json(users); //responde com os usuários em formato JSON
-    //console.log(users); //imprime os usuários no console (teste)
-});
+//app.get('/users/:id', async function(req, res) {
+
 
 /*---------------------------------------------------------------------------------------------------*/
 

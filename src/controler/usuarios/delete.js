@@ -29,7 +29,9 @@ export async function deleteUser (req, res) {
     );
     //confirma a transação
      await db.run('COMMIT TRANSACTION')
-     return  res.json({status: 'success', message: 'Usuário deletado com sucesso !'});
+     return  res.json({ statusCode: 'Sucesso (200)',
+                        usuario: `${existeUser.nome}` ,
+                        message: 'O usuario foi deletado com sucesso !'});
 
     } catch (error) {
         await db.run('ROLLBACK'); //desfaz a transação

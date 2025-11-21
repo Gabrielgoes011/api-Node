@@ -1,0 +1,20 @@
+# Bodys para as requisições da API
+
+Este arquivo contém exemplos de corpos de requisição (JSON) para os endpoints que já estão implementados.
+
+---
+
+## 1. Cadastro de Novo Usuário (POST /users)
+
+Para criar um novo usuário, envie um JSON com os seguintes campos. A senha precisa ter no mínimo 8 caracteres e uma letra maiúscula.
+
+```json
+{
+  "nome": "Alec Goes",
+  "idade": 1,
+  "email": "alec20@gmail.com",
+  "cpf": "45645645645",
+  "senha": "Teste123",
+  "confirmaSenha": "Teste123"
+}
+```

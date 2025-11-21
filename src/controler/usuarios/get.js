@@ -20,22 +20,21 @@ export async function listarUsuarios () {
     `);
   }
 
-//exporta a função buscaUserId
+//exporta a função buscaUserId  - //busca usuario pelo id
  export async function buscaUserId (id) {
-  //busca usuario pelo id
   try {
       const db = await openDb(); //abre a conexão com o banco de dados
       const userId = await db.get(
-           `SELECT id
+           `SELECT id, nome
            FROM TabUser
            WHERE id = ? `, [id]
-           ); //busca o usuario pelo id
-          
-          //se encontrar, retorna o objeto, senão retorna null
-          return userId || null;  
+           ); 
+        
+          return userId //retorna o id existente para usar na função
+        }  
           
       //caso ocorra um erro, captura e retorna erro 500
-      } catch (error) {
+        catch (error) {
         console.error('Erro ao buscar o usuário pelo ID:', error);
         return res.status(500).send('Erro interno do servidor');
     }  
