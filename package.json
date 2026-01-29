@@ -13,6 +13,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "readline-sync": "^1.4.10",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7"
   },
