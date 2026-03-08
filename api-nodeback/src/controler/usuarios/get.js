@@ -6,12 +6,14 @@ export async function listarUsuarios(req, res) {
   const db = await openDb();
 
   try {
-    // Retorna TODOS os usuários (ativos e inativos)
-    // O frontend faz a filtragem baseado no status
+    const parametro = req.query.status || 'on'; // Pega o parâmetro de status da query string, ou usa 'on' como padrão
+    const blvalor = parametro === 'on' ? true : false; // Converte o parâmetro para booleano
+
     const resultado = await db.query(`        
         SELECT id, nome, cpf, idade, email, ativo
-        FROM dbo."tabUser" 
-        ORDER BY id DESC `
+        FROM dbo."tabUser"
+        WHERE ativo = $1 
+        ORDER BY id DESC `, [blvalor]
     );
 
     // Se nenhum usuário for encontrado, responde com array vazio

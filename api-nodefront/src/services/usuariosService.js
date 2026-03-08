@@ -4,9 +4,9 @@ const API_URL = 'http://localhost:3000';
 
 export const usuariosService = {
   // Listar todos os usuários
-  listarTodos: async () => {
+  listarTodos: async (status = 'on') => {
     try {
-      const res = await axios.get(`${API_URL}/users`);
+      const res = await axios.get(`${API_URL}/users?status=${status}`);
       if (!Array.isArray(res.data)) {
         throw new Error('Resposta da API não é um array');
       }

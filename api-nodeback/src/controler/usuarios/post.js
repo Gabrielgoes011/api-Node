@@ -27,22 +27,22 @@ export async function cadastrarUser(req, res) {
     }
 
     //verifica se email ja tem cadastro
-    const existeEmail = await db.get(`
+    const existeEmail = await db.query(`
             SELECT id 
-            FROM TabUser 
-            WHERE email = ? ` , [user.email]
+            FROM dbo."tabUser"
+            WHERE email = $1 ` , [user.email]
     );
 
-    if (existeEmail) {
+    if (existeEmail.rows.length > 0) {
         return res.status(400).json({ error: 'Email ja cadastrado!' }); //retorna e sai
     }
 
-    const existeCpf = await db.get(`
+    const existeCpf = await db.query(`
             SELECT id
-            FROM TabUser
-            WHERE cpf = ? `, [user.cpf]
+            FROM dbo."tabUser"
+            WHERE cpf = $1 `, [user.cpf]
     );
-    if (existeCpf) {
+    if (existeCpf.rows.length > 0) {
         return res.status(400).json({ error: 'CPF já cadastrado !' }); //retorna e sai
     }
 
@@ -64,36 +64,34 @@ export async function cadastrarUser(req, res) {
         const senhaPura = user.senha;
 
         //inicia transação
-        await db.run('BEGIN TRANSACTION')
+        await db.query('BEGIN TRANSACTION')
 
-        const insertUser = await db.run(`
-            INSERT INTO TabUser (nome, idade, email, cpf)
-            VALUES (?, ?, LOWER(?), ?)` ,
+        const insertUser = await db.query(`
+            INSERT INTO dbo."tabUser" (nome, idade, email, cpf)
+            VALUES ($1, $2, LOWER($3), $4)
+            RETURNING id` ,
             [user.nome, user.idade, user.email, user.cpf]
         )
         //recupera o id que foi inserido
-        const newUserId = insertUser.lastID;
+        const newUserId = insertUser.rows[0].id;
 
-        const insertCred = await db.run(`
-            INSERT INTO TabUserCred (password, idUser)
-            VALUES (?, ?)`,
+        const insertCred = await db.query(`
+            INSERT INTO dbo."tabUserCred" (password, idUser)
+            VALUES ($1, $2)`,
             [senhaPura, newUserId]
         );
 
-        await db.run('COMMIT'); //confirma a transação
+        await db.query('COMMIT'); //confirma a transação
         return res.status(201).json({ message: 'Usuário cadastrado com sucesso! ' })
     }
 
     catch (error) {
         //se qualquer await falhar
-        await db.run('ROLLBACK'); //desfaz a transação
+        await db.query('ROLLBACK'); //desfaz a transação
+        console.error('Erro ao inserir o usuário:', error);
         return res.status(500).json({ error: 'Erro ao inserir o usuário.' })
-    }
 
-    finally { //finally usando para executar um codigo mesmo após o return do try e catch
-        db.close(); //fecha a conexão com o banco de dados
     }
 }
 
 //#endregion
-

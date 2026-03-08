@@ -31,20 +31,15 @@ export const useUsuarios = () => {
   const getUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const allUsers = await usuariosService.listarTodos();
+      // Passa o status baseado na aba ativa
+      const status = activeTab === 'ativos' ? 'on' : 'off';
+      const allUsers = await usuariosService.listarTodos(status);
 
       // Mapeia o campo 'ativo' do banco para 'status' que o frontend usa
-      let processedUsers = allUsers.map(user => ({
+      const processedUsers = allUsers.map(user => ({
         ...user,
         status: user.ativo ? 'on' : 'off'
       })).sort((a, b) => (a.nome > b.nome ? 1 : -1));
-
-      // Filtrar baseado na aba ativa
-      if (activeTab === 'ativos') {
-        processedUsers = processedUsers.filter(user => user.ativo === true);
-      } else {
-        processedUsers = processedUsers.filter(user => user.ativo === false);
-      }
 
       setUsers(processedUsers);
     } catch (error) {
