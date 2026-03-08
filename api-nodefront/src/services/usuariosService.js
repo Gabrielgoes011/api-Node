@@ -1,0 +1,48 @@
+import axios from 'axios';
+
+const API_URL = 'http://localhost:3000';
+
+export const usuariosService = {
+  // Listar todos os usuários
+  listarTodos: async () => {
+    try {
+      const res = await axios.get(`${API_URL}/users`);
+      if (!Array.isArray(res.data)) {
+        throw new Error('Resposta da API não é um array');
+      }
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Criar novo usuário
+  criar: async (usuarioData) => {
+    try {
+      const res = await axios.post(`${API_URL}/cadUsers`, usuarioData);
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Atualizar usuário
+  atualizar: async (id, usuarioData) => {
+    try {
+      const res = await axios.put(`${API_URL}/users/update/${id}`, usuarioData);
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // Deletar usuário
+  deletar: async (id) => {
+    try {
+      const res = await axios.delete(`${API_URL}/users/delete/${id}`);
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+};

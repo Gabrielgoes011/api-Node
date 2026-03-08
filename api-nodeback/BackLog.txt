@@ -1,0 +1,62 @@
+# Backlog de Migração e Evolução (PostgreSQL)
+
+Este arquivo guia a migração do SQLite para o PostgreSQL (Neon) e as próximas funcionalidades.
+
+---
+
+### 📚 Guia Rápido: O que muda do SQLite para PostgreSQL?
+
+1.  **Comando Universal:**
+    *   SQLite: Usava `db.run` (inserir), `db.get` (buscar um), `db.all` (buscar todos).
+    *   Postgres: Usa **`db.query(...)`** para TUDO.
+
+2.  **Variáveis na Query:**
+    *   SQLite: Usava `?` (ex: `WHERE id = ?`).
+    *   Postgres: Usa **`$1, $2, $3...`** na ordem do array (ex: `WHERE id = $1`).
+
+3.  **Pegando Resultados:**
+    *   SQLite: Retornava o objeto direto.
+    *   Postgres: Retorna um objeto completo. Os dados reais estão em **`resultado.rows`**.
+        *   Lista: `resultado.rows`
+        *   Único item: `resultado.rows[0]`
+
+4.  **Inserindo e Pegando ID (INSERT):**
+    *   SQLite: Usava `this.lastID`.
+    *   Postgres: Adicione **`RETURNING id`** no final do SQL. O ID virá em `resultado.rows[0].id`.
+
+5.  **Fechar Conexão:**
+    *   SQLite: Precisava fechar arquivo.
+    *   Postgres: **NÃO feche** o `pool` dentro das rotas (`db.end()` ou `pool.end()`). O `pool` gerencia as conexões abertas e as reutiliza automaticamente. Só fechamos se desligarmos o servidor.
+
+6.  **Transações (Begin/Commit):**
+    *   Postgres: Para transações, você não usa `pool.query` direto. Você precisa fazer:
+        `const client = await pool.connect();`
+        `await client.query('BEGIN');`
+        `... queries usando client ...`
+        `await client.query('COMMIT');`
+        `client.release();` (Libera a conexão de volta pro pool).
+
+---
+
+### 🚀 Fase 1: CRUD Completo no PostgreSQL (Foco Atual)
+
+-   **[x] Configuração Inicial:**
+    -   Instalar `pg` e `dotenv`.
+    -   Configurar `configDb.js` com `Pool` e SSL (Neon).
+
+-   **[x] Criação de Tabelas:**
+    -   Script `setup.js` criado para gerar `TabUser` e `TabUserCred`.
+
+-   **[ ] Refatorar Controllers (Sintaxe SQL):**
+    -   **[x] `get.js` (Listagem):** Refatorado para `db.query`.
+    -   **[ ] `post.js` (Cadastro):** Mudar `db.run` para `db.query`. Usar `RETURNING id`. Ajustar transação.
+    -   **[ ] `put.js` (Atualizar/Inativar):** Atualizar sintaxe para PostgreSQL.
+    -   **[ ] `delete.js` (Excluir):** Atualizar sintaxe para PostgreSQL.
+
+### 🔮 Fase 2: Autenticação e Segurança (Futuro)
+
+-   **[ ] Implementar Login:**
+    -   Mover para novo controller (`src/controler/auth/login.js`).
+    -   Refatorar para PostgreSQL.
+    -   Gerar Token JWT.
+-   **[ ] Criptografia:** Usar `bcrypt` para senhas.
