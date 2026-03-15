@@ -120,7 +120,8 @@ const TableAcoes = ({
                   fontSize: tamanhoFontHead, 
                   textAlign: 'center', 
                   width: '200px',
-                  backgroundColor: '#f8f9fa'
+                  backgroundColor: '#f8f9fa',
+                  borderLeft: '1px solid #dee2e6'
                 }}>
                   Ações
                 </th>
@@ -150,14 +151,16 @@ const TableAcoes = ({
               {(usaVisualizar || usaEditar || usaExcluir || usaResetarSenha || usaInativar || usaReativar) && (
                 <td style={{ 
                   textAlign: 'center', 
-                  padding: '8px 4px',
+                  padding: paddingBody,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '6px',
                   flexWrap: 'nowrap',
                   whiteSpace: 'nowrap',
-                  minWidth: '200px'
+                  minWidth: '200px',
+                  minHeight: '50px',
+                  borderLeft: '1px solid #dee2e6'
                 }}>
                   {usaVisualizar && acaoVisualizar && (
                     <button

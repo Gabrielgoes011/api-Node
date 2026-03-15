@@ -1,4 +1,4 @@
-import { openDb } from '../../configDb.js';
+import { openDb } from '../../config/configDb.js';
 import { validaEmailExistente } from '../validacoes/validaUser.js';
 import { success, error, custom, serverError } from '../../utils/httpResponse.js';
 
@@ -25,16 +25,16 @@ export async function atualizarUser(req, res) {
     return res.status(400).json({ status: 400, message: 'Email inválido !' });
   }
 
-  if (email) {//verifica se o email já existe no banco de dados
+  //verifica se o email já existe no banco de dados
+  if (email) {
     const existeEmail = await validaEmailExistente(email, db);
-    if (existeEmail && existeEmail.id != id) {//se o email existir e for diferente do id do usuário que está ///sendo atualizado
-      return req.res.status(400).json({ status: 400, message: 'Email já cadastrado !' });
+    //se o email existir e for diferente do id do usuário que está sendo atualizado, retorna erro de email já cadastrado
+    if (existeEmail && existeEmail.id != id) {
+      return res.status(400).json({ status: 400, message: 'Email já cadastrado !' });
     }
   }
 
   try {
-    const db = await openDb(); //abre a conexão com o banco de dados
-
     // Converte status 'on'/'off' para booleano
     const ativo = status === 'on' ? true : (status === 'off' ? false : undefined);
 
@@ -74,43 +74,49 @@ export async function atualizarUser(req, res) {
 
 
 
-//#region - Inativa User
+//#region - Inativa ou Reativa User
 
-export async function inativaUser(req, res) {
-
-  const { id } = req.params //pega o id da url da req
-  const { valorAtivo } = req.body //pega o valor do body da req
-
-  // Garante que qualquer valor "truthy" vire 1, senão 0
-  const statusFinal = Number(Boolean(valorAtivo));
-
-  if (statusFinal !== 0 && statusFinal !== 1) {
-    return res.status(400).json({ status: 400, message: 'Status inválido!' });
-  }
-
-  // abre a conexão com banco
-  const db = await openDb()
+export async function inativaReativaUser(req, res) {
+  const { id } = req.params;
+  const db = await openDb();
 
   try {
-    const sql = await db.run(
-      `UPDATE TabUser
-       SET Ativo = ?
-       WHERE id = ?`, [statusFinal, id]
+    // Busca o usuário para verificar existência e status atual
+    const resultado = await db.query(`
+      SELECT id, ativo 
+      FROM dbo."tabUser"
+      WHERE id = $1 `, [id]
     );
 
-    if (sql.changes === 0) { // Verifica se algum registro foi atualizado
-      return res.status(404).json({ status: 404, message: 'Usuário não encontrado.' });
+    if (resultado.rows.length === 0) {
+      return res.status(404).json({ status: 404, message: 'Usuário não encontrado!' });
     }
 
-    return res.status(200).json(
-      {
-        status: 200,
-        message: 'Usuário atualizado com sucesso!'
-      }
+    const usuario = resultado.rows[0];
+    // Inverte o status atual (se true vira false, se false vira true)
+    const novoStatus = !usuario.ativo;
+    const msg = novoStatus ? 'Usuário reativado com sucesso!' : 'Usuário inativado com sucesso!';
+
+    // Executa o update
+    const update = await db.query(
+      `UPDATE dbo."tabUser"
+       SET ativo = $1
+       WHERE id = $2`, [novoStatus, id]
     );
+
+    if (update.rowCount === 0) {
+      return res.status(400).json({ status: 400, message: 'Não foi possível atualizar o status.' });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: msg,
+      ativo: novoStatus
+    });
+
   } catch (error) {
-    console.error('Erro ao inativar o usuário:', error);
-    return res.status(400).json({ status: 400, message: 'Erro ao inativar o usuário.' });
+    console.error('Erro ao alterar status do usuário:', error);
+    return res.status(500).json({ status: 500, message: 'Erro interno ao processar solicitação.' });
   }
 }
-//#end region
+//#endregion

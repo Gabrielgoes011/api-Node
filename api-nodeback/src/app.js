@@ -1,9 +1,9 @@
 
-import { openDb } from './configDb.js';    //importa a função openDb do arquivo configDb.js
+import { openDb } from './config/configDb.js';    //importa a função openDb do arquivo configDb.js
 import { contarUsuarios, listarUsuarios } from './controler/usuarios/get.js'; //importa a função listarUsuarios do arquivo Get.js
 import { cadastrarUser } from './controler/usuarios/post.js'; //importa a função cadastrarUser do arquivo Post.js
 import { deleteUser } from './controler/usuarios/delete.js'; //importa a função deleteUser do arquivo Delete.js
-import { atualizarUser, inativaUser } from './controler/usuarios/put.js'; //importa a função putUser do arquivo Put.js
+import { atualizarUser, inativaReativaUser } from './controler/usuarios/put.js'; //importa a função putUser do arquivo Put.js
 import express from 'express'; //importa a biblioteca express
 import cors from 'cors'; // importa a biblioteca cors
 const app = express(); //cria uma aplicação express
@@ -45,7 +45,7 @@ app.post('/cadUsers', cadastrarUser); //chama a função cadastrarUser
 
 //#region inativa Usuário
 //post inativa user
-app.put('/inativaUser/:id', inativaUser); //chama a função cadastrarUser
+app.put('/inativaUser/:id', inativaReativaUser); //chama a função cadastrarUser
 //#endregion
 
 

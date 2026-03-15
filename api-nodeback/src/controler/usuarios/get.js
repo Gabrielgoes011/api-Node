@@ -1,4 +1,4 @@
-import { openDb } from "../../configDb.js"
+import { openDb } from "../../config/configDb.js"
 
 
 //#region função listarUsuarios - lista usuarios (ativos/inativos)

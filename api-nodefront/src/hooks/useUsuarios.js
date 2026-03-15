@@ -16,7 +16,8 @@ export const useUsuarios = () => {
     email: '',
     cpf: '',
     senha: '',
-    confirmaSenha: ''
+    confirmaSenha: '',
+    foto: null
   });
 
   // Estados para o modal de confirmação
@@ -90,10 +91,7 @@ export const useUsuarios = () => {
   // Inativar usuário
   const handleInactivateUser = async (user) => {
     try {
-      await usuariosService.atualizar(user.id, {
-        ...user,
-        status: 'off'
-      });
+      await usuariosService.inativarReativar(user.id);
       toast.success('Usuário inativado com sucesso!');
       getUsers();
     } catch (error) {
@@ -104,10 +102,7 @@ export const useUsuarios = () => {
   // Reativar usuário
   const handleReactivateUser = async (user) => {
     try {
-      await usuariosService.atualizar(user.id, {
-        ...user,
-        status: 'on'
-      });
+      await usuariosService.inativarReativar(user.id);
       toast.success('Usuário reativado com sucesso!');
       getUsers();
     } catch (error) {
@@ -131,7 +126,8 @@ export const useUsuarios = () => {
       email: user.email,
       cpf: user.cpf,
       senha: '',
-      confirmaSenha: ''
+      confirmaSenha: '',
+      foto: user.foto || null
     });
     setShowFormModal(true);
   };
@@ -177,7 +173,8 @@ export const useUsuarios = () => {
       email: '',
       cpf: '',
       senha: '',
-      confirmaSenha: ''
+      confirmaSenha: '',
+      foto: null
     });
   };
 

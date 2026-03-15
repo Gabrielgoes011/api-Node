@@ -36,10 +36,10 @@ export const usuariosService = {
     }
   },
 
-  // Deletar usuário
-  deletar: async (id) => {
+  // Inativar/Reativar usuário
+  inativarReativar: async (id) => {
     try {
-      const res = await axios.delete(`${API_URL}/users/delete/${id}`);
+      const res = await axios.put(`${API_URL}/inativaUser/${id}`);
       return res.data;
     } catch (error) {
       throw error;

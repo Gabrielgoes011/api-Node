@@ -10,13 +10,13 @@ const pool = new Pool({
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
-    ssl: true // Obrigatório para conexão com Neon (PostgreSQL na nuvem)
+    ssl: { rejectUnauthorized: false }, // Ajuste para SSL sem rejeitar certificados não autorizados
+    idleTimeoutMillis: 30000, // Fecha conexões ociosas após 30s
+    connectionTimeoutMillis: 2000, // Timeout de conexão de 2s
 });
 
-// Teste de conexão ao iniciar (opcional, mas bom para debug)
-pool.connect()
-    .then(() => console.log('✅ Conectado ao PostgreSQL com sucesso!'))
-    .catch(err => console.error('❌ Erro ao conectar no PostgreSQL:', err));
+// Teste de conexão ao iniciar (removido para evitar erros desnecessários - o pool conecta automaticamente)
+console.log('🔄 Pool de conexões PostgreSQL configurado. Conexões serão estabelecidas conforme necessário.');
 
 // Função wrapper para manter compatibilidade com o código que usa openDb()
 export async function openDb() {

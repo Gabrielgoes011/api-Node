@@ -1,4 +1,4 @@
-import { openDb } from '../../configDb.js';
+import { openDb } from '../../config/configDb.js';
 
 
 //#region Função para cadastar usuarios Cadastrar Usuario

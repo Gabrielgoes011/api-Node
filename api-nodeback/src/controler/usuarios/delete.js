@@ -1,4 +1,4 @@
-import { openDb } from "../../configDb.js";
+import { openDb } from "../../config/configDb.js";
 import { buscaUserId } from "./get.js";
 
 
@@ -25,7 +25,7 @@ export async function deleteUser(req, res) {
         FROM TabUserCred
         WHERE idUser = ? `, [idUser]
         );
-        
+
         const delUser = await db.run(`
         DELETE 
         FROM TabUser
