@@ -1,9 +1,14 @@
 import React from 'react';
-import { FaHome, FaUsers, FaCog, FaCircle, FaSignOutAlt } from 'react-icons/fa';
+import { FaHome, FaUsers, FaCog, FaCircle, FaSignOutAlt, FaMoneyBillAlt, FaMoneyBillWaveAlt } from 'react-icons/fa';
 
 function Sidebar({ currentPage, onNavigate }) {
   const menuItems = [
     { id: 'dashboard', label: 'Início', icon: FaHome },
+    { id: 'ControleAtivos', label: 'Controle de ativos', icon: FaMoneyBillAlt },
+    { id: 'Rendimentos', label: 'Rendimentos', icon: FaMoneyBillWaveAlt  },
+    { id: 'Precificacao', label: 'Precificacao', icon: FaUsers },
+    { id: 'Operacoes', label: 'Operacoes', icon: FaUsers },
+    { id: 'Relatorios', label: 'Relatórios', icon: FaUsers },
     { id: 'usuarios', label: 'Usuários', icon: FaUsers },
     { id: 'configuracoes', label: 'Configurações', icon: FaCog }
   ];
