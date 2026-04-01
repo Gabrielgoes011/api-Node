@@ -12,12 +12,16 @@ export const useUsuarios = () => {
   // Estados para o formulário
   const [formData, setFormData] = useState({
     nome: '',
-    idade: '',
+    dataNascimento: '',
     email: '',
     cpf: '',
-    senha: '',
-    confirmaSenha: '',
     foto: null
+  });
+
+  const [dashboard, setDashboard] = useState({
+    ativos: 0,
+    inativos: 0,
+    total: 0
   });
 
   // Estados para o modal de confirmação
@@ -50,6 +54,21 @@ export const useUsuarios = () => {
       setLoading(false);
     }
   }, [activeTab]);
+
+  // Função para buscar contagem do dashboard
+  const getDashboard = useCallback(async () => {
+    try {
+      const result = await usuariosService.contar();
+      setDashboard({
+        ativos: result.ativos ?? 0,
+        inativos: result.inativos ?? 0,
+        total: result.total ?? 0
+      });
+    } catch (error) {
+      toast.error('Erro ao carregar contagem de usuários');
+      console.error(error);
+    }
+  }, []);
 
   // Adicionar usuário
   const handleAddUser = async (novoUsuario) => {
@@ -122,11 +141,9 @@ export const useUsuarios = () => {
     setOnEdit(user);
     setFormData({
       nome: user.nome,
-      idade: user.idade,
+      dataNascimento: user.dataNascimento || '',
       email: user.email,
       cpf: user.cpf,
-      senha: '',
-      confirmaSenha: '',
       foto: user.foto || null
     });
     setShowFormModal(true);
@@ -169,11 +186,9 @@ export const useUsuarios = () => {
   const resetForm = () => {
     setFormData({
       nome: '',
-      idade: '',
+      dataNascimento: '',
       email: '',
       cpf: '',
-      senha: '',
-      confirmaSenha: '',
       foto: null
     });
   };
@@ -203,8 +218,12 @@ export const useUsuarios = () => {
     setShowModal,
     setShowFormModal,
 
+    // Métricas
+    dashboard,
+
     // Métodos
     getUsers,
+    getDashboard,
     handleAddUser,
     handleUpdateUser,
     handleDeleteUser,

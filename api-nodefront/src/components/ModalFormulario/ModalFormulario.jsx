@@ -3,7 +3,7 @@ import { FaUser, FaCamera } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
 function ModalFormulario({ onClose, onSubmit, isEditing, formData, setFormData }) {
-  const [fotoPreview, setFotoPreview] = useState(formData.foto || null);
+  const [fotoPreview] = useState(formData.foto || null);
   const fileInputRef = useRef(null);
 
   return (
@@ -90,10 +90,10 @@ function ModalFormulario({ onClose, onSubmit, isEditing, formData, setFormData }
 
           <div style={{ display: 'flex', gap: '10px' }}>
             <input
-              type="number"
-              placeholder="Idade"
-              value={formData.idade}
-              onChange={(e) => setFormData({ ...formData, idade: e.target.value })}
+              type="text"
+              placeholder="Data de Nascimento (DD/MM/AAAA)"
+              value={formData.dataNascimento}
+              onChange={(e) => setFormData({ ...formData, dataNascimento: e.target.value })}
               style={{ padding: '12px', fontSize: '16px', width: '100%', boxSizing: 'border-box', borderRadius: '5px', border: '1px solid #ccc' }}
             />
             <input
@@ -112,26 +112,6 @@ function ModalFormulario({ onClose, onSubmit, isEditing, formData, setFormData }
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             style={{ padding: '12px', fontSize: '16px', width: '100%', boxSizing: 'border-box', borderRadius: '5px', border: '1px solid #ccc' }}
           />
-
-          {!isEditing && (
-            <>
-              <input
-                type="password"
-                placeholder="Senha"
-                value={formData.senha}
-                onChange={(e) => setFormData({ ...formData, senha: e.target.value })}
-                style={{ padding: '12px', fontSize: '16px', width: '100%', boxSizing: 'border-box', borderRadius: '5px', border: '1px solid #ccc' }}
-              />
-
-              <input
-                type="password"
-                placeholder="Confirme a Senha"
-                value={formData.confirmaSenha}
-                onChange={(e) => setFormData({ ...formData, confirmaSenha: e.target.value })}
-                style={{ padding: '12px', fontSize: '16px', width: '100%', boxSizing: 'border-box', borderRadius: '5px', border: '1px solid #ccc' }}
-              />
-            </>
-          )}
 
           <button
             type="submit"

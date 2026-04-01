@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Layout from './components/Layout/Layout';
 import PaginaDashboard from './pages/Dashboard';
-import PaginaUsuarios from './pages/Usuarios';
+import PaginaUsuarios from './pages/cadastros/Usuarios';
 import PaginaConfiguracoes from './pages/Configuracoes';
 import PaginaControleAtivos from './pages/controleAtivos/controleAtivos';
 import PaginaRendimentos from './pages/rendimentos/rendimentos';
