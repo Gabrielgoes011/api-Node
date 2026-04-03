@@ -8,6 +8,10 @@ import PaginaRendimentos from './pages/rendimentos/rendimentos';
 import PaginaPrecificacao from './pages/precificacao/precificacao';
 import PaginaOperacoes from './pages/operacoes/operacoes';
 import PaginaRelatorios from './pages/relatorios/relatorios';
+import PaginaSeguimentos from './pages/cadastros/seguimentos/seguimentos';
+import PaginaMeusFiis from './pages/cadastros/meusFundos/meusFiis';
+
+
 
 import './styles/global.css';
 
@@ -31,6 +35,10 @@ function App() {
         return <PaginaRelatorios />;
       case 'usuarios':
         return <PaginaUsuarios />;
+      case 'seguimentos':
+        return <PaginaSeguimentos />;
+      case 'meusFiis':
+        return <PaginaMeusFiis />;
       case 'configuracoes':
         return <PaginaConfiguracoes />;
       default:

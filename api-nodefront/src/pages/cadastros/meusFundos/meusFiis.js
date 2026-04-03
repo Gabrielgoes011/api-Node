@@ -1,6 +1,6 @@
 import React from 'react';
 
-function PaginaControleAtivos() {
+function PaginaMeusFiis() {
   return (
     <div style={{ marginTop: '60px' }}>
       <div style={{
@@ -9,7 +9,7 @@ function PaginaControleAtivos() {
         borderRadius: '10px',
         boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
       }}>
-        <h1 style={{ color: '#2c3e50', marginBottom: '20px' }}>⚙️ Controle de Ativos</h1>
+        <h1 style={{ color: '#2c3e50', marginBottom: '20px' }}>⚙️ Meus FIIS</h1>
         <p style={{ color: '#7f8c8d', fontSize: '18px' }}>
           Seção de cadastros de FIIS em desenvolvimento...
         </p>
@@ -18,4 +18,4 @@ function PaginaControleAtivos() {
   );
 }
 
-export default PaginaControleAtivos;
+export default PaginaMeusFiis;

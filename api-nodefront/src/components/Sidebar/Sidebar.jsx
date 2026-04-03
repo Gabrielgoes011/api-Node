@@ -212,10 +212,10 @@ function Sidebar({ currentPage, onNavigate, isOpen, onToggle }) {
                     {cadastrosOpen && isOpen && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginLeft: '5px', marginBottom: '8px' }}>
                         <button
-                          onClick={() => onNavigate('meusFundos')}
+                          onClick={() => onNavigate('meusFiis')}
                           style={{
-                            color: currentPage === 'meusFundos' ? '#1d4ed8' : '#ecf0f1',
-                            backgroundColor: currentPage === 'meusFundos' ? '#ebf4ff' : 'transparent',
+                            color: currentPage === 'meusFiis' ? '#1d4ed8' : '#ecf0f1',
+                            backgroundColor: currentPage === 'meusFiis' ? '#ebf4ff' : 'transparent',
                             border: 'none',
                             borderRadius: '6px',
                             padding: '8px 10px',
