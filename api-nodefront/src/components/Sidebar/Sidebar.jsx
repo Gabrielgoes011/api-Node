@@ -123,138 +123,143 @@ function Sidebar({ currentPage, onNavigate, isOpen, onToggle }) {
 
         {/* Menu */}
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
-          {menuItems.map((item) => {
+          {menuItems.map((item, index) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id;
             return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  onNavigate(item.id);
-                }}
-                title={!isOpen ? item.label : ''}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: isOpen ? '12px' : '0px',
-                  padding: '12px 15px',
-                  backgroundColor: isActive ? '#3498db' : 'transparent',
-                  color: isActive ? '#fff' : '#bdc3c7',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: isActive ? 'bold' : 'normal',
-                  transition: 'all 0.3s ease',
-                  borderLeft: isActive ? '4px solid #fff' : '4px solid transparent',
-                  justifyContent: isOpen ? 'flex-start' : 'center',
-                  whiteSpace: 'nowrap'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.target.style.backgroundColor = '#34495e';
-                    e.target.style.color = '#ecf0f1';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.target.style.backgroundColor = 'transparent';
-                    e.target.style.color = '#bdc3c7';
-                  }
-                }}
-              >
-                <Icon size={20} />
-                {isOpen && <span>{item.label}</span>}
-              </button>
+              <React.Fragment key={item.id}>
+                <button
+                  onClick={() => {
+                    onNavigate(item.id);
+                  }}
+                  title={!isOpen ? item.label : ''}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: isOpen ? '12px' : '0px',
+                    padding: '12px 15px',
+                    backgroundColor: isActive ? '#3498db' : 'transparent',
+                    color: isActive ? '#fff' : '#bdc3c7',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                    fontWeight: isActive ? 'bold' : 'normal',
+                    transition: 'all 0.3s ease',
+                    borderLeft: isActive ? '4px solid #fff' : '4px solid transparent',
+                    justifyContent: isOpen ? 'flex-start' : 'center',
+                    whiteSpace: 'nowrap'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.target.style.backgroundColor = '#34495e';
+                      e.target.style.color = '#ecf0f1';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.target.style.backgroundColor = 'transparent';
+                      e.target.style.color = '#bdc3c7';
+                    }
+                  }}
+                >
+                  <Icon size={20} />
+                  {isOpen && <span>{item.label}</span>}
+                </button>
+
+                {index === 0 && (
+                  <>
+                    <button
+                      onClick={() => setCadastrosOpen(!cadastrosOpen)}
+                      title={!isOpen ? 'Cadastros' : ''}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: isOpen ? '12px' : '0px',
+                        padding: '12px 15px',
+                        backgroundColor: cadastrosOpen ? '#3498db' : 'transparent',
+                        color: cadastrosOpen ? '#fff' : '#bdc3c7',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        fontWeight: cadastrosOpen ? 'bold' : 'normal',
+                        transition: 'all 0.3s ease',
+                        borderLeft: cadastrosOpen ? '4px solid #fff' : '4px solid transparent',
+                        justifyContent: isOpen ? 'space-between' : 'center',
+                        whiteSpace: 'nowrap'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!cadastrosOpen) {
+                          e.target.style.backgroundColor = '#34495e';
+                          e.target.style.color = '#ecf0f1';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!cadastrosOpen) {
+                          e.target.style.backgroundColor = 'transparent';
+                          e.target.style.color = '#bdc3c7';
+                        }
+                      }}
+                    >
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <FaFolder size={20} />
+                        {isOpen && <span>Cadastros</span>}
+                      </span>
+                      {isOpen && (cadastrosOpen ? <FaChevronUp size={16} /> : <FaChevronDown size={16} />)}
+                    </button>
+
+                    {cadastrosOpen && isOpen && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginLeft: '5px', marginBottom: '8px' }}>
+                        <button
+                          onClick={() => onNavigate('meusFundos')}
+                          style={{
+                            color: currentPage === 'meusFundos' ? '#1d4ed8' : '#ecf0f1',
+                            backgroundColor: currentPage === 'meusFundos' ? '#ebf4ff' : 'transparent',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '8px 10px',
+                            textAlign: 'left',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Meus Fundos
+                        </button>
+                        <button
+                          onClick={() => onNavigate('seguimentos')}
+                          style={{
+                            color: currentPage === 'seguimentos' ? '#1d4ed8' : '#ecf0f1',
+                            backgroundColor: currentPage === 'seguimentos' ? '#ebf4ff' : 'transparent',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '8px 10px',
+                            textAlign: 'left',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Segmentos
+                        </button>
+                        <button
+                          onClick={() => onNavigate('usuarios')}
+                          style={{
+                            color: currentPage === 'usuarios' ? '#1d4ed8' : '#ecf0f1',
+                            backgroundColor: currentPage === 'usuarios' ? '#ebf4ff' : 'transparent',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '8px 10px',
+                            textAlign: 'left',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Usuários
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </React.Fragment>
             );
           })}
-
-          <button
-            onClick={() => setCadastrosOpen(!cadastrosOpen)}
-            title={!isOpen ? 'Cadastros' : ''}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: isOpen ? '12px' : '0px',
-              padding: '12px 15px',
-              backgroundColor: cadastrosOpen ? '#3498db' : 'transparent',
-              color: cadastrosOpen ? '#fff' : '#bdc3c7',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: cadastrosOpen ? 'bold' : 'normal',
-              transition: 'all 0.3s ease',
-              borderLeft: cadastrosOpen ? '4px solid #fff' : '4px solid transparent',
-              justifyContent: isOpen ? 'space-between' : 'center',
-              whiteSpace: 'nowrap'
-            }}
-            onMouseEnter={(e) => {
-              if (!cadastrosOpen) {
-                e.target.style.backgroundColor = '#34495e';
-                e.target.style.color = '#ecf0f1';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!cadastrosOpen) {
-                e.target.style.backgroundColor = 'transparent';
-                e.target.style.color = '#bdc3c7';
-              }
-            }}
-          >
-            <span style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <FaFolder size={20} />
-              {isOpen && <span>Cadastros</span>}
-            </span>
-            {isOpen && (cadastrosOpen ? <FaChevronUp size={16} /> : <FaChevronDown size={16} />)}
-          </button>
-
-          {cadastrosOpen && isOpen && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginLeft: '5px', marginBottom: '8px' }}>
-              <button
-                onClick={() => onNavigate('meusFundos')}
-                style={{
-                  color: currentPage === 'meusFundos' ? '#1d4ed8' : '#ecf0f1',
-                  backgroundColor: currentPage === 'meusFundos' ? '#ebf4ff' : 'transparent',
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '8px 10px',
-                  textAlign: 'left',
-                  cursor: 'pointer'
-                }}
-              >
-                Meus Fundos
-              </button>
-              <button
-                onClick={() => onNavigate('seguimentos')}
-                style={{
-                  color: currentPage === 'seguimentos' ? '#1d4ed8' : '#ecf0f1',
-                  backgroundColor: currentPage === 'seguimentos' ? '#ebf4ff' : 'transparent',
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '8px 10px',
-                  textAlign: 'left',
-                  cursor: 'pointer'
-                }}
-              >
-                Segmentos
-              </button>
-              <button
-                onClick={() => onNavigate('usuarios')}
-                style={{
-                  color: currentPage === 'usuarios' ? '#1d4ed8' : '#ecf0f1',
-                  backgroundColor: currentPage === 'usuarios' ? '#ebf4ff' : 'transparent',
-                  border: 'none',
-                  borderRadius: '6px',
-                  padding: '8px 10px',
-                  textAlign: 'left',
-                  cursor: 'pointer'
-                }}
-              >
-                Usuários
-              </button>
-            </div>
-          )}
       </nav>
 
       {/* Logout Button - Parte inferior */}
