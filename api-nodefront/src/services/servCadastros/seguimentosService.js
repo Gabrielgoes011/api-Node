@@ -3,11 +3,10 @@ import axios from 'axios';
 const API_URL = 'http://localhost:3000';
 
 export const seguimentosService = {
-  // Listar todos os segmentos
+  // Listar todos os seguimentos
   listarTodos: async () => {
     try {
       const res = await axios.get(`${API_URL}/seguimentos`);
-      // Tratamento temporário caso a API retorne a contagem em vez de array neste momento
       if (!Array.isArray(res.data)) {
         return [];
       }
@@ -17,7 +16,7 @@ export const seguimentosService = {
     }
   },
 
-  // Criar novo segmento
+  // Criar novo seguimento
   criar: async (seguimentoData) => {
     try {
       const res = await axios.post(`${API_URL}/seguimentos`, seguimentoData);
@@ -27,7 +26,7 @@ export const seguimentosService = {
     }
   },
 
-  // Atualizar segmento
+  // Atualizar seguimento
   atualizar: async (id, seguimentoData) => {
     try {
       const res = await axios.put(`${API_URL}/seguimentos/update/${id}`, seguimentoData);
@@ -37,7 +36,7 @@ export const seguimentosService = {
     }
   },
 
-  // Inativar/Reativar segmento
+  // Inativar/Reativar seguimento
   inativarReativar: async (id) => {
     try {
       const res = await axios.put(`${API_URL}/seguimentos/inativaReativa/${id}`);
@@ -47,7 +46,7 @@ export const seguimentosService = {
     }
   },
 
-  // Excluir segmento
+  // Excluir seguimento
   excluir: async (id) => {
     try {
       const res = await axios.delete(`${API_URL}/seguimentos/delete/${id}`);
@@ -57,7 +56,7 @@ export const seguimentosService = {
     }
   },
 
-  // Contagem de segmentos para dashboard
+  // Contagem de seguimentos para dashboard
   contar: async () => {
     try {
       const res = await axios.get(`${API_URL}/seguimentos/contar`);

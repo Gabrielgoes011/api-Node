@@ -27,8 +27,9 @@ export const useSeguimentos = () => {
   const getDashboard = useCallback(async () => {
     try {
       const data = await seguimentosService.contar();
+      const totalCount = Array.isArray(data) ? data.length : (Number(data.total) || Number(data.ativos) || 0);
       setDashboard({
-        total: data.total || data.ativos || 0 // Usando fallback caso o backend retorne 'ativos'
+        total: totalCount
       });
     } catch (error) {
       console.error('Erro ao buscar dashboard:', error);
@@ -38,24 +39,24 @@ export const useSeguimentos = () => {
   const handleAddSeguimento = async (data) => {
     try {
       await seguimentosService.criar(data);
-      toast.success('Segmento cadastrado com sucesso!');
+      toast.success('Seguimento cadastrado com sucesso!');
       closeFormModal();
       getSeguimentos();
       getDashboard();
     } catch (error) {
-      toast.error(error.response?.data?.error || error.response?.data || 'Erro ao cadastrar segmento.');
+      toast.error(error.response?.data?.error || error.response?.data || 'Erro ao cadastrar seguimento.');
     }
   };
 
   const handleUpdateSeguimento = async (data) => {
     try {
       await seguimentosService.atualizar(onEdit.id, data);
-      toast.success('Segmento atualizado com sucesso!');
+      toast.success('Seguimento atualizado com sucesso!');
       closeFormModal();
       getSeguimentos();
       getDashboard();
     } catch (error) {
-      toast.error(error.response?.data?.error || error.response?.data || 'Erro ao atualizar segmento.');
+      toast.error(error.response?.data?.error || error.response?.data || 'Erro ao atualizar seguimento.');
     }
   };
 
@@ -65,12 +66,12 @@ export const useSeguimentos = () => {
     try {
       if (modalAction === 'delete') {
         await seguimentosService.excluir(itemSelected.id);
-        toast.success('Segmento excluído com sucesso!');
+        toast.success('Seguimento excluído com sucesso!');
       }
       getSeguimentos();
       getDashboard();
     } catch (error) {
-      toast.error(`Erro ao processar ação no segmento.`);
+      toast.error(error.response?.data?.error || `Erro ao excluir o seguimento.`);
     }
 
     setShowModal(false);
