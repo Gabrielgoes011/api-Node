@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Table } from 'react-bootstrap';
-import { FaEye, FaEdit, FaTrashAlt, FaKey, FaPowerOff, FaPlay, FaTimes } from 'react-icons/fa';
+import { AiOutlineEye, AiOutlineEdit, AiOutlineDelete, AiOutlineKey, AiOutlinePoweroff, AiOutlinePlayCircle, AiOutlineClose } from 'react-icons/ai';
 
 // Interface ITabela (documentação):
 // titulo: string - título da coluna
@@ -59,6 +58,7 @@ const TableAcoes = ({
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [buscar, setBuscar] = useState('');
+  const [currentItemsPerPage, setCurrentItemsPerPage] = useState(itemsPerPage);
 
   // Filtragem simples
   const filteredData = data.filter((item) => {
@@ -71,76 +71,85 @@ const TableAcoes = ({
   });
 
   // Paginação simples
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
+  const activeItemsPerPage = Number(currentItemsPerPage) || 10;
+  const totalPages = Math.ceil(filteredData.length / activeItemsPerPage);
+  const startIndex = (currentPage - 1) * activeItemsPerPage;
+  const paginatedData = filteredData.slice(startIndex, startIndex + activeItemsPerPage);
 
   return (
-    <div>
-      {/* Campo de busca */}
-      <div style={{ marginBottom: '10px', display: 'flex', gap: '10px', alignItems: 'center' }}>
-        <input
-          type="text"
-          placeholder={labelpesquisa}
-          value={buscar}
-          onChange={(e) => setBuscar(e.target.value)}
-          style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px', flex: 1 }}
-        />
-        {buscar && (
-          <button
-            onClick={() => setBuscar('')}
-            style={{ padding: '8px', background: '#f8f9fa', border: '1px solid #ccc', borderRadius: '4px' }}
-          >
-            <FaTimes />
-          </button>
-        )}
-      </div>
+    <div style={{ fontFamily: 'sans-serif' }}>
+        {/* Campo de busca */}
+      <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '10px', alignItems: 'center', backgroundColor: '#ffffff', padding: '1rem', borderRadius: '0.75rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0' }}>
+          <input
+            type="text"
+            placeholder={labelpesquisa}
+            value={buscar}
+            onChange={(e) => setBuscar(e.target.value)}
+            style={{ padding: '0.5rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', flex: 1, outline: 'none', color: '#334155', fontSize: '14px' }}
+          />
+          {buscar && (
+            <button
+              onClick={() => setBuscar('')}
+              style={{ padding: '0.5rem', background: '#f1f5f9', border: 'none', borderRadius: '0.375rem', color: '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              title="Limpar busca"
+            >
+              <AiOutlineClose size={18} />
+            </button>
+          )}
+        </div>
 
       {/* Tabela */}
-      <div style={{ overflowX: 'auto', width: '100%' }}>
-        <Table striped bordered hover style={{ width: '100%', tableLayout: 'fixed', marginBottom: 0, borderCollapse: 'collapse' }}>
+      <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <div style={{ overflowX: 'auto', width: '100%' }}>
+          <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
           <thead>
-            <tr>
+              <tr style={{ backgroundColor: '#dbeafe', color: '#334155', fontSize: '14px', borderBottom: '2px solid #93c5fd' }}>
               {coluna.map((col, index) => (
                 <th key={index} style={{ 
-                  padding: paddingHead, 
-                  fontSize: tamanhoFontHead,
-                  width: col.width || 'auto',
-                  textAlign: col.align || 'left',
-                  whiteSpace: 'nowrap',
-                  borderRight: index < coluna.length - 1 ? '1px solid #dee2e6' : 'none',
-                  backgroundColor: '#f8f9fa'
-                }}>
+                    padding: '1rem',
+                    fontWeight: 600,
+                    width: col.width || 'auto',
+                    textAlign: col.align || 'left',
+                    whiteSpace: 'nowrap'
+                  }}>
                   {col.titulo}
                 </th>
               ))}
               {(usaVisualizar || usaEditar || usaExcluir || usaResetarSenha || usaInativar || usaReativar) && (
                 <th style={{ 
-                  padding: paddingHead, 
-                  fontSize: tamanhoFontHead, 
-                  textAlign: 'center', 
-                  width: '200px',
-                  backgroundColor: '#f8f9fa',
-                  borderLeft: '1px solid #dee2e6'
-                }}>
+                    padding: '1rem 2rem 1rem 1rem',
+                    fontWeight: 600,
+                    textAlign: 'center',
+                    width: '200px',
+                    whiteSpace: 'nowrap'
+                  }}>
                   Ações
                 </th>
               )}
             </tr>
           </thead>
-          <tbody>
+            <tbody style={{ fontSize: '14px' }}>
             {paginatedData.map((row, rowIndex) => (
-              <tr key={rowIndex}>
+                <tr 
+                  key={rowIndex}
+                  style={{
+                    borderBottom: '1px solid #e2e8f0',
+                    backgroundColor: rowIndex % 2 === 0 ? '#ffffff' : '#fafbfc',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = rowIndex % 2 === 0 ? '#ffffff' : '#fafbfc'}
+                >
                 {coluna.map((col, colIndex) => (
                   <td key={colIndex} style={{ 
-                    padding: paddingBody, 
-                    fontSize: tamanhoFontBody,
-                    width: col.width || 'auto',
-                    textAlign: col.align || 'left',
-                    overflow: col.truncate ? 'hidden' : 'visible',
-                    textOverflow: col.truncate ? 'ellipsis' : 'clip',
-                    borderRight: colIndex < coluna.length - 1 ? '1px solid #dee2e6' : 'none'
-                  }}>
+                      padding: '1rem',
+                      fontWeight: 500,
+                      color: '#334155',
+                      width: col.width || 'auto',
+                      textAlign: col.align || 'left',
+                      overflow: col.truncate ? 'hidden' : 'visible',
+                      textOverflow: col.truncate ? 'ellipsis' : 'clip'
+                    }}>
                     {row[col.acesso] ? (
                       col.acesso.toLowerCase().includes('data') || col.acesso.toLowerCase().includes('cadastro') ?
                         (col.acesso.toLowerCase().includes('hora') ? formatarDataComHora(row[col.acesso]) : formatarDataBR(row[col.acesso]))
@@ -150,102 +159,163 @@ const TableAcoes = ({
                 ))}
               {(usaVisualizar || usaEditar || usaExcluir || usaResetarSenha || usaInativar || usaReativar) && (
                 <td style={{ 
-                  textAlign: 'center', 
-                  padding: paddingBody,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  flexWrap: 'nowrap',
-                  whiteSpace: 'nowrap',
-                  minWidth: '200px',
-                  minHeight: '50px',
-                  borderLeft: '1px solid #dee2e6'
-                }}>
+                      padding: '1rem 2rem 1rem 1rem',
+                      textAlign: 'center'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
                   {usaVisualizar && acaoVisualizar && (
                     <button
                       onClick={() => acaoVisualizar(row)}
-                      style={{ background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', padding: '2px 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}
-                      title="Visualizar"
-                    >
-                      <FaEye />
+                            style={{ color: '#cbd5e1', cursor: 'pointer', padding: '0.375rem', borderRadius: '0.375rem', backgroundColor: 'transparent', border: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
+                            onMouseOver={(e) => { e.currentTarget.style.color = '#3b82f6'; e.currentTarget.style.backgroundColor = '#dbeafe'; }}
+                            onMouseOut={(e) => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }}
+                            title="Visualizar"
+                          >
+                            <AiOutlineEye size={18} />
                     </button>
                   )}
                   {usaEditar && acaoEditar && (
                     <button
                       onClick={() => acaoEditar(row)}
-                      style={{ background: 'none', border: 'none', color: '#ffc107', cursor: 'pointer', padding: '2px 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}
-                      title="Editar"
-                    >
-                      <FaEdit />
+                            style={{ color: '#cbd5e1', cursor: 'pointer', padding: '0.375rem', borderRadius: '0.375rem', backgroundColor: 'transparent', border: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
+                            onMouseOver={(e) => { e.currentTarget.style.color = '#3b82f6'; e.currentTarget.style.backgroundColor = '#dbeafe'; }}
+                            onMouseOut={(e) => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }}
+                            title="Editar"
+                          >
+                            <AiOutlineEdit size={18} />
                     </button>
                   )}
                   {usaResetarSenha && acaoResetarSenha && (
                     <button
                       onClick={() => acaoResetarSenha(row)}
-                      style={{ background: 'none', border: 'none', color: '#ffc107', cursor: 'pointer', padding: '2px 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}
-                      title="Resetar Senha"
-                    >
-                      <FaKey />
+                            style={{ color: '#cbd5e1', cursor: 'pointer', padding: '0.375rem', borderRadius: '0.375rem', backgroundColor: 'transparent', border: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
+                            onMouseOver={(e) => { e.currentTarget.style.color = '#f59e0b'; e.currentTarget.style.backgroundColor = '#fef3c7'; }}
+                            onMouseOut={(e) => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }}
+                            title="Resetar Senha"
+                          >
+                            <AiOutlineKey size={18} />
                     </button>
                   )}
                   {usaReativar && acaoReativar && (
                     <button
                       onClick={() => acaoReativar(row)}
-                      style={{ background: 'none', border: 'none', color: '#28a745', cursor: 'pointer', padding: '2px 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}
-                      title="Reativar Usuário"
-                    >
-                      <FaPlay />
+                            style={{ color: '#cbd5e1', cursor: 'pointer', padding: '0.375rem', borderRadius: '0.375rem', backgroundColor: 'transparent', border: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
+                            onMouseOver={(e) => { e.currentTarget.style.color = '#10b981'; e.currentTarget.style.backgroundColor = '#d1fae5'; }}
+                            onMouseOut={(e) => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }}
+                            title="Reativar Usuário"
+                          >
+                            <AiOutlinePlayCircle size={18} />
                     </button>
                   )}
                   {usaInativar && acaoInativar && (
                     <button
                       onClick={() => acaoInativar(row)}
-                      style={{ background: 'none', border: 'none', color: '#6c757d', cursor: 'pointer', padding: '2px 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}
-                      title="Inativar Usuário"
-                    >
-                      <FaPowerOff />
+                            style={{ color: '#cbd5e1', cursor: 'pointer', padding: '0.375rem', borderRadius: '0.375rem', backgroundColor: 'transparent', border: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
+                            onMouseOver={(e) => { e.currentTarget.style.color = '#64748b'; e.currentTarget.style.backgroundColor = '#f1f5f9'; }}
+                            onMouseOut={(e) => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }}
+                            title="Inativar Usuário"
+                          >
+                            <AiOutlinePoweroff size={18} />
                     </button>
                   )}
                   {usaExcluir && acaoExcluir && (
                     <button
                       onClick={() => acaoExcluir(row)}
-                      style={{ background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer', padding: '2px 4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}
-                      title="Excluir"
-                    >
-                      <FaTrashAlt />
+                            style={{ color: '#cbd5e1', cursor: 'pointer', padding: '0.375rem', borderRadius: '0.375rem', backgroundColor: 'transparent', border: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
+                            onMouseOver={(e) => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.backgroundColor = '#fee2e2'; }}
+                            onMouseOut={(e) => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }}
+                            title="Excluir"
+                          >
+                            <AiOutlineDelete size={18} />
                     </button>
                   )}
+                      </div>
                 </td>
               )}
             </tr>
           ))}
+              {paginatedData.length === 0 && (
+                <tr>
+                  <td colSpan={coluna.length + 1} style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
+                    Nenhum registro encontrado.
+                  </td>
+                </tr>
+              )}
         </tbody>
-        </Table>
-      </div>
+          </table>
+        </div>
 
-      {/* Paginação simples */}
-      {totalPages > 1 && (
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+        {/* Paginação e Filtro de Linhas */}
+        <div style={{ padding: '1rem', backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', fontSize: '14px', color: '#475569' }}>
+          
+          {/* Seletor de itens por página */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span>Mostrar</span>
+            <input
+              type="number"
+              min="1"
+              value={currentItemsPerPage}
+              onChange={(e) => {
+                const val = e.target.value;
+                setCurrentItemsPerPage(val === '' ? '' : Number(val));
+                setCurrentPage(1);
+              }}
+              onBlur={(e) => {
+                if (e.target.value === '' || Number(e.target.value) < 1) {
+                  setCurrentItemsPerPage(10);
+                }
+              }}
+              style={{ width: '70px', padding: '0.375rem 0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', outline: 'none', color: '#334155', fontSize: '14px', textAlign: 'center' }}
+            />
+            <span>linhas</span>
+          </div>
+
+          {/* Controles de navegação */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <button
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
-            style={{ margin: '0 5px', padding: '5px 10px', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
+              style={{ 
+                padding: '0.375rem 0.75rem', 
+                backgroundColor: '#ffffff', 
+                border: '1px solid #cbd5e1', 
+                borderRadius: '0.375rem', 
+                color: '#334155', 
+                cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                fontWeight: 500,
+                opacity: currentPage === 1 ? 0.5 : 1,
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={(e) => { if(currentPage !== 1) e.currentTarget.style.backgroundColor = '#f1f5f9'; }}
+              onMouseOut={(e) => { if(currentPage !== 1) e.currentTarget.style.backgroundColor = '#ffffff'; }}
           >
             Anterior
           </button>
-          <span style={{ margin: '0 10px', alignSelf: 'center' }}>
-            Página {currentPage} de {totalPages}
+            <span style={{ fontWeight: 500 }}>
+              Página {currentPage} de {Math.max(1, totalPages)}
           </span>
           <button
             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-            disabled={currentPage === totalPages}
-            style={{ margin: '0 5px', padding: '5px 10px', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer' }}
+              disabled={currentPage >= totalPages || totalPages === 0}
+              style={{ 
+                padding: '0.375rem 0.75rem', 
+                backgroundColor: '#ffffff', 
+                border: '1px solid #cbd5e1', 
+                borderRadius: '0.375rem', 
+                color: '#334155', 
+                cursor: (currentPage >= totalPages || totalPages === 0) ? 'not-allowed' : 'pointer',
+                fontWeight: 500,
+                opacity: (currentPage >= totalPages || totalPages === 0) ? 0.5 : 1,
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={(e) => { if(currentPage !== totalPages && totalPages > 0) e.currentTarget.style.backgroundColor = '#f1f5f9'; }}
+              onMouseOut={(e) => { if(currentPage !== totalPages && totalPages > 0) e.currentTarget.style.backgroundColor = '#ffffff'; }}
           >
             Próxima
           </button>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

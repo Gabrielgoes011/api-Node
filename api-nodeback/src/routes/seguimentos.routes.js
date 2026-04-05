@@ -5,16 +5,15 @@ import {
   listarSeguimentos,
   contarSeguimentos,
   cadastrarSeguimento,
-  atualizarSeguimento,
-  inativaReativaSeguimento,
   deleteSeguimento
-} from '../controllers/cadastros/seguimentos/seguimento.controller.js';
+} from '../controllers/cadastros/seguimentos/seguimentos.controller.js';
 
-router.get('/seguimentos', contarSeguimentos);
-//router.post('/seguimentos', cadastrarSeguimento);
+router.get('/seguimentos', listarSeguimentos);
+router.get('/seguimentos/contar', contarSeguimentos);
+router.post('/seguimentos', cadastrarSeguimento);
+router.delete('/seguimentos/delete/:id', deleteSeguimento);
 //router.put('/seguimentos/update/:id', atualizarSeguimento);
 //router.put('/seguimentos/inativaReativa/:id', inativaReativaSeguimento);
-//router.delete('/seguimentos/delete/:id', deleteSeguimento);
 
 export default router;
 

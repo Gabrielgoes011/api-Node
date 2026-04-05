@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { toast } from 'react-toastify';
-import { usuariosService } from '../services/usuariosService';
+import { usuariosService } from '../../services/servCadastros/usuariosService';
 
 export const useUsuarios = () => {
   // Estado para armazenar a lista de usuários
