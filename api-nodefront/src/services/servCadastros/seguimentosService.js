@@ -27,9 +27,12 @@ export const seguimentosService = {
   },
 
   // Atualizar seguimento
-  atualizar: async (id, seguimentoData) => {
+  atualizar: async (id, seguimento) => {
     try {
-      const res = await axios.put(`${API_URL}/seguimentos/update/${id}`, seguimentoData);
+      const res = await axios.put(`${API_URL}/seguimentos/update`, { 
+        idSeguimento: id, 
+        nome: seguimento.nome || seguimento 
+      });
       return res.data;
     } catch (error) {
       throw error;

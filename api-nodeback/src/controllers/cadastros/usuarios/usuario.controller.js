@@ -23,7 +23,7 @@ export async function buscaUserId(id, db) {
   try {
     const resultado = await db.query(
       `SELECT id, nome
-       FROM TabUser
+       FROM usuarios
        WHERE id = $1 `, [id]
     );
     return resultado.rows[0];
@@ -33,10 +33,6 @@ export async function buscaUserId(id, db) {
   }
 }
 //#endregion
-
-// ─────────────────────────────────────────────
-// GET
-// ─────────────────────────────────────────────
 
 //#region função listarUsuarios - lista usuarios (ativos/inativos)
 export async function listarUsuarios(req, res) {
@@ -95,9 +91,7 @@ export async function contarUsuarios(req, res) {
 }
 //#endregion
 
-// ─────────────────────────────────────────────
-// POST
-// ─────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────────
 
 //#region Função para cadastrar usuarios
 export async function cadastrarUser(req, res) {
@@ -187,10 +181,6 @@ export async function cadastrarUser(req, res) {
 }
 //#endregion
 
-// ─────────────────────────────────────────────
-// PUT
-// ─────────────────────────────────────────────
-
 //#region PUT - atualizar usuario
 export async function atualizarUser(req, res) {
   const { nome, dataNascimento, email, status } = req.body;
@@ -263,7 +253,7 @@ export async function inativaReativaUser(req, res) {
   try {
     const resultado = await db.query(`
       SELECT id, ativo 
-      FROM dbo."tabUser"
+      FROM usuarios
       WHERE id = $1 `, [id]
     );
 
@@ -276,7 +266,7 @@ export async function inativaReativaUser(req, res) {
     const msg = novoStatus ? 'Usuário reativado com sucesso!' : 'Usuário inativado com sucesso!';
 
     const update = await db.query(
-      `UPDATE dbo."tabUser"
+      `UPDATE usuarios
        SET ativo = $1
        WHERE id = $2`, [novoStatus, id]
     );
@@ -293,10 +283,6 @@ export async function inativaReativaUser(req, res) {
 }
 //#endregion
 
-// ─────────────────────────────────────────────
-// DELETE
-// ─────────────────────────────────────────────
-
 //#region DELETE - deletar usuario
 export async function deleteUser(req, res) {
   const idUser = req.params.id;
@@ -309,21 +295,21 @@ export async function deleteUser(req, res) {
       return res.status(404).json({ error: 'Usuário não encontrado !' });
     }
 
-    await db.run('BEGIN');
+    await db.query('BEGIN');
 
-    await db.run(`
+    await db.query(`
       DELETE 
-      FROM TabUserCred
-      WHERE idUser = ? `, [idUser]
+      FROM "credenciaisUsuario"
+      WHERE "idUser" = $1 `, [idUser]
     );
 
-    await db.run(`
+    await db.query(`
       DELETE 
-      FROM TabUser
-      WHERE id = ? `, [idUser]
+      FROM usuarios
+      WHERE id = $1 `, [idUser]
     );
 
-    await db.run('COMMIT');
+    await db.query('COMMIT');
 
     return res.json({
       statusCode: 'Sucesso (200)',
@@ -331,12 +317,10 @@ export async function deleteUser(req, res) {
       message: 'O usuario foi deletado com sucesso !'
     });
   } catch (error) {
-    await db.run('ROLLBACK');
+    await db.query('ROLLBACK');
     console.error('Erro ao deletar o usuário:', error);
     return res.status(400).json({ error: 'Erro ao deletar o usuário.' });
-  } finally {
-    db.close();
-  }
+  } 
 }
 //#endregion
 

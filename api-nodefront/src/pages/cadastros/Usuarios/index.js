@@ -10,7 +10,7 @@ import ModalConfirmacao from '../../../components/ModalDeConfirmacao/ModalConfir
 const colunasUsuarios = [
   { titulo: 'Nome', acesso: 'nome', width: '25%', align: 'left' },
   { titulo: 'Email', acesso: 'email', width: '30%', align: 'left' },
-  { titulo: 'Data Nascimento', acesso: 'dataNascimento', width: '20%', align: 'center' },
+  { titulo: 'Idade', acesso: 'idade', width: '10%', align: 'center' },
   { titulo: 'CPF', acesso: 'cpf', width: '20%', align: 'center' }
 ];
 
