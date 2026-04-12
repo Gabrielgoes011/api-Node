@@ -320,7 +320,7 @@ export async function deleteUser(req, res) {
     await db.query('ROLLBACK');
     console.error('Erro ao deletar o usuário:', error);
     return res.status(400).json({ error: 'Erro ao deletar o usuário.' });
-  } 
+  }
 }
 //#endregion
 

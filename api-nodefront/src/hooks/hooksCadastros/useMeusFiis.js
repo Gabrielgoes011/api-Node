@@ -9,7 +9,7 @@ export const useMeusFiis = () => {
   const [dashboard, setDashboard] = useState({ total: 0 });
 
   const [onEdit, setOnEdit] = useState(null);
-  const [formData, setFormData] = useState({ ticker: '', nomeFundo: '', cnpj: '', idSegmento: '' });
+  const [formData, setFormData] = useState({ ticker: '', nomeFundo: '', cnpj: '', idSeguimento: '' });
   const [showFormModal, setShowFormModal] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
@@ -46,7 +46,21 @@ export const useMeusFiis = () => {
 
   const handleAddFii = async (data) => {
     try {
-      await meusFiisService.criar(data);
+      const payload = { ...data };
+
+      // Trazendo de volta a captura do ID, caso a tela ainda envie como "idSegmento"
+      if (payload.idSegmento) {
+        payload.idSeguimento = payload.idSegmento;
+        delete payload.idSegmento;
+      }
+
+      // Validação no front-end para evitar o erro de not-null do banco de dados
+      if (!payload.idSeguimento || payload.idSeguimento === '') {
+        toast.warn('Por favor, selecione um Seguimento para o fundo!');
+        return;
+      }
+
+      await meusFiisService.criar(payload);
       toast.success('Fundo cadastrado com sucesso!');
       closeFormModal();
       getFiis();
@@ -58,7 +72,19 @@ export const useMeusFiis = () => {
 
   const handleUpdateFii = async (data) => {
     try {
-      await meusFiisService.atualizar(onEdit.id, data);
+      const payload = { ...data };
+
+      if (payload.idSegmento) {
+        payload.idSeguimento = payload.idSegmento;
+        delete payload.idSegmento;
+      }
+
+      if (!payload.idSeguimento || payload.idSeguimento === '') {
+        toast.warn('Por favor, selecione um Seguimento para o fundo!');
+        return;
+      }
+
+      await meusFiisService.atualizar(onEdit.id, payload);
       toast.success('Fundo atualizado com sucesso!');
       closeFormModal();
       getFiis();
@@ -89,7 +115,7 @@ export const useMeusFiis = () => {
 
   const handleOpenCreate = () => {
     setOnEdit(null);
-    setFormData({ ticker: '', nomeFundo: '', cnpj: '', idSegmento: '' });
+    setFormData({ ticker: '', nomeFundo: '', cnpj: '', idSeguimento: '' });
     setShowFormModal(true);
   };
 
@@ -99,7 +125,7 @@ export const useMeusFiis = () => {
       ticker: item.ticker,
       nomeFundo: item.nomeFundo,
       cnpj: item.cnpj,
-      idSegmento: item.idSegmento || ''
+      idSeguimento: item.idSeguimento || ''
     });
     setShowFormModal(true);
   };
@@ -113,7 +139,7 @@ export const useMeusFiis = () => {
   const closeFormModal = () => {
     setShowFormModal(false);
     setOnEdit(null);
-    setFormData({ ticker: '', nomeFundo: '', cnpj: '', idSegmento: '' });
+    setFormData({ ticker: '', nomeFundo: '', cnpj: '', idSeguimento: '' });
   };
 
   return {

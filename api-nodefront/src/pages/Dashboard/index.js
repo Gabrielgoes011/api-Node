@@ -18,7 +18,7 @@ function PaginaDashboard() {
           marginBottom: '20px',
           fontWeight: 'bold'
         }}>
-          Bem-vindo! 👋
+          Dashboard de Ativos 👋
         </h1>
 
         <p style={{
@@ -28,8 +28,8 @@ function PaginaDashboard() {
           maxWidth: '600px',
           lineHeight: '1.6'
         }}>
-          Bem-vindo ao gerenciador de aplicação. <br />
-          Use o menu lateral para navegar entre as funcionalidades.
+          Bem-vindo ao gerenciador de Fundos Imobiliários. <br />
+          Utilize o menu para controlar sua carteira, rendimentos e movimentações.
         </p>
 
         {/* Cards de informações */}
@@ -50,8 +50,8 @@ function PaginaDashboard() {
             onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
             onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
           >
-            <h3 style={{ color: '#3498db', marginBottom: '10px' }}>👥 Usuários</h3>
-            <p style={{ color: '#7f8c8d' }}>Gerencie todos os usuários do sistema</p>
+            <h3 style={{ color: '#3498db', marginBottom: '10px' }}>🏢 Carteira de FIIs</h3>
+            <p style={{ color: '#7f8c8d' }}>Acompanhe seus fundos imobiliários e a evolução do seu patrimônio.</p>
           </div>
 
           <div style={{
@@ -64,8 +64,8 @@ function PaginaDashboard() {
             onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
             onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
           >
-            <h3 style={{ color: '#2ecc71', marginBottom: '10px' }}>⚙️ Configurações</h3>
-            <p style={{ color: '#7f8c8d' }}>Ajuste as configurações da aplicação</p>
+            <h3 style={{ color: '#2ecc71', marginBottom: '10px' }}>💰 Rendimentos</h3>
+            <p style={{ color: '#7f8c8d' }}>Controle os dividendos e proventos recebidos mensalmente.</p>
           </div>
 
           <div style={{
@@ -78,8 +78,8 @@ function PaginaDashboard() {
             onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
             onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
           >
-            <h3 style={{ color: '#e74c3c', marginBottom: '10px' }}>📊 Dashboard</h3>
-            <p style={{ color: '#7f8c8d' }}>Acompanhe as métricas da aplicação</p>
+            <h3 style={{ color: '#e74c3c', marginBottom: '10px' }}>🔄 Compras e Vendas</h3>
+            <p style={{ color: '#7f8c8d' }}>Registre e consulte o histórico de ordens executadas.</p>
           </div>
         </div>
       </div>

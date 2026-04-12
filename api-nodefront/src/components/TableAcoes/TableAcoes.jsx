@@ -148,7 +148,10 @@ const TableAcoes = ({
                       width: col.width || 'auto',
                       textAlign: col.align || 'left',
                       overflow: col.truncate ? 'hidden' : 'visible',
-                      textOverflow: col.truncate ? 'ellipsis' : 'clip'
+                      textOverflow: col.truncate ? 'ellipsis' : 'clip',
+                      whiteSpace: col.truncate ? 'nowrap' : 'normal',
+                      wordBreak: 'break-word',
+                      overflowWrap: 'anywhere'
                     }}>
                     {row[col.acesso] ? (
                       col.acesso.toLowerCase().includes('data') || col.acesso.toLowerCase().includes('cadastro') ?

@@ -6,7 +6,7 @@ export const meusFiisService = {
   // Listar todos os FIIs
   listarTodos: async () => {
     try {
-      const res = await axios.get(`${API_URL}/meus-fiis`);
+      const res = await axios.get(`${API_URL}/meusFundos`);
       if (!Array.isArray(res.data)) {
         return [];
       }
@@ -19,7 +19,7 @@ export const meusFiisService = {
   // Criar novo FII
   criar: async (fiiData) => {
     try {
-      const res = await axios.post(`${API_URL}/meus-fiis`, fiiData);
+      const res = await axios.post(`${API_URL}/meusFundos`, fiiData);
       return res.data;
     } catch (error) {
       throw error;
