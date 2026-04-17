@@ -49,7 +49,7 @@ export const meusFiisService = {
   // Contagem de FIIs
   contar: async () => {
     try {
-      const res = await axios.get(`${API_URL}/meus-fiis/contar`);
+      const res = await axios.get(`${API_URL}/meusFundos/contar`);
       return res.data;
     } catch (error) {
       throw error;

@@ -68,3 +68,19 @@ export async function listarFundos(req, res) {
   }
 }
 //#endregion
+
+//#region função de contar fundos ativos
+export async function contarFundosAtivos(req, res) {
+  const db = await openDb();
+  try {
+    const resultado = await db.query(`
+        SELECT COUNT(*) AS total
+        FROM ativos
+    `);
+    res.status(200).json({ total: parseInt(resultado.rows[0].total, 10) });
+  } catch (error) {
+    console.error('Erro ao contar fundos ativos:', error);
+    res.status(500).json({ error: 'Erro ao contar fundos ativos.' });
+  }
+}
+//#endregion

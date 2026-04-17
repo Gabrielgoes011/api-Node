@@ -1,65 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AiOutlineWarning, AiOutlinePlus, AiOutlineDelete } from 'react-icons/ai';
+import NovaOperacaoModal from './components/modalNovaOperacao';
 
 const SimpleBarChart = ({ data }) => {
-  const maxValue = Math.max(...data.map(item => Math.max(item.Compra, item.Venda, item.Liquido))) || 1500;
+  if (!data || data.length === 0) {
+    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, color: '#94a3b8' }}>Nenhum dado disponível</div>;
+  }
+
+  const maxValue = Math.max(...data.map(item => Math.max(item.Compra, item.Venda, item.Liquido))) || 1;
   
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', height: '320px', gap: '8px', overflowX: 'auto', padding: '20px 0' }}>
+    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', flex: 1, gap: '4px', overflowX: 'auto', padding: '10px 0' }}>
       {data.map((item, idx) => (
-        <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '0 0 auto', minWidth: '80px' }}>
+        <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1 1 0', minWidth: '35px' }}>
           {/* Barras */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '4px', height: '250px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2px', height: '150px', width: '100%', justifyContent: 'center' }}>
             {/* Compra */}
-            <div style={{ width: '20px', height: `${(item.Compra / maxValue) * 250}px`, backgroundColor: '#4ade80', borderRadius: '4px 4px 0 0' }} title={`Compra: R$ ${item.Compra.toFixed(2)}`} />
+            <div style={{ width: '30%', maxWidth: '10px', height: `${(item.Compra / maxValue) * 150}px`, backgroundColor: '#4ade80', borderRadius: '2px 2px 0 0' }} title={`Compra: R$ ${item.Compra.toFixed(2)}`} />
             {/* Venda */}
-            <div style={{ width: '20px', height: `${(item.Venda / maxValue) * 250}px`, backgroundColor: '#ef4444', borderRadius: '4px 4px 0 0' }} title={`Venda: R$ ${item.Venda.toFixed(2)}`} />
+            <div style={{ width: '30%', maxWidth: '10px', height: `${(item.Venda / maxValue) * 150}px`, backgroundColor: '#ef4444', borderRadius: '2px 2px 0 0' }} title={`Venda: R$ ${item.Venda.toFixed(2)}`} />
             {/* Líquido */}
-            <div style={{ width: '20px', height: `${(item.Liquido / maxValue) * 250}px`, backgroundColor: '#3b82f6', borderRadius: '4px 4px 0 0' }} title={`Líquido: R$ ${item.Liquido.toFixed(2)}`} />
+            <div style={{ width: '30%', maxWidth: '10px', height: `${(item.Liquido / maxValue) * 150}px`, backgroundColor: '#3b82f6', borderRadius: '2px 2px 0 0' }} title={`Líquido: R$ ${item.Liquido.toFixed(2)}`} />
           </div>
           {/* Label */}
-          <p style={{ fontSize: '12px', fontWeight: 600, color: '#1e293b', marginTop: '12px', margin: '12px 0 0 0' }}>{item.name}</p>
+          <p style={{ fontSize: '10px', fontWeight: 600, color: '#1e293b', marginTop: '8px', margin: '8px 0 0 0' }}>{item.name}</p>
         </div>
       ))}
     </div>
   );
 };
 
-// Dados simulados baseados na imagem
-const chartData = [
-  { name: 'Jan', Compra: 1164.25, Venda: 0, Liquido: 1164.25 },
-  { name: 'Fev', Compra: 0, Venda: 0, Liquido: 0 },
-  { name: 'Mar', Compra: 0, Venda: 0, Liquido: 0 },
-  { name: 'Abr', Compra: 0, Venda: 0, Liquido: 0 },
-  { name: 'Mai', Compra: 0, Venda: 0, Liquido: 0 },
-  { name: 'Jun', Compra: 0, Venda: 0, Liquido: 0 },
-  { name: 'Jul', Compra: 0, Venda: 0, Liquido: 0 },
-  { name: 'Ago', Compra: 0, Venda: 0, Liquido: 0 },
-  { name: 'Set', Compra: 0, Venda: 0, Liquido: 0 },
-  { name: 'Out', Compra: 0, Venda: 0, Liquido: 0 },
-  { name: 'Nov', Compra: 0, Venda: 0, Liquido: 0 },
-  { name: 'Dez', Compra: 0, Venda: 0, Liquido: 0 },
-  { name: 'Total', Compra: 1164.25, Venda: 0, Liquido: 1164.25 },
-];
-
-const initialOperacoesData = [
-  { id: 1, data: '17/02/2023', operacao: 'Compra', ativo: 'MXRF11', qtde: 1, preco: 10.12 },
-  { id: 2, data: '13/03/2023', operacao: 'Compra', ativo: 'MXRF11', qtde: 4, preco: 10.24 },
-  { id: 3, data: '14/03/2023', operacao: 'Compra', ativo: 'HGRU11', qtde: 1, preco: 115.59 },
-  { id: 4, data: '14/03/2023', operacao: 'Compra', ativo: 'BTCI11', qtde: 3, preco: 8.86 },
-  { id: 5, data: '24/03/2023', operacao: 'Compra', ativo: 'XPML11', qtde: 1, preco: 96.15 },
-  { id: 6, data: '24/03/2023', operacao: 'Compra', ativo: 'MXRF11', qtde: 1, preco: 10.32 },
-  { id: 7, data: '04/04/2023', operacao: 'Compra', ativo: 'MXRF11', qtde: 4, preco: 10.32 },
-  { id: 8, data: '04/04/2023', operacao: 'Compra', ativo: 'HGRU11', qtde: 1, preco: 115.31 },
-  { id: 9, data: '04/04/2023', operacao: 'Compra', ativo: 'BTCI11', qtde: 2, preco: 9.02 },
-  { id: 10, data: '12/04/2023', operacao: 'Compra', ativo: 'BTCI11', qtde: 3, preco: 9.09 },
-  { id: 11, data: '28/04/2023', operacao: 'Compra', ativo: 'VGIR11', qtde: 1, preco: 9.15 },
-];
-
 export default function PaginaOperacoes() {
-  const [anoSelecionado, setAnoSelecionado] = useState('2023');
+  const [anoSelecionado, setAnoSelecionado] = useState('2026');
   const [mesSelecionado, setMesSelecionado] = useState('Todos');
-  const [operacoes, setOperacoes] = useState(initialOperacoesData);
+  const [operacoes, setOperacoes] = useState([]);
+  const [chartData, setChartData] = useState([]);
+  const [modalAberto, setModalAberto] = useState(false);
+
+  // Efeito simulando carregamento dos dados do backend
+  useEffect(() => {
+    // TODO: Fazer a integração real com axios.get('/operacoes') etc.
+    // axios.get(`${API_URL}/operacoes?ano=${anoSelecionado}`).then(res => {
+    //   setOperacoes(res.data.operacoes);
+    //   setChartData(res.data.chartData);
+    // });
+  }, [anoSelecionado]);
 
   // Formatador de moeda para Real
   const formatarMoeda = (valor) => {
@@ -104,8 +89,8 @@ export default function PaginaOperacoes() {
               <div style={{ position: 'relative' }}>
                 <select 
                   value={anoSelecionado}
-                  onChange={(e) => setAnoSelecionado(e.target.value)}
-                  style={{ appearance: 'none', backgroundColor: '#fed7aa', border: '1px solid #fbcfe8', color: '#92400e', fontWeight: 600, padding: '0.5rem 0.75rem 0.5rem 1rem', paddingRight: '2.5rem', borderRadius: '0.375rem', outline: 'none', cursor: 'pointer' }}
+                onChange={(e) => setAnoSelecionado(e.target.value)}
+                  style={{ appearance: 'none', backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', color: '#334155', fontWeight: 600, padding: '0.5rem 0.75rem 0.5rem 1rem', paddingRight: '2.5rem', borderRadius: '0.375rem', outline: 'none', cursor: 'pointer' }}
                 >
                   <option value="2023">2023</option>
                   <option value="2024">2024</option>
@@ -161,7 +146,10 @@ export default function PaginaOperacoes() {
               </select>
             </div>
             
-            <button style={{ backgroundColor: '#fed7aa', color: '#92400e', fontWeight: 600, padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer', transition: 'background-color 0.2s', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.1)' }} onMouseOver={(e) => e.target.style.backgroundColor = '#fdba74'} onMouseOut={(e) => e.target.style.backgroundColor = '#fed7aa'}>
+            <button 
+              onClick={() => setModalAberto(true)}
+              style={{ backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 600, padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer', transition: 'background-color 0.2s', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.1)' }} 
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1d4ed8'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}>
               <AiOutlinePlus size={18} />
               Nova Operação
             </button>
@@ -198,8 +186,8 @@ export default function PaginaOperacoes() {
                           backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafbfc',
                           transition: 'background-color 0.2s'
                         }}
-                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
-                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = (index % 2 === 0 ? '#ffffff' : '#fafbfc')}
+                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
+                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = (index % 2 === 0 ? '#ffffff' : '#fafbfc')}
                       >
                         <td style={{ padding: '1rem', fontWeight: 500, color: '#334155' }}>{row.data}</td>
                         <td style={{ padding: '1rem' }}>
@@ -217,8 +205,8 @@ export default function PaginaOperacoes() {
                           <button 
                             onClick={() => excluirOperacao(row.id)}
                             style={{ color: '#cbd5e1', cursor: 'pointer', padding: '0.375rem', borderRadius: '0.375rem', backgroundColor: 'transparent', border: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
-                            onMouseOver={(e) => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.backgroundColor = '#fee2e2'; }}
-                            onMouseOut={(e) => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }}
+                          onMouseOver={(e) => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.backgroundColor = '#fee2e2'; }}
+                          onMouseOut={(e) => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }}
                             title="Excluir operação"
                           >
                             <AiOutlineDelete size={16} />
@@ -238,6 +226,8 @@ export default function PaginaOperacoes() {
         </div>
 
       </main>
+      
+      <NovaOperacaoModal isOpen={modalAberto} onClose={() => setModalAberto(false)} />
     </div>
   );
 }
