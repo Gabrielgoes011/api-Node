@@ -159,13 +159,15 @@ export default function PaginaOperacoes() {
             <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ backgroundColor: '#dbeafe', color: '#334155', fontSize: '14px', borderBottom: '2px solid #93c5fd' }}>
-                  <th style={{ padding: '1rem', fontWeight: 600 }}>DATA</th>
+                  <th style={{ padding: '1rem', fontWeight: 600 }}>Data</th>
                   <th style={{ padding: '1rem', fontWeight: 600 }}>Operação</th>
                   <th style={{ padding: '1rem', fontWeight: 600 }}>Ativo</th>
+                  <th style={{ padding: '1rem', fontWeight: 600 }}>Seguimento</th>
                   <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'right' }}>Quantidade</th>
                   <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'right' }}>Preço</th>
                   <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'right' }}>Valor Total</th>
                   <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'center' }}>Ações</th>
+
                 </tr>
               </thead>
               <tbody style={{ fontSize: '14px' }}>

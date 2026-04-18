@@ -22,7 +22,7 @@ export async function listarOperacoes(req, res) {
         ORDER BY o.data DESC
     `, [mes, ano]);
 
-    //retornar os dados para o cliente
+    //retornar os dados para o front-end
     res.json(operacoes);
 
     }
