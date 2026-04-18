@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { AiOutlineWarning, AiOutlinePlus, AiOutlineDelete } from 'react-icons/ai';
+import { AiOutlinePlus, AiOutlineDelete } from 'react-icons/ai';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import NovaOperacaoModal from './components/modalNovaOperacao';
 
 const SimpleBarChart = ({ data }) => {
@@ -37,48 +39,124 @@ export default function PaginaOperacoes() {
   const [chartData, setChartData] = useState([]);
   const [modalAberto, setModalAberto] = useState(false);
 
-  // Efeito simulando carregamento dos dados do backend
+  const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+  // Função para recarregar os dados
+  const recarregarDados = () => {
+    // Recarregar operações
+    const fetchOperacoes = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/operacoes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            mes: mesSelecionado,
+            ano: anoSelecionado
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Formatando os dados retornados pelo backend
+          const operacoesFormatadas = data.map((op, index) => {
+            const dt = new Date(op.dataOperacao);
+            return {
+              id: op.id || index, // usa o index como fallback caso não haja id
+              data: dt.toLocaleDateString('pt-BR', { timeZone: 'UTC' }),
+              operacao: op.tipo,
+              ativo: op.ticker,
+              seguimento: op.nomeSeguimento,
+              qtde: op.quantidade,
+              preco: op.preco
+            };
+          });
+          
+          setOperacoes(operacoesFormatadas);
+        } else {
+          console.error('Erro ao buscar operações da API');
+        }
+      } catch (error) {
+        console.error('Erro na requisição:', error);
+      }
+    };
+
+    // Recarregar dados do gráfico
+    const fetchChartData = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/operacoes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            mes: 'Todos',
+            ano: anoSelecionado
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+
+          const agrupado = monthNames.reduce((acc, nome) => {
+            acc[nome] = { name: nome, Compra: 0, Venda: 0, Liquido: 0 };
+            return acc;
+          }, {});
+
+          data.forEach(op => {
+            const dt = new Date(op.dataOperacao);
+            const monthIndex = dt.getUTCMonth();
+            const nomeMes = monthNames[monthIndex];
+            const total = op.quantidade * op.preco;
+
+            if (op.tipo.toLowerCase() === 'compra' || op.tipo.toLowerCase() === 'c') {
+              agrupado[nomeMes].Compra += total;
+            } else {
+              agrupado[nomeMes].Venda += total;
+            }
+            agrupado[nomeMes].Liquido = agrupado[nomeMes].Compra - agrupado[nomeMes].Venda;
+          });
+
+          setChartData(Object.values(agrupado));
+        } else {
+          console.error('Erro ao buscar dados do gráfico');
+        }
+      } catch (error) {
+        console.error('Erro na requisição do gráfico:', error);
+      }
+    };
+
+    fetchOperacoes();
+    fetchChartData();
+  };
+
   useEffect(() => {
-    // TODO: Fazer a integração real com axios.get('/operacoes') etc.
-    // axios.get(`${API_URL}/operacoes?ano=${anoSelecionado}`).then(res => {
-    //   setOperacoes(res.data.operacoes);
-    //   setChartData(res.data.chartData);
-    // });
-  }, [anoSelecionado]);
+    recarregarDados();
+  }, [anoSelecionado, mesSelecionado]);
 
   // Formatador de moeda para Real
   const formatarMoeda = (valor) => {
-    return new Intl.NumberFormat('pt-BR', {
+    const formatador = new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
-    }).format(valor);
+    });
+    return formatador.format(valor);
   };
 
   const excluirOperacao = (id) => {
     setOperacoes(operacoes.filter(op => op.id !== id));
   };
 
-  const operacoesFiltradas = operacoes.filter(op => {
-    const [dia, mes, ano] = op.data.split('/');
-    const anoMatch = ano === anoSelecionado;
-    const mesMatch = mesSelecionado === 'Todos' || mes === mesSelecionado;
-    return anoMatch && mesMatch;
-  });
+  // O backend já retorna os dados filtrados por mês e ano
+  const operacoesFiltradas = operacoes;
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f1f5f9', color: '#334155', fontFamily: 'sans-serif' }}>
       
       <main style={{ maxWidth: '60rem', margin: '0 auto', padding: '1rem 0.5rem', marginTop: '0px' }}>
         
-        {/* Alerta de Instruções */}
-        <div style={{ backgroundColor: '#fef3c7', borderLeft: '4px solid #f59e0b', padding: '1rem', borderRadius: '0 0.375rem 0.375rem 0', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
-          <AiOutlineWarning style={{ width: '24px', height: '24px', color: '#f59e0b', marginRight: '12px', marginTop: '4px', flexShrink: 0 }} />
-          <div>
-            <h3 style={{ fontSize: '14px', fontWeight: 700, color: '#92400e', margin: 0 }}>Instruções de uso</h3>
-            <p style={{ fontSize: '14px', color: '#b45309', marginTop: '4px', margin: 0 }}>A primeira inserção de um ativo <strong>precisa ser uma compra</strong>. O sistema validará isso automaticamente.</p>
-          </div>
-        </div>
-
         {/* Seção do Gráfico */}
         <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0', padding: '1.5rem', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
@@ -96,6 +174,10 @@ export default function PaginaOperacoes() {
                   <option value="2024">2024</option>
                   <option value="2025">2025</option>
                   <option value="2026">2026</option>
+                  <option value="2027">2027</option>
+                  <option value="2028">2028</option>
+                  <option value="2029">2029</option>
+                  <option value="2030">2030</option>
                 </select>
               </div>
             </div>
@@ -162,7 +244,7 @@ export default function PaginaOperacoes() {
                   <th style={{ padding: '1rem', fontWeight: 600 }}>Data</th>
                   <th style={{ padding: '1rem', fontWeight: 600 }}>Operação</th>
                   <th style={{ padding: '1rem', fontWeight: 600 }}>Ativo</th>
-                  <th style={{ padding: '1rem', fontWeight: 600 }}>Seguimento</th>
+                  <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'center' }}>Seguimento</th>
                   <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'right' }}>Quantidade</th>
                   <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'right' }}>Preço</th>
                   <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'right' }}>Valor Total</th>
@@ -193,12 +275,25 @@ export default function PaginaOperacoes() {
                       >
                         <td style={{ padding: '1rem', fontWeight: 500, color: '#334155' }}>{row.data}</td>
                         <td style={{ padding: '1rem' }}>
-                          <span style={{ display: 'inline-flex', alignItems: 'center', paddingLeft: '0.625rem', paddingRight: '0.625rem', paddingTop: '0.25rem', paddingBottom: '0.25rem', borderRadius: '9999px', fontSize: '12px', fontWeight: 500, backgroundColor: '#dcfce7', color: '#166534' }}>
+                          <span style={{ 
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            paddingLeft: '0.625rem', 
+                            paddingRight: '0.625rem', 
+                            paddingTop: '0.25rem', 
+                            paddingBottom: '0.25rem', 
+                            borderRadius: '9999px', 
+                            fontSize: '12px', 
+                            fontWeight: 500, 
+                            backgroundColor: row.operacao.toUpperCase() === 'COMPRA' ? '#dcfce7' : '#fee2e2',
+                            color: row.operacao.toUpperCase() === 'COMPRA' ? '#166534' : '#dc2626'
+                          }}>
                             {row.operacao}
                           </span>
                         </td>
                         <td style={{ padding: '1rem', fontWeight: 700, color: '#1e293b' }}>{row.ativo}</td>
-                        <td style={{ padding: '1rem', textAlign: 'right', color: '#475569' }}>{row.qtde}</td>
+                        <td style={{ padding: '1rem', color: '#475569', textAlign: 'center' }}>{row.seguimento}</td>
+                        <td style={{ padding: '1rem', textAlign: 'center', color: '#475569' }}>{row.qtde}</td>
                         <td style={{ padding: '1rem', textAlign: 'right', color: '#475569' }}>{formatarMoeda(row.preco)}</td>
                         <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 600, color: '#1e293b' }}>
                           {formatarMoeda(valorTotal)}
@@ -229,7 +324,9 @@ export default function PaginaOperacoes() {
 
       </main>
       
-      <NovaOperacaoModal isOpen={modalAberto} onClose={() => setModalAberto(false)} />
+      <NovaOperacaoModal isOpen={modalAberto} onClose={() => setModalAberto(false)} onSuccess={() => { toast.success('Operação cadastrada com sucesso!'); recarregarDados(); }} />
+      
+      <ToastContainer />
     </div>
   );
 }

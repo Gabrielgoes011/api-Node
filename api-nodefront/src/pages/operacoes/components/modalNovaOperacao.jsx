@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 
-export default function NovaOperacaoModal({ isOpen, onClose }) {
+export default function NovaOperacaoModal({ isOpen, onClose, onSuccess }) {
   const [data, setData] = useState('');
   const [operacao, setOperacao] = useState('Compra');
   const [ativo, setAtivo] = useState('');
@@ -9,12 +9,33 @@ export default function NovaOperacaoModal({ isOpen, onClose }) {
   const [valorUnidade, setValorUnidade] = useState('');
   
   const [ativosDisponiveis, setAtivosDisponiveis] = useState([]);
+  const [carregando, setCarregando] = useState(false);
 
   // Carregar os ativos assim que o modal abrir
   useEffect(() => {
     if (isOpen) {
-      // TODO: Conectar com a rota do backend
-      setAtivosDisponiveis(['MXRF11', 'HGLG11', 'XPML11', 'KNCR11']);
+      setCarregando(true);
+      
+      // Buscar ativos do backend
+      const fetchAtivos = async () => {
+        try {
+          const response = await fetch('http://localhost:3000/ativosDropList');
+          if (response.ok) {
+            const data = await response.json();
+            setAtivosDisponiveis(data);
+          } else {
+            console.error('Erro ao carregar ativos');
+            setAtivosDisponiveis([]);
+          }
+        } catch (error) {
+          console.error('Erro ao buscar ativos:', error);
+          setAtivosDisponiveis([]);
+        } finally {
+          setCarregando(false);
+        }
+      };
+
+      fetchAtivos();
       
       setData(new Date().toISOString().split('T')[0]); 
       setOperacao('Compra');
@@ -37,20 +58,48 @@ export default function NovaOperacaoModal({ isOpen, onClose }) {
     }).format(valor);
   };
 
-  const handleCadastrar = (e) => {
+  const handleCadastrar = async (e) => {
     e.preventDefault();
     
+    // Buscar o id do ativo selecionado
+    const ativoSelecionado = ativosDisponiveis.find(a => a.ticker === ativo);
+    
+    if (!ativoSelecionado) {
+      console.error('Selecione um ativo válido');
+      return;
+    }
+
     const novaOperacao = {
-      data,
-      operacao,
-      ativo,
-      qtde: Number(qtde),
-      preco: Number(valorUnidade),
-      valorTotal
+      idAtivo: ativoSelecionado.id,
+      dataOperacao: data,
+      tipo: operacao,
+      quantidade: Number(qtde),
+      preco: Number(valorUnidade)
     };
 
-    console.log('Cadastrar Operação:', novaOperacao);
-    onClose(); // Fecha o modal após "salvar"
+    try {
+      setCarregando(true);
+      const response = await fetch('http://localhost:3000/lancarOperacao', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(novaOperacao)
+      });
+
+      if (response.ok) {
+        console.log('Operação cadastrada com sucesso!');
+        onClose();
+        if (onSuccess) onSuccess(); // Recarregar dados
+      } else {
+        const errorData = await response.json();
+        console.error('Erro ao cadastrar operação:', errorData.message || 'Erro desconhecido');
+      }
+    } catch (error) {
+      console.error('Erro ao cadastrar operação:', error);
+    } finally {
+      setCarregando(false);
+    }
   };
 
   // Estilizações em linha reaproveitáveis
@@ -85,10 +134,10 @@ export default function NovaOperacaoModal({ isOpen, onClose }) {
 
           <div style={{ marginBottom: '1rem' }}>
             <label style={labelStyle}>Ativo</label>
-            <select value={ativo} onChange={(e) => setAtivo(e.target.value)} required style={{ ...inputStyle, backgroundColor: '#fff', cursor: 'pointer' }}>
+            <select value={ativo} onChange={(e) => setAtivo(e.target.value)} required disabled={ativosDisponiveis.length === 0} style={{ ...inputStyle, backgroundColor: '#fff', cursor: 'pointer' }}>
               <option value="" disabled>Selecione um ativo...</option>
               {ativosDisponiveis.map(a => (
-                <option key={a} value={a}>{a}</option>
+                <option key={a.id} value={a.ticker}>{a.ticker}</option>
               ))}
             </select>
           </div>
@@ -112,11 +161,11 @@ export default function NovaOperacaoModal({ isOpen, onClose }) {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-            <button type="button" onClick={onClose} style={{ padding: '0.5rem 1rem', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '0.375rem', fontWeight: 600, cursor: 'pointer' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#ffffff'}>
+            <button type="button" onClick={onClose} disabled={carregando} style={{ padding: '0.5rem 1rem', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', color: '#475569', borderRadius: '0.375rem', fontWeight: 600, cursor: carregando ? 'not-allowed' : 'pointer', opacity: carregando ? 0.6 : 1 }} onMouseOver={(e) => !carregando && (e.currentTarget.style.backgroundColor = '#f1f5f9')} onMouseOut={(e) => !carregando && (e.currentTarget.style.backgroundColor = '#ffffff')}>
               Cancelar
             </button>
-            <button type="submit" style={{ padding: '0.5rem 1rem', backgroundColor: '#2563eb', border: 'none', color: '#ffffff', borderRadius: '0.375rem', fontWeight: 600, cursor: 'pointer' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1d4ed8'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}>
-              Cadastrar Operação
+            <button type="submit" disabled={carregando} style={{ padding: '0.5rem 1rem', backgroundColor: '#2563eb', border: 'none', color: '#ffffff', borderRadius: '0.375rem', fontWeight: 600, cursor: carregando ? 'not-allowed' : 'pointer', opacity: carregando ? 0.6 : 1 }} onMouseOver={(e) => !carregando && (e.currentTarget.style.backgroundColor = '#1d4ed8')} onMouseOut={(e) => !carregando && (e.currentTarget.style.backgroundColor = '#2563eb')}>
+              {carregando ? 'Cadastrando...' : 'Cadastrar Operação'}
             </button>
           </div>
         </form>

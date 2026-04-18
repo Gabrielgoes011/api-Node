@@ -1,32 +1,140 @@
-import { openDb } from "../../../config/configDb.js";
+import { openDb } from "../../config/configDb.js";
 
-//função carrega grid de operações
 
+
+//#region função listar fundos -  (ativos/inativos)
+export async function carregaAtivosDropList(req, res) {
+    const db = await openDb();
+    try {
+        const resultado = await db.query(`        
+        SELECT
+          id, ticker
+        FROM ativos 
+        `
+        );
+        // Verifica se a consulta retornou resultados
+        if (resultado.rows.length === 0) {
+            return res.status(200).json([]);
+        }
+        // Retorna os resultados  
+        res.status(200).json(resultado.rows);
+
+    } catch (error) {
+        // Log do erro para depuração
+        console.error('Erro ao listar seguimentos:', error);
+        res.status(500).json({ error: 'Erro ao listar seguimentos.' });
+    }
+}
+//#endregion
+
+//#region função carrega grid de operações
 export async function listarOperacoes(req, res) {
 
-    //recuperar dados da requisição
-    const campos {
-        mes,
-        ano,
-    } = req.body;
+    try {
+        //recuperar dados da requisição
+        const campos = {
+            mes: req.body.mes,
+            ano: req.body.ano
+        };
 
-    //abrir conexão com o banco de dados
-    const db = await openDb();
+        //abrir conexão com o banco de dados
+        const db = await openDb();
 
-    //consultar os dados
-    const operacoes = await db.query(`
-        SELECT o.id, o.data, o.valor, o.descricao, o.tipo, c.nome AS categoria
-        FROM operacoes o
-        JOIN categorias c ON o.categoria_id = c.id
-        WHERE MONTH(o.data) = ? AND YEAR(o.data) = ?
-        ORDER BY o.data DESC
-    `, [mes, ano]);
+        //construir a query dinamicamente
+        let query = `
+            SELECT 
+                a."dtOperacao" "dataOperacao", a.tipo, b.ticker, 
+                c."nomeSeguimento" ,a.quantidade , a.preco
+            FROM 
+                operacoes a INNER JOIN ativos b
+            ON a."idAtivo" = b.id 
+            INNER JOIN seguimentos c
+            ON c.id = b."idSeguimento" 
+            WHERE 
+                EXTRACT(YEAR FROM a."dtOperacao") = $1
+        `;
+        let params = [campos.ano];
 
-    //retornar os dados para o front-end
-    res.json(operacoes);
+        //se o mês não for "Todos", adicionar a condição do mês
+        if (campos.mes !== 'Todos') {
+            query += ` AND EXTRACT(MONTH FROM a."dtOperacao") = $2`;
+            params.push(campos.mes);
+        }
 
+        query += ` ORDER BY a."dtOperacao" DESC`;
+
+        //consultar os dados
+        const operacoes = await db.query(query, params);
+
+        //verificar se a consulta retornou resultados
+        if (operacoes.rows.length === 0) {
+            return res.status(200).json([]);
+        }
+
+        //retornar os dados
+        return res.status(200).json(operacoes.rows);
+
+    } catch (error) {
+
+        //retornar um erro detalhado em caso de falha na consulta
+        return res.status(500).json({ error: 'Erro ao listar as operações.', errorDetails: error.message });
     }
-}//DEPOIS FINALIZO
-//DEPOIS FINALIZO
-//DEPOIS FINALIZO
-//DEPOIS FINALIZO 
+}
+//#endregion
+
+//#region => função para lançar novas operações (compra ou venda)
+
+export async function lancarOperacao(req, res) {
+
+    try {
+        //recuperar dados da requisição
+        const dados = {
+            idAtivo: req.body.idAtivo,
+            dataOperacao: req.body.dataOperacao,
+            tipo: req.body.tipo,
+            quantidade: req.body.quantidade,
+            preco: req.body.preco
+        };
+
+        //abrir conexão com o banco de dados
+        const db = await openDb();
+
+        //consultar se o ativo existe
+        const ativo = await db.query(`
+            SELECT id 
+            FROM ativos 
+            WHERE id = $1`, [dados.idAtivo]);
+
+        if (ativo.rows.length === 0) {
+            return res.status(400).json({ error: 'Ativo não encontrado.' });
+        }
+
+        const novasOperacao = await db.query(`
+            INSERT INTO operacoes
+                ("idAtivo", "dtOperacao", tipo, quantidade, preco)
+            VALUES 
+                ($1, $2, $3, $4, $5)
+            RETURNING id`,
+            [dados.idAtivo, dados.dataOperacao, dados.tipo, dados.quantidade, dados.preco]
+        );
+
+        // Retornar o ID da operação lançada
+        return res.status(201).json({ message: 'Operação lançada com sucesso!', idOperacao: novasOperacao.rows[0].id });
+    } catch (error) {
+
+        // Retornar um erro detalhado em caso de falha na inserção
+        return res.status(500).json({ error: 'Erro ao lançar a operação.', errorDetails: error.message });
+    }
+}
+//#endregion
+
+
+
+
+
+export default {
+    listarOperacoes,
+    lancarOperacao,
+    carregaAtivosDropList
+}
+//#endregion
