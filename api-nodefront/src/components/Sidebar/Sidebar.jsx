@@ -1,17 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { FaHome, FaUsers, FaCog, FaCircle, FaSignOutAlt, FaBars, FaTimes, FaWallet, FaChartLine, FaTags, FaExchangeAlt, FaFileAlt, FaFolder, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
-function Sidebar({ currentPage, onNavigate, isOpen, onToggle }) {
+function Sidebar({ isOpen, onToggle }) {
   const [cadastrosOpen, setCadastrosOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const currentPath = location.pathname;
+
+  useEffect(() => {
+    if (['/cadastros/meusfiis', '/cadastros/seguimentos', '/cadastros/usuarios'].includes(currentPath)) {
+      setCadastrosOpen(true);
+    }
+  }, [currentPath]);
 
   const menuItems = [
-    { id: 'dashboard', label: 'Início', icon: FaHome },
-    { id: 'ControleAtivos', label: 'Controle de ativos', icon: FaWallet },
-    { id: 'Operacoes', label: 'Operações', icon: FaExchangeAlt },
-    { id: 'Precificacao', label: 'Precificação', icon: FaTags },
-    { id: 'Rendimentos', label: 'Rendimentos', icon: FaChartLine },
-    { id: 'Relatorios', label: 'Relatórios', icon: FaFileAlt },
-    { id: 'configuracoes', label: 'Configurações', icon: FaCog }
+    { id: 'dashboard', path: '/', label: 'Início', icon: FaHome },
+    { id: 'controle-ativos', path: '/controle-ativos', label: 'Controle de ativos', icon: FaWallet },
+    { id: 'operacoes', path: '/operacoes', label: 'Operações', icon: FaExchangeAlt },
+    { id: 'precificacao', path: '/precificacao', label: 'Precificação', icon: FaTags },
+    { id: 'rendimentos', path: '/rendimentos', label: 'Rendimentos', icon: FaChartLine },
+    { id: 'relatorios', path: '/relatorios', label: 'Relatórios', icon: FaFileAlt },
+    { id: 'configuracoes', path: '/configuracoes', label: 'Configurações', icon: FaCog }
   ];
 
   const handleLogout = () => {
@@ -28,6 +39,7 @@ function Sidebar({ currentPage, onNavigate, isOpen, onToggle }) {
       {/* Botão Toggle - Visível quando sidebar está fechada */}
       {!isOpen && (
         <button
+          type="button"
           onClick={onToggle}
           style={{
             position: 'fixed',
@@ -67,6 +79,7 @@ function Sidebar({ currentPage, onNavigate, isOpen, onToggle }) {
         {/* Botão Fechar - Visível quando sidebar está aberta */}
         {isOpen && (
           <button
+            type="button"
             onClick={onToggle}
             style={{
               position: 'absolute',
@@ -125,12 +138,13 @@ function Sidebar({ currentPage, onNavigate, isOpen, onToggle }) {
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1 }}>
           {menuItems.map((item, index) => {
             const Icon = item.icon;
-            const isActive = currentPage === item.id;
+            const isActive = currentPath === item.path;
             return (
               <React.Fragment key={item.id}>
                 <button
+                  type="button"
                   onClick={() => {
-                    onNavigate(item.id);
+                    navigate(item.path);
                   }}
                   title={!isOpen ? item.label : ''}
                   style={{
@@ -170,6 +184,7 @@ function Sidebar({ currentPage, onNavigate, isOpen, onToggle }) {
                 {index === 0 && (
                   <>
                     <button
+                      type="button"
                       onClick={() => setCadastrosOpen(!cadastrosOpen)}
                       title={!isOpen ? 'Cadastros' : ''}
                       style={{
@@ -212,10 +227,11 @@ function Sidebar({ currentPage, onNavigate, isOpen, onToggle }) {
                     {cadastrosOpen && isOpen && (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginLeft: '5px', marginBottom: '8px' }}>
                         <button
-                          onClick={() => onNavigate('meusFiis')}
+                          type="button"
+                          onClick={() => navigate('/cadastros/meusfiis')}
                           style={{
-                            color: currentPage === 'meusFiis' ? '#1d4ed8' : '#ecf0f1',
-                            backgroundColor: currentPage === 'meusFiis' ? '#ebf4ff' : 'transparent',
+                            color: currentPath === '/cadastros/meusfiis' ? '#1d4ed8' : '#ecf0f1',
+                            backgroundColor: currentPath === '/cadastros/meusfiis' ? '#ebf4ff' : 'transparent',
                             border: 'none',
                             borderRadius: '6px',
                             padding: '8px 10px',
@@ -226,10 +242,11 @@ function Sidebar({ currentPage, onNavigate, isOpen, onToggle }) {
                           Meus Fundos
                         </button>
                         <button
-                          onClick={() => onNavigate('seguimentos')}
+                          type="button"
+                          onClick={() => navigate('/cadastros/seguimentos')}
                           style={{
-                            color: currentPage === 'seguimentos' ? '#1d4ed8' : '#ecf0f1',
-                            backgroundColor: currentPage === 'seguimentos' ? '#ebf4ff' : 'transparent',
+                            color: currentPath === '/cadastros/seguimentos' ? '#1d4ed8' : '#ecf0f1',
+                            backgroundColor: currentPath === '/cadastros/seguimentos' ? '#ebf4ff' : 'transparent',
                             border: 'none',
                             borderRadius: '6px',
                             padding: '8px 10px',
@@ -240,10 +257,11 @@ function Sidebar({ currentPage, onNavigate, isOpen, onToggle }) {
                           Segmentos
                         </button>
                         <button
-                          onClick={() => onNavigate('usuarios')}
+                          type="button"
+                          onClick={() => navigate('/cadastros/usuarios')}
                           style={{
-                            color: currentPage === 'usuarios' ? '#1d4ed8' : '#ecf0f1',
-                            backgroundColor: currentPage === 'usuarios' ? '#ebf4ff' : 'transparent',
+                            color: currentPath === '/cadastros/usuarios' ? '#1d4ed8' : '#ecf0f1',
+                            backgroundColor: currentPath === '/cadastros/usuarios' ? '#ebf4ff' : 'transparent',
                             border: 'none',
                             borderRadius: '6px',
                             padding: '8px 10px',
@@ -270,6 +288,7 @@ function Sidebar({ currentPage, onNavigate, isOpen, onToggle }) {
           marginTop: 'auto'
         }}>
           <button
+            type="button"
             onClick={handleLogout}
             style={{
               display: 'flex',

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from '../Sidebar/Sidebar';
 
-function Layout({ currentPage, onNavigate, children }) {
+function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const toggleSidebar = () => {
@@ -12,8 +12,6 @@ function Layout({ currentPage, onNavigate, children }) {
     <div style={{ display: 'flex', minHeight: '100vh' }}>
       {/* Sidebar */}
       <Sidebar 
-        currentPage={currentPage} 
-        onNavigate={onNavigate} 
         isOpen={sidebarOpen}
         onToggle={toggleSidebar}
       />

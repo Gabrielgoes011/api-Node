@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout/Layout';
 import PaginaDashboard from './pages/Dashboard';
 import PaginaUsuarios from './pages/cadastros/usuarios';
@@ -11,44 +12,25 @@ import PaginaRelatorios from './pages/relatorios/relatorios';
 import PaginaSeguimentos from './pages/cadastros/seguimentos/seguimentos';
 import PaginaMeusFiis from './pages/cadastros/meusFundos/meusFiis';
 
-
-
 import './styles/global.css';
 
-
 function App() {
-  const [currentPage, setCurrentPage] = useState('dashboard');
-
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'dashboard':
-        return <PaginaDashboard />;
-      case 'ControleAtivos':
-        return <PaginaControleAtivos />;
-      case 'Rendimentos':
-        return <PaginaRendimentos />;
-      case 'Precificacao':
-        return <PaginaPrecificacao />;
-      case 'Operacoes':
-        return <PaginaOperacoes />;
-      case 'Relatorios':
-        return <PaginaRelatorios />;
-      case 'usuarios':
-        return <PaginaUsuarios />;
-      case 'seguimentos':
-        return <PaginaSeguimentos />;
-      case 'meusFiis':
-        return <PaginaMeusFiis />;
-      case 'configuracoes':
-        return <PaginaConfiguracoes />;
-      default:
-        return <PaginaDashboard />;
-    }
-  };
-
   return (
-    <Layout currentPage={currentPage} onNavigate={setCurrentPage}>
-      {renderPage()}
+    <Layout>
+      <Routes>
+        <Route path="/" element={<PaginaDashboard />} />
+        <Route path="/controle-ativos" element={<PaginaControleAtivos />} />
+        <Route path="/operacoes" element={<PaginaOperacoes />} />
+        <Route path="/precificacao" element={<PaginaPrecificacao />} />
+        <Route path="/rendimentos" element={<PaginaRendimentos />} />
+        <Route path="/relatorios" element={<PaginaRelatorios />} />
+        <Route path="/configuracoes" element={<PaginaConfiguracoes />} />
+        <Route path="/cadastros/usuarios" element={<PaginaUsuarios />} />
+        <Route path="/cadastros/seguimentos" element={<PaginaSeguimentos />} />
+        <Route path="/cadastros/meusfiis" element={<PaginaMeusFiis />} />
+        <Route path="/operacao" element={<Navigate to="/operacoes" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </Layout>
   );
 }
