@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { AiOutlinePlus, AiOutlineDelete } from 'react-icons/ai';
+import { AiOutlinePlus, AiOutlineDelete, AiOutlineBarChart, AiOutlineAreaChart } from 'react-icons/ai';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import NovaOperacaoModal from './components/modalNovaOperacao';
 
 const SimpleBarChart = ({ data }) => {
+  const [animate, setAnimate] = useState(false);
+
+  useEffect(() => {
+    setAnimate(false);
+    const timer = setTimeout(() => setAnimate(true), 100); // Pequeno atraso para a animação engatilhar
+    return () => clearTimeout(timer);
+  }, [data]);
+
   if (!data || data.length === 0) {
     return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, color: '#94a3b8' }}>Nenhum dado disponível</div>;
   }
@@ -12,22 +20,124 @@ const SimpleBarChart = ({ data }) => {
   const maxValue = Math.max(...data.map(item => Math.max(item.Compra, item.Venda, item.Liquido))) || 1;
   
   return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', flex: 1, gap: '4px', overflowX: 'auto', padding: '10px 0' }}>
+    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', flex: 1, gap: '4px', overflowX: 'auto', padding: '15px 5px' }}>
       {data.map((item, idx) => (
-        <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1 1 0', minWidth: '35px' }}>
+        <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1 1 0', minWidth: '40px' }}>
           {/* Barras */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2px', height: '150px', width: '100%', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '3px', height: '160px', width: '100%', justifyContent: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '4px' }}>
             {/* Compra */}
-            <div style={{ width: '30%', maxWidth: '10px', height: `${(item.Compra / maxValue) * 150}px`, backgroundColor: '#4ade80', borderRadius: '2px 2px 0 0' }} title={`Compra: R$ ${item.Compra.toFixed(2)}`} />
+            <div style={{ width: '28%', maxWidth: '12px', height: animate ? `${(item.Compra / maxValue) * 150}px` : '0px', background: 'linear-gradient(180deg, #4ade80 0%, #16a34a 100%)', borderRadius: '4px 4px 0 0', boxShadow: '0 4px 6px -1px rgba(74, 222, 128, 0.4)', transition: `height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 0.05}s` }} title={`Compra: R$ ${item.Compra.toFixed(2)}`} />
             {/* Venda */}
-            <div style={{ width: '30%', maxWidth: '10px', height: `${(item.Venda / maxValue) * 150}px`, backgroundColor: '#ef4444', borderRadius: '2px 2px 0 0' }} title={`Venda: R$ ${item.Venda.toFixed(2)}`} />
+            <div style={{ width: '28%', maxWidth: '12px', height: animate ? `${(item.Venda / maxValue) * 150}px` : '0px', background: 'linear-gradient(180deg, #f87171 0%, #dc2626 100%)', borderRadius: '4px 4px 0 0', boxShadow: '0 4px 6px -1px rgba(248, 113, 113, 0.4)', transition: `height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 0.05 + 0.1}s` }} title={`Venda: R$ ${item.Venda.toFixed(2)}`} />
             {/* Líquido */}
-            <div style={{ width: '30%', maxWidth: '10px', height: `${(item.Liquido / maxValue) * 150}px`, backgroundColor: '#3b82f6', borderRadius: '2px 2px 0 0' }} title={`Líquido: R$ ${item.Liquido.toFixed(2)}`} />
+            <div style={{ width: '28%', maxWidth: '12px', height: animate ? `${(Math.max(0, item.Liquido) / maxValue) * 150}px` : '0px', background: 'linear-gradient(180deg, #60a5fa 0%, #2563eb 100%)', borderRadius: '4px 4px 0 0', boxShadow: '0 4px 6px -1px rgba(96, 165, 250, 0.4)', transition: `height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 0.05 + 0.2}s` }} title={`Líquido: R$ ${item.Liquido.toFixed(2)}`} />
           </div>
           {/* Label */}
-          <p style={{ fontSize: '10px', fontWeight: 600, color: '#1e293b', marginTop: '8px', margin: '8px 0 0 0' }}>{item.name}</p>
+          <p style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', marginTop: '8px', margin: '8px 0 0 0' }}>{item.name.substring(0,3)}</p>
         </div>
       ))}
+    </div>
+  );
+};
+
+const SmoothAreaChart = ({ data }) => {
+  const [animate, setAnimate] = useState(false);
+
+  useEffect(() => {
+    setAnimate(false);
+    const timer = setTimeout(() => setAnimate(true), 50);
+    return () => clearTimeout(timer);
+  }, [data]);
+
+  if (!data || data.length === 0) {
+    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, color: '#94a3b8' }}>Nenhum dado disponível</div>;
+  }
+
+  const maxValue = Math.max(...data.map(item => Math.max(item.Compra, item.Venda, item.Liquido))) || 1;
+  
+  // Configurações do SVG
+  const height = 160;
+  const width = 1200; // Largura virtual para distribuir os meses uniformemente
+  
+  // Funções matemáticas para mapear os dados para as coordenadas do SVG
+  const getX = (i) => (i * (width / data.length)) + (width / data.length / 2);
+  const getY = (val) => height - (Math.max(0, val) / maxValue) * (height - 30) - 15; // 15px de margem superior e inferior
+
+  // Gerador de curvas suaves (Bezier)
+  const makePath = (key) => {
+    let path = `M ${getX(0)},${getY(data[0][key])}`;
+    for (let i = 1; i < data.length; i++) {
+      const x0 = getX(i - 1);
+      const y0 = getY(data[i - 1][key]);
+      const x1 = getX(i);
+      const y1 = getY(data[i][key]);
+      const cx = (x0 + x1) / 2; // Ponto de controle para suavizar
+      path += ` C ${cx},${y0} ${cx},${y1} ${x1},${y1}`;
+    }
+    return path;
+  };
+
+  const pathCompra = makePath('Compra');
+  const pathVenda = makePath('Venda');
+  const pathLiquido = makePath('Liquido');
+
+  return (
+    <div style={{ position: 'relative', width: '100%', padding: '15px 5px 35px 5px', overflowX: 'auto' }}>
+      <div style={{ position: 'relative', width: '100%', minWidth: '600px', height: `${height}px` }}>
+        
+        <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'visible' }}>
+          <defs>
+            {/* Gradientes */}
+            <linearGradient id="gradCompraArea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#4ade80" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#4ade80" stopOpacity="0.0" />
+            </linearGradient>
+            <linearGradient id="gradVendaArea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#f87171" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#f87171" stopOpacity="0.0" />
+            </linearGradient>
+            <linearGradient id="gradLiquidoArea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.0" />
+            </linearGradient>
+            
+            {/* Máscara de corte para animação de desenho da esquerda pra direita */}
+            <clipPath id="wipe-clip-area">
+              <rect x="0" y="-20" height="200" width={animate ? "100%" : "0%"} style={{ transition: 'width 1.2s cubic-bezier(0.25, 1, 0.5, 1)' }} />
+            </clipPath>
+          </defs>
+
+          <g clipPath="url(#wipe-clip-area)">
+            {/* Preenchimentos de Área */}
+            <path d={`${pathCompra} L ${getX(data.length - 1)},${height} L ${getX(0)},${height} Z`} fill="url(#gradCompraArea)" />
+            <path d={`${pathVenda} L ${getX(data.length - 1)},${height} L ${getX(0)},${height} Z`} fill="url(#gradVendaArea)" />
+            <path d={`${pathLiquido} L ${getX(data.length - 1)},${height} L ${getX(0)},${height} Z`} fill="url(#gradLiquidoArea)" />
+            
+            {/* Linhas principais */}
+            <path d={pathCompra} fill="none" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+            <path d={pathVenda} fill="none" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+            <path d={pathLiquido} fill="none" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+
+            {/* Pontos nas linhas (com tooltip nativo) */}
+            {data.map((d, i) => (
+              <g key={`pts-${i}`}>
+                <circle cx={getX(i)} cy={getY(d.Compra)} r="4" fill="#ffffff" stroke="#16a34a" strokeWidth="2.5" style={{ cursor: 'pointer' }}><title>Compra: R$ {d.Compra.toFixed(2)}</title></circle>
+                <circle cx={getX(i)} cy={getY(d.Venda)} r="4" fill="#ffffff" stroke="#dc2626" strokeWidth="2.5" style={{ cursor: 'pointer' }}><title>Venda: R$ {d.Venda.toFixed(2)}</title></circle>
+                <circle cx={getX(i)} cy={getY(d.Liquido)} r="4" fill="#ffffff" stroke="#2563eb" strokeWidth="2.5" style={{ cursor: 'pointer' }}><title>Líquido: R$ {d.Liquido.toFixed(2)}</title></circle>
+              </g>
+            ))}
+          </g>
+        </svg>
+        
+        {/* Rótulos de texto dos Meses sobrepondo o gráfico perfeitamente na base */}
+        <div style={{ display: 'flex', position: 'absolute', bottom: '-30px', left: 0, width: '100%', borderTop: '2px solid #f1f5f9', paddingTop: '8px' }}>
+          {data.map((item, idx) => (
+            <div key={idx} style={{ flex: '1 1 0', textAlign: 'center' }}>
+              <p style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', margin: 0 }}>{item.name.substring(0,3)}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
@@ -38,6 +148,7 @@ export default function PaginaOperacoes() {
   const [operacoes, setOperacoes] = useState([]);
   const [chartData, setChartData] = useState([]);
   const [modalAberto, setModalAberto] = useState(false);
+  const [tipoGrafico, setTipoGrafico] = useState('barras'); // 'barras' ou 'area'
 
   const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
@@ -163,6 +274,42 @@ export default function PaginaOperacoes() {
             <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1e293b', margin: 0 }}>Total de Compras Por Mês</h2>
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              
+              {/* Toggle Tipo de Gráfico */}
+              <div style={{ display: 'flex', backgroundColor: '#f1f5f9', padding: '4px', borderRadius: '0.5rem' }}>
+                <button
+                  onClick={() => setTipoGrafico('barras')}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 10px',
+                    backgroundColor: tipoGrafico === 'barras' ? '#ffffff' : 'transparent',
+                    color: tipoGrafico === 'barras' ? '#2563eb' : '#64748b',
+                    borderRadius: '0.375rem', border: 'none', cursor: 'pointer',
+                    boxShadow: tipoGrafico === 'barras' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                    transition: 'all 0.2s'
+                  }}
+                  title="Gráfico de Barras"
+                >
+                  <AiOutlineBarChart size={18} />
+                </button>
+                <button
+                  onClick={() => setTipoGrafico('area')}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6px 10px',
+                    backgroundColor: tipoGrafico === 'area' ? '#ffffff' : 'transparent',
+                    color: tipoGrafico === 'area' ? '#2563eb' : '#64748b',
+                    borderRadius: '0.375rem', border: 'none', cursor: 'pointer',
+                    boxShadow: tipoGrafico === 'area' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                    transition: 'all 0.2s'
+                  }}
+                  title="Gráfico de Área"
+                >
+                  <AiOutlineAreaChart size={18} />
+                </button>
+              </div>
+              
+              {/* Divisória Vertical */}
+              <div style={{ width: '1px', height: '24px', backgroundColor: '#cbd5e1', margin: '0 4px' }} />
+
               <label style={{ fontSize: '14px', fontWeight: 500, color: '#475569' }}>ANO</label>
               <div style={{ position: 'relative' }}>
                 <select 
@@ -183,20 +330,24 @@ export default function PaginaOperacoes() {
             </div>
           </div>
 
-          <SimpleBarChart data={chartData} />
+          {tipoGrafico === 'barras' ? (
+            <SimpleBarChart data={chartData} />
+          ) : (
+            <SmoothAreaChart data={chartData} />
+          )}
 
           {/* Legenda */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '1.5rem', fontSize: '14px', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '16px', height: '16px', backgroundColor: '#4ade80', borderRadius: '2px' }} />
+              <div style={{ width: '16px', height: '16px', background: 'linear-gradient(180deg, #4ade80 0%, #16a34a 100%)', borderRadius: '4px', boxShadow: '0 2px 4px rgba(74,222,128,0.3)' }} />
               <span>Compra</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '16px', height: '16px', backgroundColor: '#ef4444', borderRadius: '2px' }} />
+              <div style={{ width: '16px', height: '16px', background: 'linear-gradient(180deg, #f87171 0%, #dc2626 100%)', borderRadius: '4px', boxShadow: '0 2px 4px rgba(248,113,113,0.3)' }} />
               <span>Venda</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '16px', height: '16px', backgroundColor: '#3b82f6', borderRadius: '2px' }} />
+              <div style={{ width: '16px', height: '16px', background: 'linear-gradient(180deg, #60a5fa 0%, #2563eb 100%)', borderRadius: '4px', boxShadow: '0 2px 4px rgba(96,165,250,0.3)' }} />
               <span>Líquido</span>
             </div>
           </div>
