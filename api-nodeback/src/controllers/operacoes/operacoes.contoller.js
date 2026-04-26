@@ -1,7 +1,5 @@
 import { openDb } from "../../config/configDb.js";
 
-
-
 //#region função listar fundos -  (ativos/inativos)
 export async function carregaAtivosDropList(req, res) {
     const db = await openDb();
@@ -83,7 +81,6 @@ export async function listarOperacoes(req, res) {
 //#endregion
 
 //#region => função para lançar novas operações (compra ou venda)
-
 export async function lancarOperacao(req, res) {
 
     try {
@@ -128,13 +125,61 @@ export async function lancarOperacao(req, res) {
 }
 //#endregion
 
+//#region => função para carregar dados no gráfico de operações (compra e venda)
+export async function carregaDadosGraficoOperacoes(req, res) {
+    try {
+        //recuperar dados da requisição
+        const campos = {
+            ano: req.body.ano
+        };
 
+        //abrir conexão com o banco de dados
+        const db = await openDb();
 
+        //construir a query dinamicamente 
+        const query = `
+        SELECT 
+            EXTRACT(MONTH FROM "dtOperacao") AS mes,
+            EXTRACT(YEAR FROM "dtOperacao") AS ano,
 
+            SUM(CASE WHEN tipo = 'Compra' THEN (quantidade * preco) ELSE 0 END) AS "totalComprado",
+            SUM(CASE WHEN tipo = 'Venda' THEN (quantidade * preco) ELSE 0 END) AS "totalVendido",
+            SUM(CASE 
+                WHEN tipo = 'Compra' THEN (quantidade * preco) 
+                WHEN tipo = 'Venda' THEN -(quantidade * preco) 
+                ELSE 0 
+            END) AS "totalLiquido"
+
+        FROM operacoes
+        WHERE EXTRACT(YEAR FROM "dtOperacao") = $1
+        GROUP BY EXTRACT(YEAR FROM "dtOperacao"), EXTRACT(MONTH FROM "dtOperacao")
+        ORDER BY mes;
+        `;
+
+        //executar a consulta e recuperar os dados do gráfico
+        const dadosGrafico = await db.query(query, [campos.ano]);
+
+        //verificar se a consulta retornou resultados
+        if (dadosGrafico.rows.length === 0) {
+            return res.status(200).json([]);
+        }
+
+        //retornar os dados do gráfico
+        return res.status(200).json(dadosGrafico.rows);
+
+    //retornar um erro detalhado em caso de falha na consulta
+    } catch (error) {
+
+        //retornar um erro detalhado em caso de falha na consulta
+        return res.status(500).json({ error: 'Erro ao carregar os dados do gráfico.', errorDetails: error.message });
+    }
+}
+//#endregion
 
 export default {
     listarOperacoes,
     lancarOperacao,
-    carregaAtivosDropList
+    carregaAtivosDropList,
+    carregaDadosGraficoOperacoes
 }
 //#endregion

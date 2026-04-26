@@ -197,13 +197,12 @@ export default function PaginaOperacoes() {
     // Recarregar dados do gráfico
     const fetchChartData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/operacoes', {
+        const response = await fetch('http://localhost:3000/carregaDadosGraficoOperacoes', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            mes: 'Todos',
             ano: anoSelecionado
           })
         });
@@ -211,26 +210,22 @@ export default function PaginaOperacoes() {
         if (response.ok) {
           const data = await response.json();
 
-          const agrupado = monthNames.reduce((acc, nome) => {
-            acc[nome] = { name: nome, Compra: 0, Venda: 0, Liquido: 0 };
-            return acc;
-          }, {});
+          // Inicializa todos os meses com zero para manter a linha do gráfico contínua
+          const mesesIniciais = monthNames.map(nome => ({
+            name: nome, Compra: 0, Venda: 0, Liquido: 0
+          }));
 
-          data.forEach(op => {
-            const dt = new Date(op.dataOperacao);
-            const monthIndex = dt.getUTCMonth();
-            const nomeMes = monthNames[monthIndex];
-            const total = op.quantidade * op.preco;
-
-            if (op.tipo.toLowerCase() === 'compra' || op.tipo.toLowerCase() === 'c') {
-              agrupado[nomeMes].Compra += total;
-            } else {
-              agrupado[nomeMes].Venda += total;
+          // Preenche apenas os meses que voltaram valores da API
+          data.forEach(item => {
+            const mesIndex = parseInt(item.mes, 10) - 1; // A API retorna mês de 1 a 12 (ex: Jan = 1)
+            if (mesIndex >= 0 && mesIndex < 12) {
+              mesesIniciais[mesIndex].Compra = parseFloat(item.totalComprado) || 0;
+              mesesIniciais[mesIndex].Venda = parseFloat(item.totalVendido) || 0;
+              mesesIniciais[mesIndex].Liquido = parseFloat(item.totalLiquido) || 0;
             }
-            agrupado[nomeMes].Liquido = agrupado[nomeMes].Compra - agrupado[nomeMes].Venda;
           });
 
-          setChartData(Object.values(agrupado));
+          setChartData(mesesIniciais);
         } else {
           console.error('Erro ao buscar dados do gráfico');
         }

@@ -4,8 +4,13 @@ const router = express.Router();
 import {
   listarOperacoes,
   lancarOperacao,
-  carregaAtivosDropList
+  carregaAtivosDropList,
+  carregaDadosGraficoOperacoes
 } from '../controllers/operacoes/operacoes.contoller.js';
+
+
+router.get('/ativosDropList', carregaAtivosDropList);
+//body: {} - sem parâmetros, apenas para carregar a lista de ativos para o dropdown list no frontend
 
 router.post('/operacoes', listarOperacoes);
 //body: { mes, ano }
@@ -13,7 +18,8 @@ router.post('/operacoes', listarOperacoes);
 router.post('/lancarOperacao', lancarOperacao);
 //body: { idAtivo, dataOperacao, tipo, quantidade, preco }
 
-router.get('/ativosDropList', carregaAtivosDropList);
+router.post('/carregaDadosGraficoOperacoes', carregaDadosGraficoOperacoes);
+//body: { ano }
 
 export default router;
 
