@@ -149,6 +149,8 @@ export default function PaginaOperacoes() {
   const [chartData, setChartData] = useState([]);
   const [modalAberto, setModalAberto] = useState(false);
   const [tipoGrafico, setTipoGrafico] = useState('barras'); // 'barras' ou 'area'
+  const [modalExclusaoAberto, setModalExclusaoAberto] = useState(false);
+  const [operacaoParaExcluir, setOperacaoParaExcluir] = useState(null);
 
   const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
@@ -251,8 +253,38 @@ export default function PaginaOperacoes() {
     return formatador.format(valor);
   };
 
-  const excluirOperacao = (id) => {
-    setOperacoes(operacoes.filter(op => op.id !== id));
+  const abrirModalExclusao = (operacao) => {
+    setOperacaoParaExcluir(operacao);
+    setModalExclusaoAberto(true);
+  };
+
+  const confirmarExclusao = async () => {
+    if (!operacaoParaExcluir) return;
+
+    try {
+      const response = await fetch('http://localhost:3000/excluirOperacao', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: operacaoParaExcluir.id })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success(data.message || 'Operação excluída com sucesso!');
+        recarregarDados(); // Atualiza a tabela e os gráficos automaticamente
+      } else {
+        toast.error(`Erro: ${data.error} ${data.errorDetails ? '- ' + data.errorDetails : ''}`);
+      }
+    } catch (error) {
+      console.error('Erro na requisição de exclusão:', error);
+      toast.error('Erro de conexão ao tentar excluir a operação.');
+    } finally {
+      setModalExclusaoAberto(false);
+      setOperacaoParaExcluir(null);
+    }
   };
 
   // O backend já retorna os dados filtrados por mês e ano
@@ -446,7 +478,7 @@ export default function PaginaOperacoes() {
                         </td>
                         <td style={{ padding: '1rem', textAlign: 'center' }}>
                           <button 
-                            onClick={() => excluirOperacao(row.id)}
+                          onClick={() => abrirModalExclusao(row)}
                             style={{ color: '#cbd5e1', cursor: 'pointer', padding: '0.375rem', borderRadius: '0.375rem', backgroundColor: 'transparent', border: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
                           onMouseOver={(e) => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.backgroundColor = '#fee2e2'; }}
                           onMouseOut={(e) => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }}
@@ -472,6 +504,43 @@ export default function PaginaOperacoes() {
       
       <NovaOperacaoModal isOpen={modalAberto} onClose={() => setModalAberto(false)} onSuccess={() => { toast.success('Operação cadastrada com sucesso!'); recarregarDados(); }} />
       
+      {/* Modal de Confirmação de Exclusão */}
+      {modalExclusaoAberto && operacaoParaExcluir && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0, 0, 0, 0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, backdropFilter: 'blur(2px)' }}>
+          <div style={{ backgroundColor: '#fff', padding: '30px', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', width: '100%', maxWidth: '400px', fontFamily: 'sans-serif' }}>
+            <h3 style={{ margin: '0 0 15px 0', color: '#2c3e50', fontSize: '1.4rem', textAlign: 'center' }}>Excluir Operação</h3>
+            <p style={{ margin: '0 0 20px 0', color: '#475569', fontSize: '1rem', textAlign: 'center' }}>
+              Tem certeza que deseja excluir essa operação?
+            </p>
+            
+            <div style={{ backgroundColor: '#f8fafc', padding: '15px', borderRadius: '8px', marginBottom: '25px', border: '1px solid #e2e8f0' }}>
+              <p style={{ margin: '0 0 8px 0', color: '#334155' }}><strong>Ativo:</strong> {operacaoParaExcluir.ativo}</p>
+              <p style={{ margin: '0 0 8px 0', color: '#334155' }}><strong>Quantidade:</strong> {operacaoParaExcluir.qtde}</p>
+              <p style={{ margin: 0, color: '#334155' }}><strong>Total:</strong> {formatarMoeda(operacaoParaExcluir.qtde * operacaoParaExcluir.preco)}</p>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '15px' }}>
+              <button
+                onClick={() => { setModalExclusaoAberto(false); setOperacaoParaExcluir(null); }}
+                style={{ flex: 1, padding: '12px', backgroundColor: '#e2e8f0', color: '#475569', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', transition: 'background-color 0.2s' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#cbd5e1'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#e2e8f0'}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmarExclusao}
+                style={{ flex: 1, padding: '12px', backgroundColor: '#ef4444', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem', transition: 'background-color 0.2s' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#dc2626'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#ef4444'}
+              >
+                Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <ToastContainer />
     </div>
   );

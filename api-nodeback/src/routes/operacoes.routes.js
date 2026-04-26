@@ -5,7 +5,8 @@ import {
   listarOperacoes,
   lancarOperacao,
   carregaAtivosDropList,
-  carregaDadosGraficoOperacoes
+  carregaDadosGraficoOperacoes,
+  excluirOperacao
 } from '../controllers/operacoes/operacoes.contoller.js';
 
 
@@ -17,6 +18,9 @@ router.post('/operacoes', listarOperacoes);
 
 router.post('/lancarOperacao', lancarOperacao);
 //body: { idAtivo, dataOperacao, tipo, quantidade, preco }
+
+router.post('/excluirOperacao', excluirOperacao);
+// body: { id }
 
 router.post('/carregaDadosGraficoOperacoes', carregaDadosGraficoOperacoes);
 //body: { ano }

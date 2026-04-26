@@ -41,7 +41,7 @@ export async function listarOperacoes(req, res) {
         //construir a query dinamicamente
         let query = `
             SELECT 
-                a."dtOperacao" "dataOperacao", a.tipo, b.ticker, 
+                a.id, a."dtOperacao" "dataOperacao", a.tipo, b.ticker, 
                 c."nomeSeguimento" ,a.quantidade , a.preco
             FROM 
                 operacoes a INNER JOIN ativos b
@@ -176,10 +176,46 @@ export async function carregaDadosGraficoOperacoes(req, res) {
 }
 //#endregion
 
+//#region => função para exluir uma operação
+export async function excluirOperacao(req, res) {
+    try {
+        //envia o id no body da requisição
+        const idOperacao = req.body.id;
+
+        //abrir conexão com o banco de dados
+        const db = await openDb();
+
+        //excluir a operação
+        const resultado = await db.query(`
+            DELETE 
+            FROM operacoes
+            WHERE id = $1
+        `, [idOperacao]);
+
+        //verificar se a operação foi excluída 
+        if (resultado.rowCount === 0) {
+            return res.status(404).json({ error: 'Operação não encontrada.' });
+        }
+        //retornar uma mensagem de sucesso
+        return res.status(200).json({ message: 'Operação excluída com sucesso!' });
+
+    } catch (error) {
+        //retornar um erro detalhado em caso de falha na exclusão
+        return res.status(500).json({ error: 'Erro ao excluir a operação.', errorDetails: error.message });
+    }
+}
+//#endregion
+
+
+
+//#region exportação das funções do controller
+
 export default {
     listarOperacoes,
     lancarOperacao,
     carregaAtivosDropList,
-    carregaDadosGraficoOperacoes
+    carregaDadosGraficoOperacoes,
+    excluirOperacao
 }
+
 //#endregion
