@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from '../Sidebar/Sidebar';
 
-function Layout({ children }) {
+function Layout({ children, onLogout }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const toggleSidebar = () => {
@@ -14,6 +14,7 @@ function Layout({ children }) {
       <Sidebar 
         isOpen={sidebarOpen}
         onToggle={toggleSidebar}
+        onLogout={onLogout}
       />
 
       {/* Main Content */}

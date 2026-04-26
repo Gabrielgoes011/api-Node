@@ -1,0 +1,142 @@
+import React, { useState } from 'react';
+import { toast } from 'react-toastify';
+
+function Login({ onLogin }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    // Validação de teste com 'admin'/'admin'
+    if (email === 'admin' && password === 'admin@2103') {
+      toast.success('Login bem-sucedido! Redirecionando...');
+      
+      setTimeout(() => {
+        onLogin(true); // Avisa o arquivo principal (App.jsx) que logou
+      }, 1000); // Aguarda 1 segundo apenas para mostrar a mensagem verde antes de trocar de tela
+    } else {
+      toast.error('Email ou senha inválidos.');
+    }
+  };
+
+  return (
+    <>
+      <style>
+        {`
+          * {
+            box-sizing: border-box;
+          }
+          .login-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          }
+          .login-card {
+            background: #1e293b;
+            padding: 2.5rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+          }
+          .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+          }
+          .login-header h2 {
+            margin: 0;
+            color: #f8fafc;
+            font-size: 1.8rem;
+          }
+          .login-header p {
+            margin: 0.5rem 0 0;
+            color: #94a3b8;
+            font-size: 0.95rem;
+          }
+          .form-group {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+          }
+          .form-group label {
+            margin-bottom: 0.5rem;
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 0.9rem;
+          }
+          .form-group input {
+            padding: 0.85rem;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+            color: #f8fafc;
+          }
+          .form-group input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+          }
+          .login-button {
+            width: 100%;
+            padding: 0.85rem;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+          }
+          .login-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+          }
+        `}
+      </style>
+      <div className="login-wrapper">
+        <div className="login-card">
+          <div className="login-header">
+            <h2>Bem-vindo</h2>
+            <p>Faça login para acessar o sistema</p>
+          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="text"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Digite seu email"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="password">Senha</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Digite sua senha"
+                required
+              />
+            </div>
+            <button type="submit" className="login-button">Entrar</button>
+          </form>
+        </div>
+      </div>
+    </>
+  );
+}
+
+export default Login;

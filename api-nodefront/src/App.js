@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout/Layout';
 import PaginaDashboard from './pages/Dashboard';
@@ -11,12 +11,28 @@ import PaginaOperacoes from './pages/operacoes/operacoes';
 import PaginaRelatorios from './pages/relatorios/relatorios';
 import PaginaSeguimentos from './pages/cadastros/seguimentos/seguimentos';
 import PaginaMeusFiis from './pages/cadastros/meusFundos/meusFiis';
+import Login from './pages/login/login';
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './styles/global.css';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  if (!isLoggedIn) {
+    return (
+      <>
+        <ToastContainer autoClose={3000} />
+        <Login onLogin={setIsLoggedIn} />
+      </>
+    );
+  }
+
   return (
-    <Layout>
+    <>
+      <ToastContainer autoClose={3000} />
+      <Layout onLogout={() => setIsLoggedIn(false)}>
       <Routes>
         <Route path="/" element={<PaginaDashboard />} />
         <Route path="/controle-ativos" element={<PaginaControleAtivos />} />
@@ -32,6 +48,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
+    </>
   );
 }
 
