@@ -3,6 +3,7 @@ import { AiOutlinePlus, AiOutlineDelete, AiOutlineBarChart, AiOutlineAreaChart }
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import NovaOperacaoModal from './components/modalNovaOperacao';
+import API_BASE_URL from '../../config/api';
 
 const SimpleBarChart = ({ data }) => {
   const [animate, setAnimate] = useState(false);
@@ -159,7 +160,7 @@ export default function PaginaOperacoes() {
     // Recarregar operações
     const fetchOperacoes = async () => {
       try {
-        const response = await fetch('http://localhost:3000/operacoes', {
+        const response = await fetch(`${API_BASE_URL}/operacoes`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -199,7 +200,7 @@ export default function PaginaOperacoes() {
     // Recarregar dados do gráfico
     const fetchChartData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/carregaDadosGraficoOperacoes', {
+        const response = await fetch(`${API_BASE_URL}/carregaDadosGraficoOperacoes`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -262,7 +263,7 @@ export default function PaginaOperacoes() {
     if (!operacaoParaExcluir) return;
 
     try {
-      const response = await fetch('http://localhost:3000/excluirOperacao', {
+      const response = await fetch(`${API_BASE_URL}/excluirOperacao`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

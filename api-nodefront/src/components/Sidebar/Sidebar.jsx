@@ -53,7 +53,7 @@ function Sidebar({ isOpen, onToggle, onLogout }) {
             left: '10px',
             top: '20px',
             zIndex: '1000',
-            backgroundColor: '#2c3e50',
+            backgroundColor: '#1e293b',
             color: '#fff',
             border: 'none',
             borderRadius: '6px',
@@ -70,7 +70,7 @@ function Sidebar({ isOpen, onToggle, onLogout }) {
       <div style={{
         width: isOpen ? '250px' : '0px',
         height: '100vh',
-        backgroundColor: '#2c3e50',
+        backgroundColor: '#1e293b',
         padding: isOpen ? '20px' : '0px',
         position: 'fixed',
         left: 0,
@@ -107,7 +107,7 @@ function Sidebar({ isOpen, onToggle, onLogout }) {
               transition: 'all 0.2s ease'
             }}
             onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#34495e';
+              e.target.style.backgroundColor = '#334155';
             }}
             onMouseLeave={(e) => {
               e.target.style.backgroundColor = 'transparent';
@@ -129,7 +129,7 @@ function Sidebar({ isOpen, onToggle, onLogout }) {
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              backgroundColor: '#34495e',
+              backgroundColor: '#334155',
               padding: '8px 16px',
               borderRadius: '20px',
               fontSize: '14px',
@@ -173,7 +173,7 @@ function Sidebar({ isOpen, onToggle, onLogout }) {
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.target.style.backgroundColor = '#34495e';
+                      e.target.style.backgroundColor = '#334155';
                       e.target.style.color = '#ecf0f1';
                     }
                   }}
@@ -213,7 +213,7 @@ function Sidebar({ isOpen, onToggle, onLogout }) {
                       }}
                       onMouseEnter={(e) => {
                         if (!cadastrosOpen) {
-                          e.target.style.backgroundColor = '#34495e';
+                          e.target.style.backgroundColor = '#334155';
                           e.target.style.color = '#ecf0f1';
                         }
                       }}
@@ -290,7 +290,7 @@ function Sidebar({ isOpen, onToggle, onLogout }) {
       {/* Logout Button - Parte inferior */}
       {isOpen && (
         <div style={{
-          borderTop: '2px solid #34495e',
+          borderTop: '2px solid #334155',
           paddingTop: '15px',
           marginTop: 'auto'
         }}>

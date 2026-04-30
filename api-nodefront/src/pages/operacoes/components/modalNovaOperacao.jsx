@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
+import API_BASE_URL from '../../../config/api';
 
 export default function NovaOperacaoModal({ isOpen, onClose, onSuccess }) {
   const [data, setData] = useState('');
@@ -19,7 +20,7 @@ export default function NovaOperacaoModal({ isOpen, onClose, onSuccess }) {
       // Buscar ativos do backend
       const fetchAtivos = async () => {
         try {
-          const response = await fetch('http://localhost:3000/ativosDropList');
+          const response = await fetch(`${API_BASE_URL}/ativosDropList`);
           if (response.ok) {
             const data = await response.json();
             setAtivosDisponiveis(data);
@@ -79,7 +80,7 @@ export default function NovaOperacaoModal({ isOpen, onClose, onSuccess }) {
 
     try {
       setCarregando(true);
-      const response = await fetch('http://localhost:3000/lancarOperacao', {
+      const response = await fetch(`${API_BASE_URL}/lancarOperacao`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

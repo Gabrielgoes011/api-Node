@@ -206,10 +206,7 @@ export async function excluirOperacao(req, res) {
 }
 //#endregion
 
-
-
 //#region exportação das funções do controller
-
 export default {
     listarOperacoes,
     lancarOperacao,
