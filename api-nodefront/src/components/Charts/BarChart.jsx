@@ -5,11 +5,12 @@ import React, { useState, useEffect } from 'react';
  *
  * Props:
  *  - data: Array<{ name: string, [key]: number }>
- *  - keys: Array<string>  — chaves a plotar (ex: ['Compra','Venda','Liquido'])
- *  - colors: Object       — { [key]: string } cor de cada chave
- *  - height?: number      — altura das barras em px (default 150)
+ *  - keys: Array<string>   — chaves a plotar (ex: ['Compra','Venda','Liquido'])
+ *  - colors: Object        — { [key]: string } cor de cada chave
+ *  - height?: number       — altura das barras em px (default 150)
+ *  - barMaxWidth?: number  — largura máxima de cada barra em px (default: auto por nº de séries)
  */
-export default function BarChart({ data, keys, colors, height = 150 }) {
+export default function BarChart({ data, keys, colors, height = 150, barMaxWidth }) {
   const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
@@ -27,6 +28,8 @@ export default function BarChart({ data, keys, colors, height = 150 }) {
   }
 
   const maxValue = Math.max(...data.flatMap(item => keys.map(k => item[k] || 0))) || 1;
+  // largura máxima: prop explícita > auto (quanto menos séries, mais larga)
+  const maxW = barMaxWidth ?? (keys.length === 1 ? 48 : keys.length === 2 ? 24 : 14);
 
   return (
     <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', flex: 1, gap: '4px', overflowX: 'auto', padding: '15px 5px' }}>
@@ -38,7 +41,7 @@ export default function BarChart({ data, keys, colors, height = 150 }) {
                 key={key}
                 style={{
                   width: `${Math.floor(80 / keys.length)}%`,
-                  maxWidth: '14px',
+                  maxWidth: `${maxW}px`,
                   height: animate ? `${((item[key] || 0) / maxValue) * height}px` : '0px',
                   background: colors[key] || '#3b82f6',
                   borderRadius: '4px 4px 0 0',

@@ -65,9 +65,49 @@ const MOCK = [
   { id:42, data:'2026-04-15', ativo:'HGRU11', segmento:'Renda Urbana', valor:58.60 },
 ];
 
+// ─── Gráfico Evolução Anual — barras verticais com label completa e valor ────────
+function EvolucaoAnualChart({ data }) {
+  const [animate, setAnimate] = React.useState(false);
+  React.useEffect(() => {
+    setAnimate(false);
+    const t = setTimeout(() => setAnimate(true), 100);
+    return () => clearTimeout(t);
+  }, [data]);
+
+  const max = Math.max(...data.map(d => d.Valor || 0), 1);
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', gap: '12px', padding: '8px 0 0' }}>
+      {data.map((item, idx) => (
+        <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+          {/* valor em cima */}
+          <span style={{ fontSize: '11px', fontWeight: 700, color: '#475569', marginBottom: '6px', whiteSpace: 'nowrap' }}>
+            {fmt(item.Valor)}
+          </span>
+          {/* barra */}
+          <div style={{
+            width: '100%', maxWidth: '56px',
+            height: animate ? `${Math.max((item.Valor / max) * 160, item.Valor > 0 ? 4 : 0)}px` : '0px',
+            background: 'linear-gradient(180deg,#60a5fa 0%,#2563eb 100%)',
+            borderRadius: '6px 6px 0 0',
+            boxShadow: '0 4px 6px -1px rgba(96,165,250,0.35)',
+            transition: `height 0.7s cubic-bezier(0.34,1.56,0.64,1) ${idx * 0.08}s`,
+            borderBottom: '2px solid #f1f5f9',
+          }} title={`${item.name}: ${fmt(item.Valor)}`} />
+          {/* label ano completo */}
+          <span style={{ fontSize: '12px', fontWeight: 600, color: '#64748b', marginTop: '8px' }}>
+            {item.name}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ─── Gráfico de barras horizontais agrupadas (Comparação Mensal) ───────────────
 function BarChartHorizontal({ data, anos }) {
-  const max = Math.max(...data.flatMap(d => anos.map(a => d[a] || 0)), 1);
+  const anosOrdenados = [...anos].sort((a, b) => Number(a) - Number(b));
+  const max = Math.max(...data.flatMap(d => anosOrdenados.map(a => d[a] || 0)), 1);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       {MESES.map((mes, mi) => {
@@ -76,7 +116,7 @@ function BarChartHorizontal({ data, anos }) {
           <div key={mi} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '11px', color: '#64748b', width: '72px', textAlign: 'right', flexShrink: 0 }}>{mes.substring(0,3)}</span>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              {anos.map(ano => {
+              {anosOrdenados.map(ano => {
                 const val = row[ano] || 0;
                 return (
                   <div key={ano} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -106,6 +146,7 @@ export default function PaginaRendimentos() {
   const [tipoGrafico, setTipoGrafico] = useState('barras');
   const [anosComp, setAnosComp]       = useState(['2024','2025','2026']);
   const [modalAberto, setModalAberto] = useState(false);
+  const [abaAtiva, setAbaAtiva]       = useState('graficos'); // 'graficos' | 'historico'
 
   const ativos = useMemo(() => ['Todos', ...new Set(dados.map(d => d.ativo))], [dados]);
 
@@ -212,7 +253,35 @@ export default function PaginaRendimentos() {
           </div>
         </div>
 
-        {/* ── Gráfico mensal — mesmo layout do card de operações ── */}
+        {/* ── Abas ── */}
+        <nav style={{ display: 'flex', backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.75rem', overflow: 'hidden', marginBottom: '1.5rem' }}>
+          {[
+            { id: 'graficos',  label: '📊 Gráficos'  },
+            { id: 'historico', label: '📋 Histórico'  },
+          ].map(({ id, label }) => (
+            <button
+              key={id}
+              onClick={() => setAbaAtiva(id)}
+              style={{
+                flex: 1,
+                padding: '0.75rem 1rem',
+                backgroundColor: abaAtiva === id ? '#ffffff' : '#f8fafc',
+                color: abaAtiva === id ? '#1d4ed8' : '#64748b',
+                border: 'none',
+                borderBottom: abaAtiva === id ? '3px solid #1d4ed8' : '3px solid transparent',
+                fontWeight: 600,
+                fontSize: '14px',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+
+        {/* ── Aba Gráficos ── */}
+        {abaAtiva === 'graficos' && (<>
         <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0', padding: '1.5rem', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
             <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1e293b', margin: 0 }}>Total de Rendimentos por Mês</h2>
@@ -263,8 +332,8 @@ export default function PaginaRendimentos() {
 
           {/* Evolução Anual */}
           <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0', padding: '1.5rem' }}>
-            <h2 style={{ margin: '0 0 1.25rem', fontSize: '17px', fontWeight: 700, color: '#1e293b' }}>Evolução Anual Rendimentos</h2>
-            <BarChart data={chartAnual} keys={CHART_KEYS} colors={CHART_COLORS} />
+            <h2 style={{ margin: '0 0 1.5rem', fontSize: '17px', fontWeight: 700, color: '#1e293b' }}>Evolução Anual Rendimentos</h2>
+            <EvolucaoAnualChart data={chartAnual} />
           </div>
 
           {/* Comparação Mensal */}
@@ -294,6 +363,12 @@ export default function PaginaRendimentos() {
             <BarChartHorizontal data={chartComparacao} anos={anosComp} />
           </div>
         </div>
+
+        {/* ── fecha aba Gráficos ── */}
+        </>)}
+
+        {/* ── Aba Histórico ── */}
+        {abaAtiva === 'historico' && (<>
 
         {/* ── Tabela — mesmo padrão de operações ── */}
         <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
@@ -382,6 +457,9 @@ export default function PaginaRendimentos() {
             Os dados são fornecidos para fins informativos. Simulação de ambiente Web.
           </div>
         </div>
+
+        {/* ── fecha aba Histórico ── */}
+        </>)}
 
       </main>
 
