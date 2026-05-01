@@ -4,144 +4,16 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import NovaOperacaoModal from './components/modalNovaOperacao';
 import API_BASE_URL from '../../config/api';
+import { BarChart, AreaChart } from '../../components/Charts';
 
-const SimpleBarChart = ({ data }) => {
-  const [animate, setAnimate] = useState(false);
-
-  useEffect(() => {
-    setAnimate(false);
-    const timer = setTimeout(() => setAnimate(true), 100); // Pequeno atraso para a animação engatilhar
-    return () => clearTimeout(timer);
-  }, [data]);
-
-  if (!data || data.length === 0) {
-    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, color: '#94a3b8' }}>Nenhum dado disponível</div>;
-  }
-
-  const maxValue = Math.max(...data.map(item => Math.max(item.Compra, item.Venda, item.Liquido))) || 1;
-  
-  return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', flex: 1, gap: '4px', overflowX: 'auto', padding: '15px 5px' }}>
-      {data.map((item, idx) => (
-        <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1 1 0', minWidth: '40px' }}>
-          {/* Barras */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '3px', height: '160px', width: '100%', justifyContent: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '4px' }}>
-            {/* Compra */}
-            <div style={{ width: '28%', maxWidth: '12px', height: animate ? `${(item.Compra / maxValue) * 150}px` : '0px', background: 'linear-gradient(180deg, #4ade80 0%, #16a34a 100%)', borderRadius: '4px 4px 0 0', boxShadow: '0 4px 6px -1px rgba(74, 222, 128, 0.4)', transition: `height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 0.05}s` }} title={`Compra: R$ ${item.Compra.toFixed(2)}`} />
-            {/* Venda */}
-            <div style={{ width: '28%', maxWidth: '12px', height: animate ? `${(item.Venda / maxValue) * 150}px` : '0px', background: 'linear-gradient(180deg, #f87171 0%, #dc2626 100%)', borderRadius: '4px 4px 0 0', boxShadow: '0 4px 6px -1px rgba(248, 113, 113, 0.4)', transition: `height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 0.05 + 0.1}s` }} title={`Venda: R$ ${item.Venda.toFixed(2)}`} />
-            {/* Líquido */}
-            <div style={{ width: '28%', maxWidth: '12px', height: animate ? `${(Math.max(0, item.Liquido) / maxValue) * 150}px` : '0px', background: 'linear-gradient(180deg, #60a5fa 0%, #2563eb 100%)', borderRadius: '4px 4px 0 0', boxShadow: '0 4px 6px -1px rgba(96, 165, 250, 0.4)', transition: `height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 0.05 + 0.2}s` }} title={`Líquido: R$ ${item.Liquido.toFixed(2)}`} />
-          </div>
-          {/* Label */}
-          <p style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', marginTop: '8px', margin: '8px 0 0 0' }}>{item.name.substring(0,3)}</p>
-        </div>
-      ))}
-    </div>
-  );
+const CHART_KEYS   = ['Compra', 'Venda', 'Liquido'];
+const CHART_COLORS = {
+  Compra:  'linear-gradient(180deg,#4ade80 0%,#16a34a 100%)',
+  Venda:   'linear-gradient(180deg,#f87171 0%,#dc2626 100%)',
+  Liquido: 'linear-gradient(180deg,#60a5fa 0%,#2563eb 100%)',
 };
-
-const SmoothAreaChart = ({ data }) => {
-  const [animate, setAnimate] = useState(false);
-
-  useEffect(() => {
-    setAnimate(false);
-    const timer = setTimeout(() => setAnimate(true), 50);
-    return () => clearTimeout(timer);
-  }, [data]);
-
-  if (!data || data.length === 0) {
-    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, color: '#94a3b8' }}>Nenhum dado disponível</div>;
-  }
-
-  const maxValue = Math.max(...data.map(item => Math.max(item.Compra, item.Venda, item.Liquido))) || 1;
-  
-  // Configurações do SVG
-  const height = 160;
-  const width = 1200; // Largura virtual para distribuir os meses uniformemente
-  
-  // Funções matemáticas para mapear os dados para as coordenadas do SVG
-  const getX = (i) => (i * (width / data.length)) + (width / data.length / 2);
-  const getY = (val) => height - (Math.max(0, val) / maxValue) * (height - 30) - 15; // 15px de margem superior e inferior
-
-  // Gerador de curvas suaves (Bezier)
-  const makePath = (key) => {
-    let path = `M ${getX(0)},${getY(data[0][key])}`;
-    for (let i = 1; i < data.length; i++) {
-      const x0 = getX(i - 1);
-      const y0 = getY(data[i - 1][key]);
-      const x1 = getX(i);
-      const y1 = getY(data[i][key]);
-      const cx = (x0 + x1) / 2; // Ponto de controle para suavizar
-      path += ` C ${cx},${y0} ${cx},${y1} ${x1},${y1}`;
-    }
-    return path;
-  };
-
-  const pathCompra = makePath('Compra');
-  const pathVenda = makePath('Venda');
-  const pathLiquido = makePath('Liquido');
-
-  return (
-    <div style={{ position: 'relative', width: '100%', padding: '15px 5px 35px 5px', overflowX: 'auto' }}>
-      <div style={{ position: 'relative', width: '100%', minWidth: '600px', height: `${height}px` }}>
-        
-        <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'visible' }}>
-          <defs>
-            {/* Gradientes */}
-            <linearGradient id="gradCompraArea" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#4ade80" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#4ade80" stopOpacity="0.0" />
-            </linearGradient>
-            <linearGradient id="gradVendaArea" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#f87171" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#f87171" stopOpacity="0.0" />
-            </linearGradient>
-            <linearGradient id="gradLiquidoArea" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.4" />
-              <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.0" />
-            </linearGradient>
-            
-            {/* Máscara de corte para animação de desenho da esquerda pra direita */}
-            <clipPath id="wipe-clip-area">
-              <rect x="0" y="-20" height="200" width={animate ? "100%" : "0%"} style={{ transition: 'width 1.2s cubic-bezier(0.25, 1, 0.5, 1)' }} />
-            </clipPath>
-          </defs>
-
-          <g clipPath="url(#wipe-clip-area)">
-            {/* Preenchimentos de Área */}
-            <path d={`${pathCompra} L ${getX(data.length - 1)},${height} L ${getX(0)},${height} Z`} fill="url(#gradCompraArea)" />
-            <path d={`${pathVenda} L ${getX(data.length - 1)},${height} L ${getX(0)},${height} Z`} fill="url(#gradVendaArea)" />
-            <path d={`${pathLiquido} L ${getX(data.length - 1)},${height} L ${getX(0)},${height} Z`} fill="url(#gradLiquidoArea)" />
-            
-            {/* Linhas principais */}
-            <path d={pathCompra} fill="none" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-            <path d={pathVenda} fill="none" stroke="#ef4444" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-            <path d={pathLiquido} fill="none" stroke="#3b82f6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-
-            {/* Pontos nas linhas (com tooltip nativo) */}
-            {data.map((d, i) => (
-              <g key={`pts-${i}`}>
-                <circle cx={getX(i)} cy={getY(d.Compra)} r="4" fill="#ffffff" stroke="#16a34a" strokeWidth="2.5" style={{ cursor: 'pointer' }}><title>Compra: R$ {d.Compra.toFixed(2)}</title></circle>
-                <circle cx={getX(i)} cy={getY(d.Venda)} r="4" fill="#ffffff" stroke="#dc2626" strokeWidth="2.5" style={{ cursor: 'pointer' }}><title>Venda: R$ {d.Venda.toFixed(2)}</title></circle>
-                <circle cx={getX(i)} cy={getY(d.Liquido)} r="4" fill="#ffffff" stroke="#2563eb" strokeWidth="2.5" style={{ cursor: 'pointer' }}><title>Líquido: R$ {d.Liquido.toFixed(2)}</title></circle>
-              </g>
-            ))}
-          </g>
-        </svg>
-        
-        {/* Rótulos de texto dos Meses sobrepondo o gráfico perfeitamente na base */}
-        <div style={{ display: 'flex', position: 'absolute', bottom: '-30px', left: 0, width: '100%', borderTop: '2px solid #f1f5f9', paddingTop: '8px' }}>
-          {data.map((item, idx) => (
-            <div key={idx} style={{ flex: '1 1 0', textAlign: 'center' }}>
-              <p style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', margin: 0 }}>{item.name.substring(0,3)}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+// cores sólidas para o AreaChart (que usa stroke/fill direto)
+const AREA_COLORS = { Compra: '#22c55e', Venda: '#ef4444', Liquido: '#3b82f6' };
 
 export default function PaginaOperacoes() {
   const [anoSelecionado, setAnoSelecionado] = useState('2026');
@@ -359,9 +231,9 @@ export default function PaginaOperacoes() {
           </div>
 
           {tipoGrafico === 'barras' ? (
-            <SimpleBarChart data={chartData} />
+            <BarChart data={chartData} keys={CHART_KEYS} colors={CHART_COLORS} />
           ) : (
-            <SmoothAreaChart data={chartData} />
+            <AreaChart data={chartData} keys={CHART_KEYS} colors={AREA_COLORS} />
           )}
 
           {/* Legenda */}
@@ -424,7 +296,7 @@ export default function PaginaOperacoes() {
                   <th style={{ padding: '1rem', fontWeight: 600 }}>Operação</th>
                   <th style={{ padding: '1rem', fontWeight: 600 }}>Ativo</th>
                   <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'center' }}>Seguimento</th>
-                  <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'right' }}>Quantidade</th>
+                  <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'center' }}>Quantidade</th>
                   <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'right' }}>Preço</th>
                   <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'right' }}>Valor Total</th>
                   <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'center' }}>Ações</th>
@@ -471,7 +343,13 @@ export default function PaginaOperacoes() {
                           </span>
                         </td>
                         <td style={{ padding: '1rem', fontWeight: 700, color: '#1e293b' }}>{row.ativo}</td>
-                        <td style={{ padding: '1rem', color: '#475569', textAlign: 'center' }}>{row.seguimento}</td>
+                        <td style={{ padding: '1rem', textAlign: 'center' }}>
+                          <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', padding: '2px 10px', borderRadius: '9999px', fontSize: '12px', fontWeight: 500, backgroundColor: '#eff6ff', color: '#2563eb' }}>
+                              {row.seguimento}
+                            </span>
+                          </div>
+                        </td>
                         <td style={{ padding: '1rem', textAlign: 'center', color: '#475569' }}>{row.qtde}</td>
                         <td style={{ padding: '1rem', textAlign: 'right', color: '#475569' }}>{formatarMoeda(row.preco)}</td>
                         <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 600, color: '#1e293b' }}>
