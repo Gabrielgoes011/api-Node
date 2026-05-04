@@ -167,7 +167,7 @@ export async function carregaDadosGraficoOperacoes(req, res) {
         //retornar os dados do gráfico
         return res.status(200).json(dadosGrafico.rows);
 
-    //retornar um erro detalhado em caso de falha na consulta
+        //retornar um erro detalhado em caso de falha na consulta
     } catch (error) {
 
         //retornar um erro detalhado em caso de falha na consulta

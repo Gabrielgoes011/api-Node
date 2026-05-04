@@ -3,7 +3,7 @@ const router = express.Router();
 
 import {
   listarRendimentos
-} from '../controllers/rendimentos/rendimentos.contoller.js';
+} from '../controllers/rendimentos/rendimentos.controller.js';
 
 
 router.post('/rendimentos', listarRendimentos);
