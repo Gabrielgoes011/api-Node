@@ -5,12 +5,15 @@ export const rendimentosService = {
   listar: async ({ mes, ano }) => {
     try {
       const res = await api.post('/rendimentos', { mes, ano });
-      if (!Array.isArray(res.data)) {
-        return [];
-      }
-      return res.data;
-    } catch (error) {
-      throw error;
-    }
+      return Array.isArray(res.data) ? res.data : [];
+    } catch (error) { throw error; }
+  },
+
+  // Carrega dados dos gráficos (mensal + anual) por ano
+  dadosGrafico: async ({ ano }) => {
+    try {
+      const res = await api.post('/carregarGraficoDashboard', { ano });
+      return res.data; // { detalheMensal: [], detalheAnual: [] }
+    } catch (error) { throw error; }
   },
 };

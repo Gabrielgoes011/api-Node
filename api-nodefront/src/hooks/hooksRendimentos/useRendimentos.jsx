@@ -3,9 +3,13 @@ import { handleError } from '../../utils/responseUtils';
 import { rendimentosService } from '../../services/servRendimentos/rendimentosService';
 
 export const useRendimentos = () => {
-  const [rendimentos, setRendimentos] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [rendimentos, setRendimentos]       = useState([]);
+  const [detalheMensal, setDetalheMensal]   = useState([]); // [{ mes, ano, totalRendimento }]
+  const [detalheAnual, setDetalheAnual]     = useState([]); // [{ ano, totalRendimento }]
+  const [loading, setLoading]               = useState(false);
+  const [loadingGrafico, setLoadingGrafico] = useState(false);
 
+  // Busca a lista de rendimentos (tabela histórico)
   const getRendimentos = useCallback(async ({ mes, ano }) => {
     setLoading(true);
     try {
@@ -19,9 +23,27 @@ export const useRendimentos = () => {
     }
   }, []);
 
+  // Busca dados dos gráficos vindos da API (mensal + anual)
+  const getGrafico = useCallback(async ({ ano }) => {
+    setLoadingGrafico(true);
+    try {
+      const data = await rendimentosService.dadosGrafico({ ano });
+      setDetalheMensal(data?.detalheMensal || []);
+      setDetalheAnual(data?.detalheAnual   || []);
+    } catch (error) {
+      handleError(error, 'Erro ao buscar dados do gráfico.');
+    } finally {
+      setLoadingGrafico(false);
+    }
+  }, []);
+
   return {
     rendimentos,
+    detalheMensal,
+    detalheAnual,
     loading,
+    loadingGrafico,
     getRendimentos,
+    getGrafico,
   };
 };

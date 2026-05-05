@@ -1,10 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { AiOutlinePlus, AiOutlineDelete } from 'react-icons/ai';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { BarChart, AreaChart } from '../../components/Charts';
 import NovoRendimentoModal from './components/modalNovoRendimento';
 import { useRendimentos } from '../../hooks/hooksRendimentos/useRendimentos';
+import { toastSuccess } from '../../utils/responseUtils';
 
 // ─── constantes ────────────────────────────────────────────────────────────────
 const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -88,7 +87,7 @@ function BarChartHorizontal({ data, anos }) {
 
 // ─── Página principal ──────────────────────────────────────────────────────────
 export default function PaginaRendimentos() {
-  const { rendimentos, loading, getRendimentos } = useRendimentos();
+  const { rendimentos, loading, getRendimentos, detalheMensal, detalheAnual, loadingGrafico, getGrafico } = useRendimentos();
 
   const [filtroAtivo, setFiltroAtivo] = useState('Todos');
   const [filtroMes, setFiltroMes]     = useState('Todos');
@@ -104,6 +103,11 @@ export default function PaginaRendimentos() {
     getRendimentos({ mes: filtroMes, ano: filtroAno });
   }, [filtroMes, filtroAno, getRendimentos]);
 
+  // Busca dados do gráfico sempre que o ano do gráfico mudar
+  useEffect(() => {
+    getGrafico({ ano: anoGrafico });
+  }, [anoGrafico, getGrafico]);
+
   const ativos = useMemo(() => ['Todos', ...new Set(rendimentos.map(d => d.ticker))], [rendimentos]);
 
   // Filtro por ativo (apenas no front, pois a API já filtra por mês/ano)
@@ -115,27 +119,19 @@ export default function PaginaRendimentos() {
   const totalAcumulado = useMemo(() => rendimentos.reduce((s, d) => s + Number(d.valorRecebido), 0), [rendimentos]);
   const yieldOnCost    = totalAcumulado > 0 ? ((totalRecebido / totalAcumulado) * 100).toFixed(2) : '0.00';
 
-  // Gráfico mensal — usa os dados já carregados (filtrados por anoGrafico no front)
-  const chartMensal = useMemo(() => MESES.map((nome, mi) => ({
-    name: nome,
-    Valor: rendimentos.filter(d => {
-      const dt = new Date(d.dtRendimento);
-      return dt.getUTCFullYear() === Number(anoGrafico)
-          && dt.getUTCMonth() === mi
-          && (filtroAtivo === 'Todos' || d.ticker === filtroAtivo);
-    }).reduce((s, d) => s + Number(d.valorRecebido), 0),
-  })), [rendimentos, anoGrafico, filtroAtivo]);
+  // Gráfico mensal — dados reais da API (detalheMensal)
+  const chartMensal = useMemo(() => MESES.map((nome, mi) => {
+    const item = detalheMensal.find(d => parseInt(d.mes) === mi + 1);
+    return { name: nome, Valor: item ? parseFloat(item.totalRendimento) || 0 : 0 };
+  }), [detalheMensal]);
 
-  // Evolução anual — usa os dados já carregados
-  const chartAnual = useMemo(() => ANOS.map(ano => ({
-    name: ano,
-    Valor: rendimentos.filter(d =>
-      String(new Date(d.dtRendimento).getUTCFullYear()) === ano
-      && (filtroAtivo === 'Todos' || d.ticker === filtroAtivo)
-    ).reduce((s, d) => s + Number(d.valorRecebido), 0),
-  })), [rendimentos, filtroAtivo]);
+  // Evolução anual — dados reais da API (detalheAnual)
+  const chartAnual = useMemo(() => ANOS.map(ano => {
+    const item = detalheAnual.find(d => String(parseInt(d.ano)) === ano);
+    return { name: ano, Valor: item ? parseFloat(item.totalRendimento) || 0 : 0 };
+  }), [detalheAnual]);
 
-  // Comparação mensal
+  // Comparação mensal — ainda calculada no front pois precisa de múltiplos anos cruzados
   const chartComparacao = useMemo(() => MESES.map((_, mi) => {
     const row = { mes: mi + 1 };
     anosComp.forEach(ano => {
@@ -150,10 +146,10 @@ export default function PaginaRendimentos() {
   }), [rendimentos, anosComp, filtroAtivo]);
 
   const handleNovoRendimento = () => {
-    // Após salvar, recarrega os dados da API
-    toast.success('Rendimento lançado com sucesso!');
+    toastSuccess('Rendimento lançado com sucesso!');
     setModalAberto(false);
     getRendimentos({ mes: filtroMes, ano: filtroAno });
+    getGrafico({ ano: anoGrafico });
   };
 
   const toggleAnoComp = (ano) =>
@@ -419,7 +415,6 @@ export default function PaginaRendimentos() {
         onSuccess={handleNovoRendimento}
         ativos={ativos.filter(a => a !== 'Todos')}
       />
-      <ToastContainer autoClose={3000} position="top-right" />
     </div>
   );
 }

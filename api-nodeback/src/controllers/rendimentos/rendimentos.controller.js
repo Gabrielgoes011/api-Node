@@ -10,7 +10,6 @@ async function listarRendimentos(req, res) {
       ano: req.body.ano
     };
 
-
     //Abre a conexão com o banco de dados
     const db = await openDb();
 
@@ -57,5 +56,60 @@ async function listarRendimentos(req, res) {
 }
 //#endregion
 
+//#region => função para carregar grafico dashboard
+async function carregarGraficoDashboard(req, res) {
+  try {
+    //Recupera dados da requisição
 
-export { listarRendimentos };
+    const campos = {
+      ano: req.body.ano
+    };
+
+    //Abre a conexão com o banco de dados 
+    const db = await openDb();
+
+    //query para calcular o total de rendimentos por mês
+    const detalheMensal = await db.query(`
+      SELECT 
+          EXTRACT(MONTH FROM "dtRendimento") mes,
+          EXTRACT(YEAR FROM "dtRendimento") ano,
+          SUM("valorRecebido") AS "totalRendimento"
+      FROM rendimentos
+      WHERE EXTRACT(YEAR FROM "dtRendimento") = $1
+      GROUP BY 
+          EXTRACT(YEAR FROM "dtRendimento"),
+          EXTRACT(MONTH FROM "dtRendimento")
+      ORDER BY ano, mes;
+    `, [campos.ano]);
+
+    const detalheAnual = await db.query(`
+      SELECT 
+          EXTRACT(YEAR FROM "dtRendimento") ano,
+          SUM("valorRecebido") AS "totalRendimento"
+      FROM rendimentos
+      GROUP BY 
+          EXTRACT(YEAR FROM "dtRendimento")
+      ORDER BY ano;
+    `);
+    //retornar os dados
+
+    return res.status(200).json({
+      detalheMensal: detalheMensal.rows,
+      detalheAnual: detalheAnual.rows
+    });
+
+  } catch (error) {
+    //retornar um erro detalhado em caso de falha na consulta
+    return res.status(500).json({ error: 'Erro ao carregar os dados do gráfico.', errorDetails: error.message });
+  }
+}
+
+
+//#endregion
+export {
+  listarRendimentos,
+  carregarGraficoDashboard
+};
+
+
+
