@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { FaUser, FaCamera } from 'react-icons/fa';
-import { toast } from 'react-toastify';
+import { toastInfo } from '../../utils/responseUtils';
 
 function ModalFormulario({ onClose, onSubmit, isEditing, formData, setFormData }) {
   const [fotoPreview] = useState(formData.foto || null);
@@ -42,7 +42,7 @@ function ModalFormulario({ onClose, onSubmit, isEditing, formData, setFormData }
               onMouseLeave={(e) => e.target.style.borderColor = '#ccc'}
               onClick={(e) => {
                 e.preventDefault(); // Previne o comportamento padrão
-                toast.info('Função de upload de foto em desenvolvimento. Em breve disponível!');
+                toastInfo('Função de upload de foto em desenvolvimento. Em breve disponível!');
                 // Ainda abre o seletor para simular
                 setTimeout(() => fileInputRef.current?.click(), 100);
               }}

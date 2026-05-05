@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { toast } from 'react-toastify';
+import { toastWarn, toastSuccess, handleError } from '../../utils/responseUtils';
 import { meusFiisService } from '../../services/servCadastros/meusFiisService';
 import { seguimentosService } from '../../services/servCadastros/seguimentosService';
 
@@ -21,7 +21,7 @@ export const useMeusFiis = () => {
       const data = await meusFiisService.listarTodos();
       setFiis(data || []);
     } catch (error) {
-      console.error('Erro ao buscar FIIs:', error);
+      handleError(error, 'Erro ao buscar fundos.');
     }
   }, []);
 
@@ -30,7 +30,7 @@ export const useMeusFiis = () => {
       const data = await seguimentosService.listarTodos();
       setSeguimentos(data || []);
     } catch (error) {
-      console.error('Erro ao buscar seguimentos:', error);
+      handleError(error, 'Erro ao buscar seguimentos.');
     }
   }, []);
 
@@ -40,7 +40,7 @@ export const useMeusFiis = () => {
       const totalCount = Array.isArray(data) ? data.length : (Number(data.total) || 0);
       setDashboard({ total: totalCount });
     } catch (error) {
-      console.error('Erro ao buscar dashboard:', error);
+      handleError(error, 'Erro ao buscar contagem de fundos.');
     }
   }, []);
 
@@ -48,25 +48,23 @@ export const useMeusFiis = () => {
     try {
       const payload = { ...data };
 
-      // Trazendo de volta a captura do ID, caso a tela ainda envie como "idSegmento"
       if (payload.idSegmento) {
         payload.idSeguimento = payload.idSegmento;
         delete payload.idSegmento;
       }
 
-      // Validação no front-end para evitar o erro de not-null do banco de dados
       if (!payload.idSeguimento || payload.idSeguimento === '') {
-        toast.warn('Por favor, selecione um Seguimento para o fundo!');
+        toastWarn('Por favor, selecione um Seguimento para o fundo!');
         return;
       }
 
       await meusFiisService.criar(payload);
-      toast.success('Fundo cadastrado com sucesso!');
+      toastSuccess('Fundo cadastrado com sucesso!');
       closeFormModal();
       getFiis();
       getDashboard();
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Erro ao cadastrar fundo.');
+      handleError(error, 'Erro ao cadastrar fundo.');
     }
   };
 
@@ -80,17 +78,17 @@ export const useMeusFiis = () => {
       }
 
       if (!payload.idSeguimento || payload.idSeguimento === '') {
-        toast.warn('Por favor, selecione um Seguimento para o fundo!');
+        toastWarn('Por favor, selecione um Seguimento para o fundo!');
         return;
       }
 
       await meusFiisService.atualizar(onEdit.id, payload);
-      toast.success('Fundo atualizado com sucesso!');
+      toastSuccess('Fundo atualizado com sucesso!');
       closeFormModal();
       getFiis();
       getDashboard();
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Erro ao atualizar fundo.');
+      handleError(error, 'Erro ao atualizar fundo.');
     }
   };
 
@@ -100,12 +98,12 @@ export const useMeusFiis = () => {
     try {
       if (modalAction === 'delete') {
         await meusFiisService.excluir(itemSelected.id);
-        toast.success('Fundo excluído com sucesso!');
+        toastSuccess('Fundo excluído com sucesso!');
       }
       getFiis();
       getDashboard();
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Erro ao excluir o fundo.');
+      handleError(error, 'Erro ao excluir o fundo.');
     }
 
     setShowModal(false);

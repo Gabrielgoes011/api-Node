@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastInfo, handleError } from '../../utils/responseUtils';
 import { seguimentosService } from '../../services/servCadastros/seguimentosService';
 
 export const useSeguimentos = () => {
@@ -19,8 +19,7 @@ export const useSeguimentos = () => {
       const data = await seguimentosService.listarTodos();
       setSeguimentos(data || []);
     } catch (error) {
-      console.error('Erro ao buscar segmentos:', error);
-      // toast.error('Erro ao buscar segmentos');
+      handleError(error, 'Erro ao buscar seguimentos.');
     }
   }, []);
 
@@ -28,35 +27,33 @@ export const useSeguimentos = () => {
     try {
       const data = await seguimentosService.contar();
       const totalCount = Array.isArray(data) ? data.length : (Number(data.total) || Number(data.ativos) || 0);
-      setDashboard({
-        total: totalCount
-      });
+      setDashboard({ total: totalCount });
     } catch (error) {
-      console.error('Erro ao buscar dashboard:', error);
+      handleError(error, 'Erro ao buscar contagem de seguimentos.');
     }
   }, []);
 
   const handleAddSeguimento = async (data) => {
     try {
       await seguimentosService.criar(data);
-      toast.success('Seguimento cadastrado com sucesso!');
+      toastSuccess('Seguimento cadastrado com sucesso!');
       closeFormModal();
       getSeguimentos();
       getDashboard();
     } catch (error) {
-      toast.error(error.response?.data?.error || error.response?.data || 'Erro ao cadastrar seguimento.');
+      handleError(error, 'Erro ao cadastrar seguimento.');
     }
   };
 
   const handleUpdateSeguimento = async (data) => {
     try {
       await seguimentosService.atualizar(onEdit.id, data);
-      toast.success('Seguimento atualizado com sucesso!');
+      toastSuccess('Seguimento atualizado com sucesso!');
       closeFormModal();
       getSeguimentos();
       getDashboard();
     } catch (error) {
-      toast.error(error.response?.data?.error || error.response?.data || 'Erro ao atualizar seguimento.');
+      handleError(error, 'Erro ao atualizar seguimento.');
     }
   };
 
@@ -66,12 +63,12 @@ export const useSeguimentos = () => {
     try {
       if (modalAction === 'delete') {
         await seguimentosService.excluir(itemSelected.id);
-        toast.success('Seguimento excluído com sucesso!');
+        toastSuccess('Seguimento excluído com sucesso!');
       }
       getSeguimentos();
       getDashboard();
     } catch (error) {
-      toast.error(error.response?.data?.error || `Erro ao excluir o seguimento.`);
+      handleError(error, 'Erro ao excluir seguimento.');
     }
 
     setShowModal(false);
@@ -103,5 +100,10 @@ export const useSeguimentos = () => {
     setFormData({ nome: '' });
   };
 
-  return { seguimentos, onEdit, formData, showModal, itemSelected, modalAction, showFormModal, setFormData, setShowModal, dashboard, getSeguimentos, getDashboard, handleAddSeguimento, handleUpdateSeguimento, handleOpenCreate, handleEdit, handleOpenModal, executeConfirmedAction, closeFormModal };
+  return {
+    seguimentos, onEdit, formData, showModal, itemSelected, modalAction, showFormModal,
+    setFormData, setShowModal, dashboard, getSeguimentos, getDashboard,
+    handleAddSeguimento, handleUpdateSeguimento, handleOpenCreate, handleEdit,
+    handleOpenModal, executeConfirmedAction, closeFormModal
+  };
 };

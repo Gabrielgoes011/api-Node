@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import { toastError } from '../utils/responseUtils';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -28,7 +28,7 @@ api.interceptors.response.use(
     // Só redireciona se NÃO for a rota de login (evita loop)
     if (error.response?.status === 401 && !isLoginRoute) {
       localStorage.removeItem('token');
-      toast.error('Sessão expirada. Faça login novamente.');
+      toastError('Sessão expirada. Faça login novamente.');
       window.dispatchEvent(new Event('unauthorized'));
     }
     return Promise.reject(error);

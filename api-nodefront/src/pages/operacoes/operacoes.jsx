@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { AiOutlinePlus, AiOutlineDelete, AiOutlineBarChart, AiOutlineAreaChart } from 'react-icons/ai';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import NovaOperacaoModal from './components/modalNovaOperacao';
-import API_BASE_URL from '../../config/api';
 import { BarChart, AreaChart } from '../../components/Charts';
+import { useOperacoes } from '../../hooks/hooksOperacoes/useOperacoes';
 
 const CHART_KEYS   = ['Compra', 'Venda', 'Liquido'];
 const CHART_COLORS = {
@@ -12,119 +10,30 @@ const CHART_COLORS = {
   Venda:   'linear-gradient(180deg,#f87171 0%,#dc2626 100%)',
   Liquido: 'linear-gradient(180deg,#60a5fa 0%,#2563eb 100%)',
 };
-// cores sólidas para o AreaChart (que usa stroke/fill direto)
 const AREA_COLORS = { Compra: '#22c55e', Venda: '#ef4444', Liquido: '#3b82f6' };
 
 export default function PaginaOperacoes() {
   const [anoSelecionado, setAnoSelecionado] = useState('2026');
   const [mesSelecionado, setMesSelecionado] = useState('Todos');
-  const [operacoes, setOperacoes] = useState([]);
-  const [chartData, setChartData] = useState([]);
   const [modalAberto, setModalAberto] = useState(false);
-  const [tipoGrafico, setTipoGrafico] = useState('barras'); // 'barras' ou 'area'
+  const [tipoGrafico, setTipoGrafico] = useState('barras');
   const [modalExclusaoAberto, setModalExclusaoAberto] = useState(false);
   const [operacaoParaExcluir, setOperacaoParaExcluir] = useState(null);
 
-  const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+  const {
+    operacoes, chartData, loading,
+    getOperacoes, getChartData,
+    handleLancarOperacao, handleExcluirOperacao,
+  } = useOperacoes();
 
-  // Função para recarregar os dados
-  const recarregarDados = () => {
-    // Recarregar operações
-    const fetchOperacoes = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/operacoes`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            mes: mesSelecionado,
-            ano: anoSelecionado
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          
-          // Formatando os dados retornados pelo backend
-          const operacoesFormatadas = data.map((op, index) => {
-            const dt = new Date(op.dataOperacao);
-            return {
-              id: op.id || index, // usa o index como fallback caso não haja id
-              data: dt.toLocaleDateString('pt-BR', { timeZone: 'UTC' }),
-              operacao: op.tipo,
-              ativo: op.ticker,
-              seguimento: op.nomeSeguimento,
-              qtde: op.quantidade,
-              preco: op.preco
-            };
-          });
-          
-          setOperacoes(operacoesFormatadas);
-        } else {
-          console.error('Erro ao buscar operações da API');
-        }
-      } catch (error) {
-        console.error('Erro na requisição:', error);
-      }
-    };
-
-    // Recarregar dados do gráfico
-    const fetchChartData = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/carregaDadosGraficoOperacoes`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            ano: anoSelecionado
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-
-          // Inicializa todos os meses com zero para manter a linha do gráfico contínua
-          const mesesIniciais = monthNames.map(nome => ({
-            name: nome, Compra: 0, Venda: 0, Liquido: 0
-          }));
-
-          // Preenche apenas os meses que voltaram valores da API
-          data.forEach(item => {
-            const mesIndex = parseInt(item.mes, 10) - 1; // A API retorna mês de 1 a 12 (ex: Jan = 1)
-            if (mesIndex >= 0 && mesIndex < 12) {
-              mesesIniciais[mesIndex].Compra = parseFloat(item.totalComprado) || 0;
-              mesesIniciais[mesIndex].Venda = parseFloat(item.totalVendido) || 0;
-              mesesIniciais[mesIndex].Liquido = parseFloat(item.totalLiquido) || 0;
-            }
-          });
-
-          setChartData(mesesIniciais);
-        } else {
-          console.error('Erro ao buscar dados do gráfico');
-        }
-      } catch (error) {
-        console.error('Erro na requisição do gráfico:', error);
-      }
-    };
-
-    fetchOperacoes();
-    fetchChartData();
-  };
-
+  // Recarrega sempre que ano ou mês mudar
   useEffect(() => {
-    recarregarDados();
+    getOperacoes({ mes: mesSelecionado, ano: anoSelecionado });
+    getChartData({ ano: anoSelecionado });
   }, [anoSelecionado, mesSelecionado]);
 
-  // Formatador de moeda para Real
-  const formatarMoeda = (valor) => {
-    const formatador = new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    });
-    return formatador.format(valor);
-  };
+  const formatarMoeda = (valor) =>
+    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
 
   const abrirModalExclusao = (operacao) => {
     setOperacaoParaExcluir(operacao);
@@ -133,35 +42,10 @@ export default function PaginaOperacoes() {
 
   const confirmarExclusao = async () => {
     if (!operacaoParaExcluir) return;
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/excluirOperacao`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id: operacaoParaExcluir.id })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success(data.message || 'Operação excluída com sucesso!');
-        recarregarDados(); // Atualiza a tabela e os gráficos automaticamente
-      } else {
-        toast.error(`Erro: ${data.error} ${data.errorDetails ? '- ' + data.errorDetails : ''}`);
-      }
-    } catch (error) {
-      console.error('Erro na requisição de exclusão:', error);
-      toast.error('Erro de conexão ao tentar excluir a operação.');
-    } finally {
-      setModalExclusaoAberto(false);
-      setOperacaoParaExcluir(null);
-    }
+    await handleExcluirOperacao(operacaoParaExcluir.id, { ano: anoSelecionado, mes: mesSelecionado });
+    setModalExclusaoAberto(false);
+    setOperacaoParaExcluir(null);
   };
-
-  // O backend já retorna os dados filtrados por mês e ano
-  const operacoesFiltradas = operacoes;
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f1f5f9', color: '#334155', fontFamily: 'sans-serif' }}>
@@ -304,14 +188,14 @@ export default function PaginaOperacoes() {
                 </tr>
               </thead>
               <tbody style={{ fontSize: '14px' }}>
-                {operacoesFiltradas.length === 0 ? (
+                {operacoes.length === 0 ? (
                   <tr>
                     <td colSpan="7" style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
-                      Nenhuma operação encontrada para este período.
+                      {loading ? 'Carregando...' : 'Nenhuma operação encontrada para este período.'}
                     </td>
                   </tr>
                 ) : (
-                  operacoesFiltradas.map((row, index) => {
+                  operacoes.map((row, index) => {
                     const valorTotal = row.qtde * row.preco;
                     return (
                       <tr 
@@ -381,7 +265,11 @@ export default function PaginaOperacoes() {
 
       </main>
       
-      <NovaOperacaoModal isOpen={modalAberto} onClose={() => setModalAberto(false)} onSuccess={() => { toast.success('Operação cadastrada com sucesso!'); recarregarDados(); }} />
+      <NovaOperacaoModal
+        isOpen={modalAberto}
+        onClose={() => setModalAberto(false)}
+        onSuccess={(payload) => handleLancarOperacao(payload, { ano: anoSelecionado, mes: mesSelecionado })}
+      />
       
       {/* Modal de Confirmação de Exclusão */}
       {modalExclusaoAberto && operacaoParaExcluir && (
@@ -420,7 +308,6 @@ export default function PaginaOperacoes() {
         </div>
       )}
 
-      <ToastContainer />
     </div>
   );
 }

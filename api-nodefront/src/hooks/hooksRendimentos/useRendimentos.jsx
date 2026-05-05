@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { toast } from 'react-toastify';
+import { handleError } from '../../utils/responseUtils';
 import { rendimentosService } from '../../services/servRendimentos/rendimentosService';
 
 export const useRendimentos = () => {
@@ -12,9 +12,7 @@ export const useRendimentos = () => {
       const data = await rendimentosService.listar({ mes, ano });
       setRendimentos(data || []);
     } catch (error) {
-      toast.error(
-        error.response?.data?.error || 'Erro ao buscar rendimentos.'
-      );
+      handleError(error, 'Erro ao buscar rendimentos.');
       setRendimentos([]);
     } finally {
       setLoading(false);

@@ -1,15 +1,13 @@
 import { useState, useCallback } from 'react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastInfo, handleError } from '../../utils/responseUtils';
 import { usuariosService } from '../../services/servCadastros/usuariosService';
 
 export const useUsuarios = () => {
-  // Estado para armazenar a lista de usuários
   const [users, setUsers] = useState([]);
   const [onEdit, setOnEdit] = useState(null);
   const [activeTab, setActiveTab] = useState('ativos');
   const [loading, setLoading] = useState(false);
 
-  // Estados para o formulário
   const [formData, setFormData] = useState({
     nome: '',
     dataNascimento: '',
@@ -24,23 +22,17 @@ export const useUsuarios = () => {
     total: 0
   });
 
-  // Estados para o modal de confirmação
   const [showModal, setShowModal] = useState(false);
   const [userSelected, setUserSelected] = useState(null);
-  const [modalAction, setModalAction] = useState(''); // 'delete', 'reset', 'inactivate', 'reactivate'
-
-  // Estados para o modal do formulário
+  const [modalAction, setModalAction] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
 
-  // Função para buscar usuários
   const getUsers = useCallback(async () => {
     setLoading(true);
     try {
-      // Passa o status baseado na aba ativa
       const status = activeTab === 'ativos' ? 'on' : 'off';
       const allUsers = await usuariosService.listarTodos(status);
 
-      // Mapeia o campo 'ativo' do banco para 'status' que o frontend usa
       const processedUsers = allUsers.map(user => ({
         ...user,
         status: user.ativo ? 'on' : 'off'
@@ -48,14 +40,12 @@ export const useUsuarios = () => {
 
       setUsers(processedUsers);
     } catch (error) {
-      toast.error('Erro ao carregar usuários');
-      console.error(error);
+      handleError(error, 'Erro ao carregar usuários.');
     } finally {
       setLoading(false);
     }
   }, [activeTab]);
 
-  // Função para buscar contagem do dashboard
   const getDashboard = useCallback(async () => {
     try {
       const result = await usuariosService.contar();
@@ -65,78 +55,70 @@ export const useUsuarios = () => {
         total: result.total ?? 0
       });
     } catch (error) {
-      toast.error('Erro ao carregar contagem de usuários');
-      console.error(error);
+      handleError(error, 'Erro ao carregar contagem de usuários.');
     }
   }, []);
 
-  // Adicionar usuário
   const handleAddUser = async (novoUsuario) => {
     try {
       await usuariosService.criar(novoUsuario);
-      toast.success('Usuário cadastrado com sucesso!');
+      toastSuccess('Usuário cadastrado com sucesso!');
       getUsers();
       resetForm();
       setShowFormModal(false);
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Erro ao cadastrar');
+      handleError(error, 'Erro ao cadastrar usuário.');
     }
   };
 
-  // Atualizar usuário
   const handleUpdateUser = async (usuarioAtualizado) => {
     try {
       await usuariosService.atualizar(onEdit.id, usuarioAtualizado);
-      toast.success('Usuário atualizado com sucesso!');
+      toastSuccess('Usuário atualizado com sucesso!');
       getUsers();
       resetForm();
       setShowFormModal(false);
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Erro ao atualizar');
+      handleError(error, 'Erro ao atualizar usuário.');
     }
   };
 
-  // Deletar usuário
   const handleDeleteUser = async (userId) => {
     try {
       await usuariosService.deletar(userId);
-      toast.success('Usuário deletado com sucesso!');
+      toastSuccess('Usuário deletado com sucesso!');
       getUsers();
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Erro ao deletar');
+      handleError(error, 'Erro ao deletar usuário.');
     }
   };
 
-  // Inativar usuário
   const handleInactivateUser = async (user) => {
     try {
       await usuariosService.inativarReativar(user.id);
-      toast.success('Usuário inativado com sucesso!');
+      toastSuccess('Usuário inativado com sucesso!');
       getUsers();
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Erro ao inativar');
+      handleError(error, 'Erro ao inativar usuário.');
     }
   };
 
-  // Reativar usuário
   const handleReactivateUser = async (user) => {
     try {
       await usuariosService.inativarReativar(user.id);
-      toast.success('Usuário reativado com sucesso!');
+      toastSuccess('Usuário reativado com sucesso!');
       getUsers();
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Erro ao reativar');
+      handleError(error, 'Erro ao reativar usuário.');
     }
   };
 
-  // Abrir modal em modo de criação
   const handleOpenCreate = () => {
     setOnEdit(null);
     resetForm();
     setShowFormModal(true);
   };
 
-  // Abrir modal em modo de edição
   const handleEdit = (user) => {
     setOnEdit(user);
     setFormData({
@@ -149,14 +131,12 @@ export const useUsuarios = () => {
     setShowFormModal(true);
   };
 
-  // Abrir modal de confirmação
   const handleOpenModal = (user, action) => {
     setUserSelected(user);
     setModalAction(action);
     setShowModal(true);
   };
 
-  // Executar ação confirmada no modal
   const executeConfirmedAction = async () => {
     if (!userSelected) return;
 
@@ -171,7 +151,7 @@ export const useUsuarios = () => {
         await handleReactivateUser(userSelected);
         break;
       case 'reset':
-        toast.info('Rota de resetar senha será implementada');
+        toastInfo('Rota de resetar senha será implementada em breve.');
         break;
       default:
         break;
@@ -182,18 +162,10 @@ export const useUsuarios = () => {
     setModalAction('');
   };
 
-  // Resetar formulário
   const resetForm = () => {
-    setFormData({
-      nome: '',
-      dataNascimento: '',
-      email: '',
-      cpf: '',
-      foto: null
-    });
+    setFormData({ nome: '', dataNascimento: '', email: '', cpf: '', foto: null });
   };
 
-  // Fechar modal do formulário
   const closeFormModal = () => {
     setShowFormModal(false);
     resetForm();
@@ -201,39 +173,11 @@ export const useUsuarios = () => {
   };
 
   return {
-    // Estados
-    users,
-    onEdit,
-    activeTab,
-    loading,
-    formData,
-    showModal,
-    userSelected,
-    modalAction,
-    showFormModal,
-
-    // Setters
-    setFormData,
-    setActiveTab,
-    setShowModal,
-    setShowFormModal,
-
-    // Métricas
-    dashboard,
-
-    // Métodos
-    getUsers,
-    getDashboard,
-    handleAddUser,
-    handleUpdateUser,
-    handleDeleteUser,
-    handleInactivateUser,
-    handleReactivateUser,
-    handleOpenCreate,
-    handleEdit,
-    handleOpenModal,
-    executeConfirmedAction,
-    closeFormModal,
-    resetForm
+    users, onEdit, activeTab, loading, formData, showModal, userSelected,
+    modalAction, showFormModal, setFormData, setActiveTab, setShowModal,
+    setShowFormModal, dashboard, getUsers, getDashboard, handleAddUser,
+    handleUpdateUser, handleDeleteUser, handleInactivateUser, handleReactivateUser,
+    handleOpenCreate, handleEdit, handleOpenModal, executeConfirmedAction,
+    closeFormModal, resetForm
   };
 };

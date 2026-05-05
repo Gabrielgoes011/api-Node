@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { FaHome, FaUsers, FaCog, FaCircle, FaSignOutAlt, FaBars, FaTimes, FaWallet, FaChartLine, FaTags, FaExchangeAlt, FaFileAlt, FaFolder, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaHome, FaCog, FaCircle, FaBars, FaTimes, FaWallet, FaChartLine, FaTags, FaExchangeAlt, FaFileAlt, FaFolder, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 
-function Sidebar({ isOpen, onToggle, onLogout }) {
+function Sidebar({ isOpen, onToggle }) {
   const [cadastrosOpen, setCadastrosOpen] = useState(false);
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -25,21 +24,6 @@ function Sidebar({ isOpen, onToggle, onLogout }) {
     { id: 'relatorios', path: '/relatorios', label: 'Relatórios', icon: FaFileAlt },
     { id: 'configuracoes', path: '/configuracoes', label: 'Configurações', icon: FaCog }
   ];
-
-  const handleLogout = () => {
-    setShowLogoutModal(true);
-  };
-
-  const confirmLogout = () => {
-    if (onLogout) {
-      onLogout();
-    }
-    setShowLogoutModal(false);
-  };
-
-  const cancelLogout = () => {
-    setShowLogoutModal(false);
-  };
 
   return (
     <>
@@ -287,117 +271,7 @@ function Sidebar({ isOpen, onToggle, onLogout }) {
           })}
       </nav>
 
-      {/* Logout Button - Parte inferior */}
-      {isOpen && (
-        <div style={{
-          borderTop: '2px solid #334155',
-          paddingTop: '15px',
-          marginTop: 'auto'
-        }}>
-          <button
-            type="button"
-            onClick={handleLogout}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '12px 15px',
-              backgroundColor: '#e74c3c',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              transition: 'all 0.3s ease',
-              width: '100%',
-              justifyContent: 'center'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#c0392b';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = '#e74c3c';
-            }}
-          >
-            <FaSignOutAlt size={20} />
-            <span>Sair</span>
-          </button>
-        </div>
-      )}
     </div>
-
-      {/* Modal de Confirmação de Logout */}
-      {showLogoutModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'rgba(0, 0, 0, 0.6)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 9999,
-          backdropFilter: 'blur(2px)' // Dá um efeito de desfoque no fundo
-        }}>
-          <div style={{
-            backgroundColor: '#fff',
-            padding: '30px',
-            borderRadius: '12px',
-            boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-            width: '100%',
-            maxWidth: '350px',
-            textAlign: 'center',
-            fontFamily: 'sans-serif'
-          }}>
-            <h3 style={{ margin: '0 0 10px 0', color: '#2c3e50', fontSize: '1.4rem' }}>Sair do sistema</h3>
-            <p style={{ margin: '0 0 25px 0', color: '#7f8c8d', fontSize: '1rem' }}>Tem certeza que deseja sair?</p>
-            
-            <div style={{ display: 'flex', gap: '15px' }}>
-              <button
-                onClick={cancelLogout}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  backgroundColor: '#ecf0f1',
-                  color: '#2c3e50',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  fontSize: '1rem',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#bdc3c7'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#ecf0f1'}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmLogout}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  backgroundColor: '#e74c3c',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  fontSize: '1rem',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#c0392b'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#e74c3c'}
-              >
-                Sair
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }

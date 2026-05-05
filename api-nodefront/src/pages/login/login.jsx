@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toastSuccess, handleError } from '../../utils/responseUtils';
 import api from '../../config/api';
 
 function Login({ onLogin }) {
@@ -18,18 +18,11 @@ function Login({ onLogin }) {
 
       // Salva o token no localStorage para o interceptor usar nas próximas chamadas
       localStorage.setItem('token', res.data.token);
-
-      toast.success('Login bem-sucedido! Redirecionando...');
-
-      // Atualiza o estado de login e redireciona
+      toastSuccess('Login bem-sucedido! Redirecionando...');
       onLogin(true);
-      
-      setTimeout(() => {
-        navigate('/');
-      }, 800);
+      setTimeout(() => { navigate('/'); }, 800);
     } catch (error) {
-      const msg = error.response?.data?.erro || 'Erro ao realizar login.';
-      toast.error(msg);
+      handleError(error, 'Erro ao realizar login.');
     } finally {
       setLoading(false);
     }
