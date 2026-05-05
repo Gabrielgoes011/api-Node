@@ -1,22 +1,37 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import api from '../../config/api';
 
 function Login({ onLogin }) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
 
-    // Validação de teste com 'admin'/'admin'
-    if (email === 'admin' && password === 'admin@2103') {
+    try {
+      const res = await api.post('/auth/login', { email, password });
+
+      // Salva o token no localStorage para o interceptor usar nas próximas chamadas
+      localStorage.setItem('token', res.data.token);
+
       toast.success('Login bem-sucedido! Redirecionando...');
+
+      // Atualiza o estado de login e redireciona
+      onLogin(true);
       
       setTimeout(() => {
-        onLogin(true); // Avisa o arquivo principal (App.jsx) que logou
-      }, 1000); // Aguarda 1 segundo apenas para mostrar a mensagem verde antes de trocar de tela
-    } else {
-      toast.error('Email ou senha inválidos.');
+        navigate('/');
+      }, 800);
+    } catch (error) {
+      const msg = error.response?.data?.erro || 'Erro ao realizar login.';
+      toast.error(msg);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -131,7 +146,9 @@ function Login({ onLogin }) {
                 required
               />
             </div>
-            <button type="submit" className="login-button">Entrar</button>
+            <button type="submit" className="login-button" disabled={loading}>
+              {loading ? 'Entrando...' : 'Entrar'}
+            </button>
           </form>
         </div>
       </div>

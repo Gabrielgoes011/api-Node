@@ -4,7 +4,12 @@ import { openDb } from '../../config/configDb.js';
 //#region Login
 async function login(req, res) {
   try {
-    const { email, password } = req.body;
+
+    //passa body
+    const {
+      email,
+      password
+    } = req.body;
 
     // Validação básica dos campos
     if (!email || !password) {
@@ -14,24 +19,25 @@ async function login(req, res) {
     const db = await openDb();
 
     // Busca o usuário e suas credenciais pelo e-mail
-    const result = await db.query(
+    const dadosUsuario = await db.query(
       `SELECT 
-        a.id, a.email, b."password"
+        a.id, a.nome, a.email, b.password, a.ativo
        FROM usuarios a INNER JOIN "credenciaisUsuario" b 
-       ON a."idUser" = b.id
-       WHERE a.email = $1`,
+       ON a.id = b."idUser"
+       WHERE LOWER(a.email) = LOWER($1)`,
       [email]
     );
 
     // Usuário não encontrado
-    if (result.rows.length === 0) {
+    if (dadosUsuario.rows.length === 0) {
       return res.status(401).json({ erro: 'E-mail ou senha inválidos.' });
     }
 
-    const usuario = result.rows[0];
+    //
+    const usuario = dadosUsuario.rows[0];
 
     // Verifica se o usuário está ativo
-    if (!usuario.ativo) {
+    if (usuario.ativo === false) {
       return res.status(403).json({ erro: 'Usuário inativo. Entre em contato com o administrador.' });
     }
 

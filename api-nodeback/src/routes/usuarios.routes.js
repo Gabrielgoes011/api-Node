@@ -1,4 +1,5 @@
 import express from 'express';
+import verificaJWT from '../middleware/auth/verificaJWT.js';
 const router = express.Router();
 
 // Importa o controller de usuários
@@ -8,17 +9,16 @@ import {
   cadastrarUser,
   atualizarUser,
   inativaReativaUser,
-  deleteUser,
-  login
+  deleteUser
 } from '../controllers/cadastros/usuarios/usuario.controller.js';
 
 // Rotas para usuários
-router.get('/users', listarUsuarios);
-router.get('/users/dash/count', contarUsuarios);
-router.post('/cadUsers', cadastrarUser);
-router.put('/inativaUser/:id', inativaReativaUser);
-router.put('/users/update/:id', atualizarUser);
-router.delete('/users/delete/:id', deleteUser);
-router.post('/login', login);
+router.get('/users', verificaJWT, listarUsuarios);
+router.get('/users/dash/count', verificaJWT, contarUsuarios);
+router.post('/cadUsers', verificaJWT, cadastrarUser);
+router.put('/inativaUser/:id', verificaJWT, inativaReativaUser);
+router.put('/users/update/:id', verificaJWT, atualizarUser);
+router.delete('/users/delete/:id', verificaJWT, deleteUser);
+
 
 export default router;
