@@ -16,4 +16,20 @@ export const rendimentosService = {
       return res.data; // { detalheMensal: [], detalheAnual: [] }
     } catch (error) { throw error; }
   },
+
+  // Carrega ativos para o dropdown do modal (id + ticker + nomeSeguimento)
+  carregarAtivosModal: async () => {
+    try {
+      const res = await api.get('/carregarDadosModalNovoRendimento');
+      return Array.isArray(res.data) ? res.data : [];
+      // retorna: [{ id, ticker, nomeSeguimento }]
+    } catch (error) { throw error; }
+  },
+  comparacaoAnual: async ({ anos }) => {
+    try {
+      const res = await api.post('/carregarComparacaoAnual', { anos });
+      return Array.isArray(res.data) ? res.data : [];
+      // retorna: [{ mes, ano, totalRendimento }]
+    } catch (error) { throw error; }
+  },
 };

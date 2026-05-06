@@ -1,5 +1,30 @@
 import { openDb } from "../../config/configDb.js";
 
+//#region => função carregar dados modal de novo rendimento
+// GET /carregarDadosModalNovoRendimento
+// retorna: [{ idAtivo, ticker, idSeguimento, nomeSeguimento }]
+async function carregarDadosModalNovoRendimento(req, res) {
+  try {
+    const db = await openDb();
+
+    const ativos = await db.query(`
+      SELECT 
+        a.id "idAtivo", a.ticker, 
+        b.id "idSeguimento", b."nomeSeguimento"
+      FROM ativos a
+      INNER JOIN seguimentos b 
+      ON a."idSeguimento" = b.id
+      ORDER BY a.ticker ASC;
+    `);
+
+    return res.status(200).json(ativos.rows);
+
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao carregar os dados para o modal de novo rendimento.', errorDetails: error.message });
+  }
+}
+//#endregion
+
 //#region Função para listar todos os rendimentos 
 async function listarRendimentos(req, res) {
 
@@ -106,9 +131,47 @@ async function carregarGraficoDashboard(req, res) {
 
 
 //#endregion
+
+//#region => função para carregar comparação mensal entre anos
+// body: { anos: ['2023', '2024', '2025', '2026'] }
+// retorna: [{ mes, ano, totalRendimento }]
+async function carregarComparacaoAnual(req, res) {
+  try {
+    const { anos } = req.body;
+
+    if (!Array.isArray(anos) || anos.length === 0) {
+      return res.status(400).json({ error: 'Informe ao menos um ano em "anos".' });
+    }
+
+    const db = await openDb();
+
+    const resultado = await db.query(`
+      SELECT 
+          EXTRACT(MONTH FROM "dtRendimento") AS mes,
+          EXTRACT(YEAR  FROM "dtRendimento") AS ano,
+          SUM("valorRecebido") AS "totalRendimento"
+      FROM rendimentos
+      WHERE EXTRACT(YEAR FROM "dtRendimento") = ANY($1::int[])
+      GROUP BY ano, mes
+      ORDER BY ano, mes;
+    `, [anos.map(Number)]);
+
+    return res.status(200).json(resultado.rows);
+
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao carregar a comparação anual.', errorDetails: error.message });
+  }
+}
+//#endregion
+
+
+
+
 export {
   listarRendimentos,
-  carregarGraficoDashboard
+  carregarGraficoDashboard,
+  carregarComparacaoAnual,
+  carregarDadosModalNovoRendimento
 };
 
 

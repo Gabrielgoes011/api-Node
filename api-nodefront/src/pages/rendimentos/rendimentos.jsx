@@ -87,7 +87,7 @@ function BarChartHorizontal({ data, anos }) {
 
 // ─── Página principal ──────────────────────────────────────────────────────────
 export default function PaginaRendimentos() {
-  const { rendimentos, loading, getRendimentos, detalheMensal, detalheAnual, loadingGrafico, getGrafico } = useRendimentos();
+  const { rendimentos, loading, getRendimentos, detalheMensal, detalheAnual, comparacaoAnual, loadingGrafico, getGrafico, getComparacaoAnual } = useRendimentos();
 
   const [filtroAtivo, setFiltroAtivo] = useState('Todos');
   const [filtroMes, setFiltroMes]     = useState('Todos');
@@ -107,6 +107,11 @@ export default function PaginaRendimentos() {
   useEffect(() => {
     getGrafico({ ano: anoGrafico });
   }, [anoGrafico, getGrafico]);
+
+  // Busca comparação sempre que os anos selecionados mudarem
+  useEffect(() => {
+    getComparacaoAnual({ anos: anosComp });
+  }, [anosComp, getComparacaoAnual]);
 
   const ativos = useMemo(() => ['Todos', ...new Set(rendimentos.map(d => d.ticker))], [rendimentos]);
 
@@ -131,19 +136,17 @@ export default function PaginaRendimentos() {
     return { name: ano, Valor: item ? parseFloat(item.totalRendimento) || 0 : 0 };
   }), [detalheAnual]);
 
-  // Comparação mensal — ainda calculada no front pois precisa de múltiplos anos cruzados
+  // Comparação mensal — dados reais da API (comparacaoAnual)
   const chartComparacao = useMemo(() => MESES.map((_, mi) => {
     const row = { mes: mi + 1 };
     anosComp.forEach(ano => {
-      row[ano] = rendimentos.filter(d => {
-        const dt = new Date(d.dtRendimento);
-        return dt.getUTCFullYear() === Number(ano)
-            && dt.getUTCMonth() === mi
-            && (filtroAtivo === 'Todos' || d.ticker === filtroAtivo);
-      }).reduce((s, d) => s + Number(d.valorRecebido), 0);
+      const item = comparacaoAnual.find(
+        d => parseInt(d.mes) === mi + 1 && String(parseInt(d.ano)) === ano
+      );
+      row[ano] = item ? parseFloat(item.totalRendimento) || 0 : 0;
     });
     return row;
-  }), [rendimentos, anosComp, filtroAtivo]);
+  }), [comparacaoAnual, anosComp]);
 
   const handleNovoRendimento = () => {
     toastSuccess('Rendimento lançado com sucesso!');
