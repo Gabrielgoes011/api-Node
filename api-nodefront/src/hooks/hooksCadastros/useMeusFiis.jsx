@@ -4,24 +4,28 @@ import { meusFiisService } from '../../services/servCadastros/meusFiisService';
 import { seguimentosService } from '../../services/servCadastros/seguimentosService';
 
 export const useMeusFiis = () => {
-  const [fiis, setFiis] = useState([]);
+  const [fiis, setFiis]           = useState([]);
   const [seguimentos, setSeguimentos] = useState([]);
   const [dashboard, setDashboard] = useState({ total: 0 });
+  const [loading, setLoading]     = useState(false);
 
-  const [onEdit, setOnEdit] = useState(null);
-  const [formData, setFormData] = useState({ ticker: '', nomeFundo: '', cnpj: '', idSeguimento: '' });
+  const [onEdit, setOnEdit]             = useState(null);
+  const [formData, setFormData]         = useState({ ticker: '', nomeFundo: '', cnpj: '', idSeguimento: '' });
   const [showFormModal, setShowFormModal] = useState(false);
 
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal]       = useState(false);
   const [itemSelected, setItemSelected] = useState(null);
-  const [modalAction, setModalAction] = useState('');
+  const [modalAction, setModalAction]   = useState('');
 
   const getFiis = useCallback(async () => {
+    setLoading(true);
     try {
       const data = await meusFiisService.listarTodos();
       setFiis(data || []);
     } catch (error) {
       handleError(error, 'Erro ao buscar fundos.');
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -142,7 +146,7 @@ export const useMeusFiis = () => {
 
   return {
     fiis, seguimentos, onEdit, formData, showModal, itemSelected, modalAction, showFormModal,
-    setFormData, setShowModal, dashboard, getFiis, getDashboard, getSeguimentos,
+    setFormData, setShowModal, dashboard, loading, getFiis, getDashboard, getSeguimentos,
     handleAddFii, handleUpdateFii, handleOpenCreate, handleEdit, handleOpenModal,
     executeConfirmedAction, closeFormModal
   };

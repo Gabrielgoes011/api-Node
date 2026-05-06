@@ -4,22 +4,26 @@ import { seguimentosService } from '../../services/servCadastros/seguimentosServ
 
 export const useSeguimentos = () => {
   const [seguimentos, setSeguimentos] = useState([]);
-  const [dashboard, setDashboard] = useState({ total: 0 });
+  const [dashboard, setDashboard]     = useState({ total: 0 });
+  const [loading, setLoading]         = useState(false);
 
-  const [onEdit, setOnEdit] = useState(null);
-  const [formData, setFormData] = useState({ nome: '' });
+  const [onEdit, setOnEdit]             = useState(null);
+  const [formData, setFormData]         = useState({ nome: '' });
   const [showFormModal, setShowFormModal] = useState(false);
 
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal]       = useState(false);
   const [itemSelected, setItemSelected] = useState(null);
-  const [modalAction, setModalAction] = useState('');
+  const [modalAction, setModalAction]   = useState('');
 
   const getSeguimentos = useCallback(async () => {
+    setLoading(true);
     try {
       const data = await seguimentosService.listarTodos();
       setSeguimentos(data || []);
     } catch (error) {
       handleError(error, 'Erro ao buscar seguimentos.');
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -102,7 +106,7 @@ export const useSeguimentos = () => {
 
   return {
     seguimentos, onEdit, formData, showModal, itemSelected, modalAction, showFormModal,
-    setFormData, setShowModal, dashboard, getSeguimentos, getDashboard,
+    setFormData, setShowModal, dashboard, loading, getSeguimentos, getDashboard,
     handleAddSeguimento, handleUpdateSeguimento, handleOpenCreate, handleEdit,
     handleOpenModal, executeConfirmedAction, closeFormModal
   };

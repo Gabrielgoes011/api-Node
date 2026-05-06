@@ -3,6 +3,7 @@ import { AiOutlinePlus, AiOutlineDelete, AiOutlineBarChart, AiOutlineAreaChart }
 import NovaOperacaoModal from './components/modalNovaOperacao';
 import { BarChart, AreaChart } from '../../components/Charts';
 import { useOperacoes } from '../../hooks/hooksOperacoes/useOperacoes';
+import SkeletonTable from '../../components/SkeletonTable/SkeletonTable';
 
 const CHART_KEYS   = ['Compra', 'Venda', 'Liquido'];
 const CHART_COLORS = {
@@ -11,6 +12,7 @@ const CHART_COLORS = {
   Liquido: 'linear-gradient(180deg,#60a5fa 0%,#2563eb 100%)',
 };
 const AREA_COLORS = { Compra: '#22c55e', Venda: '#ef4444', Liquido: '#3b82f6' };
+const ITENS_POR_PAGINA = 10;
 
 export default function PaginaOperacoes() {
   const [anoSelecionado, setAnoSelecionado] = useState('2026');
@@ -19,6 +21,7 @@ export default function PaginaOperacoes() {
   const [tipoGrafico, setTipoGrafico] = useState('barras');
   const [modalExclusaoAberto, setModalExclusaoAberto] = useState(false);
   const [operacaoParaExcluir, setOperacaoParaExcluir] = useState(null);
+  const [pagina, setPagina] = useState(1);
 
   const {
     operacoes, chartData, loading,
@@ -30,7 +33,13 @@ export default function PaginaOperacoes() {
   useEffect(() => {
     getOperacoes({ mes: mesSelecionado, ano: anoSelecionado });
     getChartData({ ano: anoSelecionado });
+    setPagina(1);
   }, [anoSelecionado, mesSelecionado]);
+
+  // paginação
+  const totalPaginas = Math.max(1, Math.ceil(operacoes.length / ITENS_POR_PAGINA));
+  const paginaAtual  = Math.min(pagina, totalPaginas);
+  const itensPagina  = operacoes.slice((paginaAtual - 1) * ITENS_POR_PAGINA, paginaAtual * ITENS_POR_PAGINA);
 
   const formatarMoeda = (valor) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
@@ -188,14 +197,18 @@ export default function PaginaOperacoes() {
                 </tr>
               </thead>
               <tbody style={{ fontSize: '14px' }}>
-                {operacoes.length === 0 ? (
+                {loading ? (
+                  <tr><td colSpan="8" style={{ padding: 0 }}>
+                    <SkeletonTable rows={5} cols={8} />
+                  </td></tr>
+                ) : operacoes.length === 0 ? (
                   <tr>
-                    <td colSpan="7" style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
-                      {loading ? 'Carregando...' : 'Nenhuma operação encontrada para este período.'}
+                    <td colSpan="8" style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
+                      Nenhuma operação encontrada para este período.
                     </td>
                   </tr>
                 ) : (
-                  operacoes.map((row, index) => {
+                  itensPagina.map((row, index) => {
                     const valorTotal = row.qtde * row.preco;
                     return (
                       <tr 
@@ -258,8 +271,17 @@ export default function PaginaOperacoes() {
             </table>
           </div>
           
-          <div style={{ padding: '1rem', backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0', fontSize: '12px', color: '#64748b', textAlign: 'center' }}>
-            Os dados são fornecidos para fins informativos. Simulação de ambiente Web.
+          <div style={{ padding: '1rem', backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', fontSize: '14px', color: '#475569' }}>
+            <span>{operacoes.length} registro{operacoes.length !== 1 ? 's' : ''}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <button onClick={() => setPagina(p => Math.max(1, p - 1))} disabled={paginaAtual === 1} style={{ padding: '0.375rem 0.75rem', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '0.375rem', color: '#334155', cursor: paginaAtual === 1 ? 'not-allowed' : 'pointer', fontWeight: 500, opacity: paginaAtual === 1 ? 0.5 : 1 }} onMouseOver={e => { if (paginaAtual !== 1) e.currentTarget.style.backgroundColor = '#f1f5f9'; }} onMouseOut={e => { e.currentTarget.style.backgroundColor = '#ffffff'; }}>
+                Anterior
+              </button>
+              <span style={{ fontWeight: 500 }}>Página {paginaAtual} de {totalPaginas}</span>
+              <button onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))} disabled={paginaAtual >= totalPaginas} style={{ padding: '0.375rem 0.75rem', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '0.375rem', color: '#334155', cursor: paginaAtual >= totalPaginas ? 'not-allowed' : 'pointer', fontWeight: 500, opacity: paginaAtual >= totalPaginas ? 0.5 : 1 }} onMouseOver={e => { if (paginaAtual < totalPaginas) e.currentTarget.style.backgroundColor = '#f1f5f9'; }} onMouseOut={e => { e.currentTarget.style.backgroundColor = '#ffffff'; }}>
+                Próxima
+              </button>
+            </div>
           </div>
         </div>
 

@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { TableAcoes } from '../../../components/TableAcoes';
 import { useMeusFiis } from '../../../hooks/hooksCadastros/useMeusFiis';
 import ModalConfirmacao from '../../../components/ModalDeConfirmacao/ModalConfirmacao';
+import SkeletonTable from '../../../components/SkeletonTable/SkeletonTable';
 
 // Definição das colunas da tabela
 const colunasFiis = [
@@ -16,7 +17,7 @@ const colunasFiis = [
 function PaginaMeusFiis() {
   const {
     fiis,
-    seguimentos, // Lista de seguimentos para popular o <select>
+    seguimentos,
     onEdit,
     formData,
     showModal,
@@ -26,6 +27,7 @@ function PaginaMeusFiis() {
     setFormData,
     setShowModal,
     dashboard,
+    loading,
     getFiis,
     getDashboard,
     getSeguimentos, // Função para buscar os seguimentos do select
@@ -104,7 +106,9 @@ function PaginaMeusFiis() {
 
         {/* Tabela de FIIs */}
         <section style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(15,23,42,0.08)', padding: '1rem' }}>
-          {fiis && fiis.length === 0 ? (
+          {loading ? (
+            <SkeletonTable rows={5} cols={5} />
+          ) : fiis && fiis.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
               Nenhum fundo encontrado.
             </div>

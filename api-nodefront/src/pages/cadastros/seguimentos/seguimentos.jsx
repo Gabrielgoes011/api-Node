@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { TableAcoes } from '../../../components/TableAcoes';
 import { useSeguimentos } from '../../../hooks/hooksCadastros/useSeguimentos';
 import ModalConfirmacao from '../../../components/ModalDeConfirmacao/ModalConfirmacao';
+import SkeletonTable from '../../../components/SkeletonTable/SkeletonTable';
 
 // Definição das colunas da tabela
 const colunasSeguimentos = [
@@ -22,6 +23,7 @@ function PaginaSeguimentos() {
     setFormData,
     setShowModal,
     dashboard,
+    loading,
     getSeguimentos,
     getDashboard,
     handleAddSeguimento,
@@ -94,7 +96,9 @@ function PaginaSeguimentos() {
 
         {/* Tabela de segmentos */}
         <section style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(15,23,42,0.08)', padding: '1rem' }}>
-          {seguimentos.length === 0 ? (
+          {loading ? (
+            <SkeletonTable rows={5} cols={2} />
+          ) : seguimentos.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
               Nenhum seguimento encontrado.
             </div>

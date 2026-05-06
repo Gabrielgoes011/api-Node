@@ -5,6 +5,7 @@ import { TableAcoes } from '../../../components/TableAcoes';
 import { useUsuarios } from '../../../hooks/hooksCadastros/useUsuarios';
 import ModalFormulario from '../../../components/ModalFormulario/ModalFormulario';
 import ModalConfirmacao from '../../../components/ModalDeConfirmacao/ModalConfirmacao';
+import SkeletonTable from '../../../components/SkeletonTable/SkeletonTable';
 
 // Definição das colunas da tabela
 const colunasUsuarios = [
@@ -19,6 +20,7 @@ function PaginaUsuarios() {
     users,
     onEdit,
     activeTab,
+    loading,
     formData,
     showModal,
     userSelected,
@@ -142,7 +144,9 @@ function PaginaUsuarios() {
 
         {/* Tabela de usuários */}
         <section style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(15,23,42,0.08)', padding: '1rem' }}>
-          {users.length === 0 ? (
+          {loading ? (
+            <SkeletonTable rows={5} cols={5} />
+          ) : users.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
               Nenhum usuário encontrado.
             </div>
