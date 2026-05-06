@@ -4,12 +4,12 @@ import { toast } from 'react-toastify';
 import { BarChart, AreaChart } from '../../components/Charts';
 import NovoRendimentoModal from './components/modalNovoRendimento';
 import { useRendimentos } from '../../hooks/hooksRendimentos/useRendimentos';
-import { toastSuccess, handleError } from '../../utils/responseUtils';
+import { toastSuccess } from '../../utils/responseUtils';
+import { DataCard } from '../../components/DataCard';
 
 // ─── constantes ────────────────────────────────────────────────────────────────
 const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const ANOS  = ['2023','2024','2025','2026'];
-const ITENS_POR_PAGINA = 10;
 
 const CHART_KEYS   = ['Valor'];
 const CHART_COLORS = { Valor: 'linear-gradient(180deg,#60a5fa 0%,#2563eb 100%)' };
@@ -113,7 +113,6 @@ export default function PaginaRendimentos() {
   const [anosComp, setAnosComp]         = useState(['2024','2025','2026']);
   const [modalAberto, setModalAberto]   = useState(false);
   const [abaAtiva, setAbaAtiva]         = useState('graficos');
-  const [pagina, setPagina]             = useState(1);
 
   // ── confirmação de exclusão ──
   const [modalExclusao, setModalExclusao]           = useState(false);
@@ -122,7 +121,6 @@ export default function PaginaRendimentos() {
   // ── busca de dados ──
   useEffect(() => {
     getRendimentos({ mes: filtroMes, ano: filtroAno });
-    setPagina(1);
   }, [filtroMes, filtroAno, getRendimentos]);
 
   useEffect(() => {
@@ -138,11 +136,6 @@ export default function PaginaRendimentos() {
   const filtrados = useMemo(() => rendimentos.filter(d =>
     filtroAtivo === 'Todos' || d.ticker === filtroAtivo
   ), [rendimentos, filtroAtivo]);
-
-  // ── paginação ──
-  const totalPaginas  = Math.max(1, Math.ceil(filtrados.length / ITENS_POR_PAGINA));
-  const paginaAtual   = Math.min(pagina, totalPaginas);
-  const itensPagina   = filtrados.slice((paginaAtual - 1) * ITENS_POR_PAGINA, paginaAtual * ITENS_POR_PAGINA);
 
   const totalRecebido  = useMemo(() => filtrados.reduce((s, d) => s + Number(d.valorRecebido), 0), [filtrados]);
   const totalAcumulado = useMemo(() => rendimentos.reduce((s, d) => s + Number(d.valorRecebido), 0), [rendimentos]);
@@ -314,87 +307,41 @@ export default function PaginaRendimentos() {
 
           {/* ── Aba Histórico ── */}
           {abaAtiva === 'historico' && (
-            <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-              <div style={{ padding: '1rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc', flexWrap: 'wrap', gap: '1rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                  <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1e293b', margin: 0 }}>Histórico de Rendimentos</h2>
-                  <select value={filtroMes} onChange={e => { setFiltroMes(e.target.value); setPagina(1); }} style={{ backgroundColor: '#ffffff', border: '1px solid #cbd5e1', color: '#334155', fontSize: '14px', padding: '0.375rem 0.75rem', borderRadius: '0.375rem', outline: 'none', cursor: 'pointer' }}>
-                    <option value="Todos">Todos os meses</option>
-                    {MESES.map((m, i) => <option key={i} value={String(i + 1).padStart(2, '0')}>{m}</option>)}
-                  </select>
-                </div>
-                <button onClick={() => setModalAberto(true)} style={{ backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 600, padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.1)' }} onMouseOver={e => e.currentTarget.style.backgroundColor = '#1d4ed8'} onMouseOut={e => e.currentTarget.style.backgroundColor = '#2563eb'}>
-                  <AiOutlinePlus size={18} />
-                  Novo Rendimento
-                </button>
-              </div>
-
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-                  <thead>
-                    <tr style={{ backgroundColor: '#dbeafe', color: '#334155', fontSize: '14px', borderBottom: '2px solid #93c5fd' }}>
-                      <th style={{ padding: '1rem', fontWeight: 600 }}>Data</th>
-                      <th style={{ padding: '1rem', fontWeight: 600 }}>Ativo</th>
-                      <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'center' }}>Segmento</th>
-                      <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'center' }}>Valor Recebido</th>
-                      <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'center' }}>Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody style={{ fontSize: '14px' }}>
-                    {/* skeleton enquanto carrega */}
-                    {loading && [...Array(5)].map((_, i) => <SkeletonRow key={i} />)}
-
-                    {/* vazio */}
-                    {!loading && filtrados.length === 0 && (
-                      <tr>
-                        <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
-                          Nenhum rendimento encontrado para os filtros selecionados.
-                        </td>
-                      </tr>
-                    )}
-
-                    {/* dados paginados */}
-                    {!loading && itensPagina.map((row, index) => (
-                      <tr key={row.id} style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafbfc', transition: 'background-color 0.2s' }} onMouseOver={e => e.currentTarget.style.backgroundColor = '#f1f5f9'} onMouseOut={e => e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#ffffff' : '#fafbfc'}>
-                        <td style={{ padding: '1rem', fontWeight: 500, color: '#334155' }}>
-                          {new Date(row.dtRendimento).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
-                        </td>
-                        <td style={{ padding: '1rem', fontWeight: 700, color: '#1e293b' }}>{row.ticker}</td>
-                        <td style={{ padding: '1rem' }}>
-                          <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                            <span style={{ display: 'inline-flex', alignItems: 'center', padding: '2px 10px', borderRadius: '9999px', fontSize: '12px', fontWeight: 500, backgroundColor: '#eff6ff', color: '#2563eb' }}>
-                              {row.nomeSeguimento}
-                            </span>
-                          </div>
-                        </td>
-                        <td style={{ padding: '1rem', textAlign: 'center', fontWeight: 700, color: '#15803d' }}>
-                          {fmt(Number(row.valorRecebido))}
-                        </td>
-                        <td style={{ padding: '1rem', textAlign: 'center' }}>
-                          <button onClick={() => abrirModalExclusao(row)} style={{ color: '#cbd5e1', cursor: 'pointer', padding: '0.375rem', borderRadius: '0.375rem', backgroundColor: 'transparent', border: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }} onMouseOver={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.backgroundColor = '#fee2e2'; }} onMouseOut={e => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }} title="Excluir rendimento">
-                            <AiOutlineDelete size={16} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* ── Paginação ── */}
-              <div style={{ padding: '1rem', backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', fontSize: '14px', color: '#475569' }}>
-                <span>{filtrados.length} registro{filtrados.length !== 1 ? 's' : ''}</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <button onClick={() => setPagina(p => Math.max(1, p - 1))} disabled={paginaAtual === 1} style={{ padding: '0.375rem 0.75rem', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '0.375rem', color: '#334155', cursor: paginaAtual === 1 ? 'not-allowed' : 'pointer', fontWeight: 500, opacity: paginaAtual === 1 ? 0.5 : 1 }} onMouseOver={e => { if (paginaAtual !== 1) e.currentTarget.style.backgroundColor = '#f1f5f9'; }} onMouseOut={e => { e.currentTarget.style.backgroundColor = '#ffffff'; }}>
-                    Anterior
-                  </button>
-                  <span style={{ fontWeight: 500 }}>Página {paginaAtual} de {totalPaginas}</span>
-                  <button onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))} disabled={paginaAtual >= totalPaginas} style={{ padding: '0.375rem 0.75rem', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '0.375rem', color: '#334155', cursor: paginaAtual >= totalPaginas ? 'not-allowed' : 'pointer', fontWeight: 500, opacity: paginaAtual >= totalPaginas ? 0.5 : 1 }} onMouseOver={e => { if (paginaAtual < totalPaginas) e.currentTarget.style.backgroundColor = '#f1f5f9'; }} onMouseOut={e => { e.currentTarget.style.backgroundColor = '#ffffff'; }}>
-                    Próxima
-                  </button>
-                </div>
-              </div>
-            </div>
+            <DataCard
+              titulo="Histórico de Rendimentos"
+              botaoLabel="Novo Rendimento"
+              onBotaoClick={() => setModalAberto(true)}
+              labelpesquisa="Buscar ativo, segmento..."
+              filtros={
+                <select value={filtroMes} onChange={e => setFiltroMes(e.target.value)} style={{ backgroundColor: '#ffffff', border: '1px solid #cbd5e1', color: '#334155', fontSize: '14px', padding: '0.375rem 0.75rem', borderRadius: '0.375rem', outline: 'none', cursor: 'pointer' }}>
+                  <option value="Todos">Todos os meses</option>
+                  {MESES.map((m, i) => <option key={i} value={String(i + 1).padStart(2, '0')}>{m}</option>)}
+                </select>
+              }
+              coluna={[
+                {
+                  titulo: 'Data', acesso: 'dtRendimento', width: '12%',
+                  render: (val) => new Date(val).toLocaleDateString('pt-BR', { timeZone: 'UTC' }),
+                },
+                { titulo: 'Ativo', acesso: 'ticker', width: '12%', render: (val) => <span style={{ fontWeight: 700, color: '#1e293b' }}>{val}</span> },
+                {
+                  titulo: 'Segmento', acesso: 'nomeSeguimento', width: '20%', align: 'center',
+                  render: (val) => (
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', padding: '2px 10px', borderRadius: '9999px', fontSize: '12px', fontWeight: 500, backgroundColor: '#eff6ff', color: '#2563eb' }}>{val}</span>
+                    </div>
+                  ),
+                },
+                {
+                  titulo: 'Valor Recebido', acesso: 'valorRecebido', width: '15%', align: 'center',
+                  render: (val) => <span style={{ fontWeight: 700, color: '#15803d' }}>{fmt(Number(val))}</span>,
+                },
+              ]}
+              data={loading ? [] : filtrados}
+              itemsPerPage={10}
+              usaExcluir
+              acaoExcluir={abrirModalExclusao}
+            />
           )}
 
         </main>

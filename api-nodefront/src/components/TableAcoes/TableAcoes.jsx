@@ -130,9 +130,15 @@ const TableAcoes = ({
               >
                 {coluna.map((col, ci) => {
                   const val = row[col.acesso];
-                  let display = val ?? '';
-                  if (val && (col.acesso.toLowerCase().includes('data') || col.acesso.toLowerCase().includes('cadastro'))) {
-                    display = col.acesso.toLowerCase().includes('hora') ? formatarDataComHora(val) : formatarDataBR(val);
+                  let display;
+                  if (col.render) {
+                    // renderização customizada — recebe (valor, linha)
+                    display = col.render(val, row);
+                  } else {
+                    display = val ?? '';
+                    if (val && (col.acesso.toLowerCase().includes('data') || col.acesso.toLowerCase().includes('cadastro'))) {
+                      display = col.acesso.toLowerCase().includes('hora') ? formatarDataComHora(val) : formatarDataBR(val);
+                    }
                   }
                   return (
                     <td key={ci} style={{ padding: '1rem', fontWeight: 500, color: '#334155', width: col.width || 'auto', textAlign: col.align || 'left', overflow: col.truncate ? 'hidden' : 'visible', textOverflow: col.truncate ? 'ellipsis' : 'clip', whiteSpace: col.truncate ? 'nowrap' : 'normal', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>

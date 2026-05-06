@@ -3,7 +3,7 @@ import { AiOutlinePlus, AiOutlineDelete, AiOutlineBarChart, AiOutlineAreaChart }
 import NovaOperacaoModal from './components/modalNovaOperacao';
 import { BarChart, AreaChart } from '../../components/Charts';
 import { useOperacoes } from '../../hooks/hooksOperacoes/useOperacoes';
-import SkeletonTable from '../../components/SkeletonTable/SkeletonTable';
+import { DataCard } from '../../components/DataCard';
 
 const CHART_KEYS   = ['Compra', 'Venda', 'Liquido'];
 const CHART_COLORS = {
@@ -12,7 +12,8 @@ const CHART_COLORS = {
   Liquido: 'linear-gradient(180deg,#60a5fa 0%,#2563eb 100%)',
 };
 const AREA_COLORS = { Compra: '#22c55e', Venda: '#ef4444', Liquido: '#3b82f6' };
-const ITENS_POR_PAGINA = 10;
+
+const fmt = (v) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 
 export default function PaginaOperacoes() {
   const [anoSelecionado, setAnoSelecionado] = useState('2026');
@@ -21,7 +22,6 @@ export default function PaginaOperacoes() {
   const [tipoGrafico, setTipoGrafico] = useState('barras');
   const [modalExclusaoAberto, setModalExclusaoAberto] = useState(false);
   const [operacaoParaExcluir, setOperacaoParaExcluir] = useState(null);
-  const [pagina, setPagina] = useState(1);
 
   const {
     operacoes, chartData, loading,
@@ -29,20 +29,10 @@ export default function PaginaOperacoes() {
     handleLancarOperacao, handleExcluirOperacao,
   } = useOperacoes();
 
-  // Recarrega sempre que ano ou mês mudar
   useEffect(() => {
     getOperacoes({ mes: mesSelecionado, ano: anoSelecionado });
     getChartData({ ano: anoSelecionado });
-    setPagina(1);
   }, [anoSelecionado, mesSelecionado]);
-
-  // paginação
-  const totalPaginas = Math.max(1, Math.ceil(operacoes.length / ITENS_POR_PAGINA));
-  const paginaAtual  = Math.min(pagina, totalPaginas);
-  const itensPagina  = operacoes.slice((paginaAtual - 1) * ITENS_POR_PAGINA, paginaAtual * ITENS_POR_PAGINA);
-
-  const formatarMoeda = (valor) =>
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
 
   const abrirModalExclusao = (operacao) => {
     setOperacaoParaExcluir(operacao);
@@ -55,6 +45,34 @@ export default function PaginaOperacoes() {
     setModalExclusaoAberto(false);
     setOperacaoParaExcluir(null);
   };
+
+  // ── definição das colunas com render customizado ──
+  const colunasOperacoes = [
+    { titulo: 'Data',       acesso: 'data',      width: '10%' },
+    {
+      titulo: 'Operação', acesso: 'operacao', width: '10%', align: 'center',
+      render: (val) => (
+        <span style={{ display: 'inline-flex', alignItems: 'center', padding: '2px 10px', borderRadius: '9999px', fontSize: '12px', fontWeight: 500, backgroundColor: val?.toUpperCase() === 'COMPRA' ? '#dcfce7' : '#fee2e2', color: val?.toUpperCase() === 'COMPRA' ? '#166534' : '#dc2626' }}>
+          {val}
+        </span>
+      ),
+    },
+    { titulo: 'Ativo',      acesso: 'ativo',     width: '10%', render: (val) => <span style={{ fontWeight: 700, color: '#1e293b' }}>{val}</span> },
+    {
+      titulo: 'Seguimento', acesso: 'seguimento', width: '15%', align: 'center',
+      render: (val) => (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', padding: '2px 10px', borderRadius: '9999px', fontSize: '12px', fontWeight: 500, backgroundColor: '#eff6ff', color: '#2563eb' }}>{val}</span>
+        </div>
+      ),
+    },
+    { titulo: 'Qtde',       acesso: 'qtde',      width: '8%',  align: 'center' },
+    { titulo: 'Preço',      acesso: 'preco',     width: '12%', align: 'right',  render: (val) => fmt(val) },
+    { titulo: 'Valor Total',acesso: 'valorTotal',width: '14%', align: 'right',  render: (val) => <span style={{ fontWeight: 600, color: '#1e293b' }}>{fmt(val)}</span> },
+  ];
+
+  // monta valorTotal em cada linha para o render
+  const operacoesComTotal = operacoes.map(op => ({ ...op, valorTotal: op.qtde * op.preco }));
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f1f5f9', color: '#334155', fontFamily: 'sans-serif' }}>
@@ -147,143 +165,38 @@ export default function PaginaOperacoes() {
         </div>
 
         {/* Tabela de Operações */}
-        <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-          <div style={{ padding: '1rem', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f8fafc', flexWrap: 'wrap', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1e293b', margin: 0 }}>Registro de Operações</h2>
-              <select 
-                value={mesSelecionado}
-                onChange={(e) => setMesSelecionado(e.target.value)}
-                style={{ backgroundColor: '#ffffff', border: '1px solid #cbd5e1', color: '#334155', fontSize: '14px', padding: '0.375rem 0.75rem', borderRadius: '0.375rem', outline: 'none', cursor: 'pointer' }}
-              >
-                <option value="Todos">Todos os meses</option>
-                <option value="01">Janeiro</option>
-                <option value="02">Fevereiro</option>
-                <option value="03">Março</option>
-                <option value="04">Abril</option>
-                <option value="05">Maio</option>
-                <option value="06">Junho</option>
-                <option value="07">Julho</option>
-                <option value="08">Agosto</option>
-                <option value="09">Setembro</option>
-                <option value="10">Outubro</option>
-                <option value="11">Novembro</option>
-                <option value="12">Dezembro</option>
-              </select>
-            </div>
-            
-            <button 
-              onClick={() => setModalAberto(true)}
-              style={{ backgroundColor: '#2563eb', color: '#ffffff', fontWeight: 600, padding: '0.5rem 1rem', borderRadius: '0.375rem', border: 'none', cursor: 'pointer', transition: 'background-color 0.2s', display: 'flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 1px 2px rgba(0,0,0,0.1)' }} 
-              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1d4ed8'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}>
-              <AiOutlinePlus size={18} />
-              Nova Operação
-            </button>
-          </div>
-
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#dbeafe', color: '#334155', fontSize: '14px', borderBottom: '2px solid #93c5fd' }}>
-                  <th style={{ padding: '1rem', fontWeight: 600 }}>Data</th>
-                  <th style={{ padding: '1rem', fontWeight: 600 }}>Operação</th>
-                  <th style={{ padding: '1rem', fontWeight: 600 }}>Ativo</th>
-                  <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'center' }}>Seguimento</th>
-                  <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'center' }}>Quantidade</th>
-                  <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'right' }}>Preço</th>
-                  <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'right' }}>Valor Total</th>
-                  <th style={{ padding: '1rem', fontWeight: 600, textAlign: 'center' }}>Ações</th>
-
-                </tr>
-              </thead>
-              <tbody style={{ fontSize: '14px' }}>
-                {loading ? (
-                  <tr><td colSpan="8" style={{ padding: 0 }}>
-                    <SkeletonTable rows={5} cols={8} />
-                  </td></tr>
-                ) : operacoes.length === 0 ? (
-                  <tr>
-                    <td colSpan="8" style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
-                      Nenhuma operação encontrada para este período.
-                    </td>
-                  </tr>
-                ) : (
-                  itensPagina.map((row, index) => {
-                    const valorTotal = row.qtde * row.preco;
-                    return (
-                      <tr 
-                        key={row.id} 
-                        style={{ 
-                          borderBottom: '1px solid #e2e8f0', 
-                          backgroundColor: index % 2 === 0 ? '#ffffff' : '#fafbfc',
-                          transition: 'background-color 0.2s'
-                        }}
-                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f1f5f9'}
-                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = (index % 2 === 0 ? '#ffffff' : '#fafbfc')}
-                      >
-                        <td style={{ padding: '1rem', fontWeight: 500, color: '#334155' }}>{row.data}</td>
-                        <td style={{ padding: '1rem' }}>
-                          <span style={{ 
-                            display: 'inline-flex', 
-                            alignItems: 'center', 
-                            paddingLeft: '0.625rem', 
-                            paddingRight: '0.625rem', 
-                            paddingTop: '0.25rem', 
-                            paddingBottom: '0.25rem', 
-                            borderRadius: '9999px', 
-                            fontSize: '12px', 
-                            fontWeight: 500, 
-                            backgroundColor: row.operacao.toUpperCase() === 'COMPRA' ? '#dcfce7' : '#fee2e2',
-                            color: row.operacao.toUpperCase() === 'COMPRA' ? '#166534' : '#dc2626'
-                          }}>
-                            {row.operacao}
-                          </span>
-                        </td>
-                        <td style={{ padding: '1rem', fontWeight: 700, color: '#1e293b' }}>{row.ativo}</td>
-                        <td style={{ padding: '1rem', textAlign: 'center' }}>
-                          <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                            <span style={{ display: 'inline-flex', alignItems: 'center', padding: '2px 10px', borderRadius: '9999px', fontSize: '12px', fontWeight: 500, backgroundColor: '#eff6ff', color: '#2563eb' }}>
-                              {row.seguimento}
-                            </span>
-                          </div>
-                        </td>
-                        <td style={{ padding: '1rem', textAlign: 'center', color: '#475569' }}>{row.qtde}</td>
-                        <td style={{ padding: '1rem', textAlign: 'right', color: '#475569' }}>{formatarMoeda(row.preco)}</td>
-                        <td style={{ padding: '1rem', textAlign: 'right', fontWeight: 600, color: '#1e293b' }}>
-                          {formatarMoeda(valorTotal)}
-                        </td>
-                        <td style={{ padding: '1rem', textAlign: 'center' }}>
-                          <button 
-                          onClick={() => abrirModalExclusao(row)}
-                            style={{ color: '#cbd5e1', cursor: 'pointer', padding: '0.375rem', borderRadius: '0.375rem', backgroundColor: 'transparent', border: 'none', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}
-                          onMouseOver={(e) => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.backgroundColor = '#fee2e2'; }}
-                          onMouseOut={(e) => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }}
-                            title="Excluir operação"
-                          >
-                            <AiOutlineDelete size={16} />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-          
-          <div style={{ padding: '1rem', backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', fontSize: '14px', color: '#475569' }}>
-            <span>{operacoes.length} registro{operacoes.length !== 1 ? 's' : ''}</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <button onClick={() => setPagina(p => Math.max(1, p - 1))} disabled={paginaAtual === 1} style={{ padding: '0.375rem 0.75rem', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '0.375rem', color: '#334155', cursor: paginaAtual === 1 ? 'not-allowed' : 'pointer', fontWeight: 500, opacity: paginaAtual === 1 ? 0.5 : 1 }} onMouseOver={e => { if (paginaAtual !== 1) e.currentTarget.style.backgroundColor = '#f1f5f9'; }} onMouseOut={e => { e.currentTarget.style.backgroundColor = '#ffffff'; }}>
-                Anterior
-              </button>
-              <span style={{ fontWeight: 500 }}>Página {paginaAtual} de {totalPaginas}</span>
-              <button onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))} disabled={paginaAtual >= totalPaginas} style={{ padding: '0.375rem 0.75rem', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '0.375rem', color: '#334155', cursor: paginaAtual >= totalPaginas ? 'not-allowed' : 'pointer', fontWeight: 500, opacity: paginaAtual >= totalPaginas ? 0.5 : 1 }} onMouseOver={e => { if (paginaAtual < totalPaginas) e.currentTarget.style.backgroundColor = '#f1f5f9'; }} onMouseOut={e => { e.currentTarget.style.backgroundColor = '#ffffff'; }}>
-                Próxima
-              </button>
-            </div>
-          </div>
-        </div>
+        <DataCard
+          titulo="Registro de Operações"
+          botaoLabel="Nova Operação"
+          onBotaoClick={() => setModalAberto(true)}
+          labelpesquisa="Buscar operações..."
+          filtros={
+            <select
+              value={mesSelecionado}
+              onChange={e => setMesSelecionado(e.target.value)}
+              style={{ backgroundColor: '#ffffff', border: '1px solid #cbd5e1', color: '#334155', fontSize: '14px', padding: '0.375rem 0.75rem', borderRadius: '0.375rem', outline: 'none', cursor: 'pointer' }}
+            >
+              <option value="Todos">Todos os meses</option>
+              <option value="01">Janeiro</option>
+              <option value="02">Fevereiro</option>
+              <option value="03">Março</option>
+              <option value="04">Abril</option>
+              <option value="05">Maio</option>
+              <option value="06">Junho</option>
+              <option value="07">Julho</option>
+              <option value="08">Agosto</option>
+              <option value="09">Setembro</option>
+              <option value="10">Outubro</option>
+              <option value="11">Novembro</option>
+              <option value="12">Dezembro</option>
+            </select>
+          }
+          coluna={colunasOperacoes}
+          data={loading ? [] : operacoesComTotal}
+          itemsPerPage={10}
+          usaExcluir
+          acaoExcluir={abrirModalExclusao}
+        />
 
       </main>
       
