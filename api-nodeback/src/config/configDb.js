@@ -4,14 +4,10 @@ import 'dotenv/config'; // Carrega as variáveis do .env automaticamente
 const { Pool } = pkg;
 
 
-// Cria um pool de conexões usando as variáveis do .env
+// Cria um pool de conexões usando a DATABASE_URL do .env
 const pool = new Pool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-    ssl: { rejectUnauthorized: false }, // Ajuste para SSL sem rejeitar certificados não autorizados
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
     idleTimeoutMillis: 30000, // Fecha conexões ociosas após 30s
     connectionTimeoutMillis: 2000, // Timeout de conexão de 2s
 });
@@ -20,8 +16,8 @@ const pool = new Pool({
 setTimeout(() => {
     (async () => {
         // Verifica as variáveis de ambiente aqui para o erro sair no lugar certo
-        if (!process.env.DB_HOST || !process.env.DB_USER || !process.env.DB_PASS || !process.env.DB_NAME) {
-            console.error('❌ ERRO: Variáveis de ambiente ausentes!');
+        if (!process.env.DATABASE_URL) {
+            console.error('❌ ERRO: Variável de ambiente DATABASE_URL ausente!');
             return; // Para a execução e não tenta conectar
         }
 
