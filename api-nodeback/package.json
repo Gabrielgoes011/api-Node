@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js",
-    "start": "nodemon server.js"
+    "dev": "nodemon --import ./src/config/env.js server.js",
+    "start": "node --import ./src/config/env.js server.js"
   },
   "author": "",
   "license": "ISC",

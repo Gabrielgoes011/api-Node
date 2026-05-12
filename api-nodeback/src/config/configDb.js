@@ -1,5 +1,4 @@
 import pkg from 'pg';
-import 'dotenv/config'; // Carrega as variáveis do .env automaticamente
 
 const { Pool } = pkg;
 
@@ -28,6 +27,7 @@ setTimeout(() => {
         } catch (error) {
             console.error('❌ Falha ao conectar ao banco de dados PostgreSQL!');
             console.error(`   Motivo: ${error.message}`);
+            console.error('   Detalhes:', error);
         }
     })();
 }, 500); // 500ms de atraso garante que o log do Express passe antes
