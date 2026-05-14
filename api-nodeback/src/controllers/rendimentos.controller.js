@@ -1,4 +1,4 @@
-import { openDb } from "../../config/configDb.js";
+import { openDb } from "../config/configDb.js";
 
 //#region => função carregar dados modal de novo rendimento
 // GET /carregarDadosModalNovoRendimento

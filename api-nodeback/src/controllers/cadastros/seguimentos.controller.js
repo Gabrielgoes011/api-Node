@@ -1,4 +1,4 @@
-import { openDb } from "../../../config/configDb.js";
+import { openDb } from "../../config/configDb.js";
 
 
 //função auxiliar para buscar seguimento por id

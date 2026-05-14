@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { openDb } from '../../config/configDb.js';
+import { openDb } from '../config/configDb.js';
 
 //#region Login
 async function login(req, res) {

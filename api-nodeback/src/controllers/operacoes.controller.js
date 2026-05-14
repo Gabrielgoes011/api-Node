@@ -1,4 +1,4 @@
-import { openDb } from "../../config/configDb.js";
+import { openDb } from "../config/configDb.js";
 
 //#region função listar fundos -  (ativos/inativos)
 export async function carregaAtivosDropList(req, res) {

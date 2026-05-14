@@ -1,4 +1,6 @@
-import { openDb } from "../../../config/configDb.js";
+import { openDb } from "../../config/configDb.js";
+import { listarFundosRepository } from "../../repositories/cadastros/meuFundos.repositories.js";
+import { listarFundosService } from "../../services/cadastros/meusFundos.services.js";
 
 
 //cadastrar meus fundos
@@ -45,28 +47,26 @@ export async function cadastrarFundos(req, res) {
 
 //#region função listar fundos -  (ativos/inativos)
 export async function listarFundos(req, res) {
-  const db = await openDb();
   try {
-    const resultado = await db.query(`        
-        SELECT
-          a.ticker, a."nomeFundo", a.cnpj,
-          b."nomeSeguimento", a."idUsuario", a."dtCadastro" 
-        FROM ativos a INNER JOIN seguimentos b 
-        ON a."idSeguimento" = b.id `
-    );
-    // Verifica se a consulta retornou resultados
-    if (resultado.rows.length === 0) {
-      return res.status(200).json([]);
-    }
-    // Retorna os resultados  
-    res.status(200).json(resultado.rows);
 
+    // Chama a função do repositório para listar os fundos
+    const listarFundos = 
+      await listarFundosService();
+
+    // Retorna os resultados da consulta em formato JSON
+    res.status(200).json(listarFundos);
+
+  //
   } catch (error) {
     // Log do erro para depuração
-    console.error('Erro ao listar seguimentos:', error);
-    res.status(500).json({ error: 'Erro ao listar seguimentos.' });
+    console.error('Erro ao listar fundos:', error); 
+
+    // Retorna um erro genérico para o cliente
+    return res.status(500).json({ error: 'Erro ao listar fundos.' });
+
   }
 }
+
 //#endregion
 
 //#region função de contar fundos ativos
