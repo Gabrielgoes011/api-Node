@@ -18,7 +18,7 @@ export const useRendimentos = () => {
       const data = await rendimentosService.listar({ mes, ano });
       setRendimentos(data || []);
     } catch (error) {
-      handleError(error, 'Erro ao buscar rendimentos.');
+      handleError(error);
       setRendimentos([]);
     } finally {
       setLoading(false);
@@ -33,7 +33,7 @@ export const useRendimentos = () => {
       setDetalheMensal(data?.detalheMensal || []);
       setDetalheAnual(data?.detalheAnual   || []);
     } catch (error) {
-      handleError(error, 'Erro ao buscar dados do gráfico.');
+      handleError(error);
     } finally {
       setLoadingGrafico(false);
     }
@@ -46,7 +46,7 @@ export const useRendimentos = () => {
       const data = await rendimentosService.comparacaoAnual({ anos });
       setComparacaoAnual(data || []);
     } catch (error) {
-      handleError(error, 'Erro ao buscar comparação anual.');
+      handleError(error);
       setComparacaoAnual([]);
     } finally {
       setLoadingComp(false);

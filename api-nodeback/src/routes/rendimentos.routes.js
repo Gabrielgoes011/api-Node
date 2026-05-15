@@ -7,7 +7,7 @@ import {
   carregarGraficoDashboard,
   carregarComparacaoAnual,
   carregarDadosModalNovoRendimento
-} from '../controllers/rendimentos/rendimentos.controller.js';
+} from '../controllers/rendimentos.controller.js';
 
 
 router.post('/rendimentos', verificaJWT, listarRendimentos);

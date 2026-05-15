@@ -21,7 +21,7 @@ export const useSeguimentos = () => {
       const data = await seguimentosService.listarTodos();
       setSeguimentos(data || []);
     } catch (error) {
-      handleError(error, 'Erro ao buscar seguimentos.');
+      handleError(error);
     } finally {
       setLoading(false);
     }
@@ -33,7 +33,7 @@ export const useSeguimentos = () => {
       const totalCount = Array.isArray(data) ? data.length : (Number(data.total) || Number(data.ativos) || 0);
       setDashboard({ total: totalCount });
     } catch (error) {
-      handleError(error, 'Erro ao buscar contagem de seguimentos.');
+      handleError(error);
     }
   }, []);
 
@@ -45,7 +45,7 @@ export const useSeguimentos = () => {
       getSeguimentos();
       getDashboard();
     } catch (error) {
-      handleError(error, 'Erro ao cadastrar seguimento.');
+      handleError(error);
     }
   };
 
@@ -57,7 +57,7 @@ export const useSeguimentos = () => {
       getSeguimentos();
       getDashboard();
     } catch (error) {
-      handleError(error, 'Erro ao atualizar seguimento.');
+      handleError(error);
     }
   };
 
@@ -72,7 +72,7 @@ export const useSeguimentos = () => {
       getSeguimentos();
       getDashboard();
     } catch (error) {
-      handleError(error, 'Erro ao excluir seguimento.');
+      handleError(error);
     }
 
     setShowModal(false);

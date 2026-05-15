@@ -23,7 +23,7 @@ export const useMeusFiis = () => {
       const data = await meusFiisService.listarTodos();
       setFiis(data || []);
     } catch (error) {
-      handleError(error, 'Erro ao buscar fundos.');
+      handleError(error);
     } finally {
       setLoading(false);
     }
@@ -34,7 +34,7 @@ export const useMeusFiis = () => {
       const data = await seguimentosService.listarTodos();
       setSeguimentos(data || []);
     } catch (error) {
-      handleError(error, 'Erro ao buscar seguimentos.');
+      handleError(error);
     }
   }, []);
 
@@ -44,7 +44,7 @@ export const useMeusFiis = () => {
       const totalCount = Array.isArray(data) ? data.length : (Number(data.total) || 0);
       setDashboard({ total: totalCount });
     } catch (error) {
-      handleError(error, 'Erro ao buscar contagem de fundos.');
+      handleError(error);
     }
   }, []);
 
@@ -68,7 +68,7 @@ export const useMeusFiis = () => {
       getFiis();
       getDashboard();
     } catch (error) {
-      handleError(error, 'Erro ao cadastrar fundo.');
+      handleError(error);
     }
   };
 
@@ -92,7 +92,7 @@ export const useMeusFiis = () => {
       getFiis();
       getDashboard();
     } catch (error) {
-      handleError(error, 'Erro ao atualizar fundo.');
+      handleError(error);
     }
   };
 
@@ -107,7 +107,7 @@ export const useMeusFiis = () => {
       getFiis();
       getDashboard();
     } catch (error) {
-      handleError(error, 'Erro ao excluir o fundo.');
+      handleError(error);
     }
 
     setShowModal(false);

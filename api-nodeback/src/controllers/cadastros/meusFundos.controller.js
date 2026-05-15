@@ -1,65 +1,50 @@
 import { openDb } from "../../config/configDb.js";
-import { listarFundosRepository } from "../../repositories/cadastros/meuFundos.repositories.js";
-import { listarFundosService } from "../../services/cadastros/meusFundos.services.js";
+import { 
+  listarFundosService,
+  cadastrarFundosService
+ } from "../../services/cadastros/meusFundos.services.js";
 
 
-//cadastrar meus fundos
+//#region => cadastrar meus fundos
 export async function cadastrarFundos(req, res) {
+  //recebe os dados do corpo da requisição
   const dados = req.body;
-  const db = await openDb();
-
-  if (!dados.ticker) {
-    return res.status(400).json({ error: 'O campo ticker nao pode ser vazio' });
-  }
-
-  // Verificar se o ticker já existe no banco de dados
-  const existeTicker = await db.query(`
-      SELECT id 
-      FROM ativos
-      WHERE ticker = $1 `, [dados.ticker]
-  );
-
-  // Se o ticker já existir, retornar um erro
-  if (existeTicker.rows.length > 0) {
-    return res.status(400).json({ error: 'O ticker informado já está cadastrado' });
-  }
 
   try {
-    const insertFundos = await db.query(`
-        INSERT INTO ativos
-          ("ticker", "nomeFundo", cnpj, "idSeguimento", "dtCadastro")
-        VALUES 
-          ($1, $2, $3, $4, now())
-        RETURNING id`,
-      [dados.ticker, dados.nomeFundo, dados.cnpj, dados.idSeguimento]
-    );
 
-    // Retornar o ID do fundo cadastrado
-    return res.status(201).json({ message: 'Fundo cadastrado com sucesso! ' });
+    // Chama a função do serviço para cadastrar os fundos
+    const cadastrarFundos = await cadastrarFundosService(dados);
+
+    // Retorna os resultados da consulta em formato JSON
+    return res.status(201).json({
+      message: 'Fundo cadastrado com sucesso',
+      fundo: cadastrarFundos
+    });
 
   } catch (error) {
 
-    // Retornar um erro detalhado em caso de falha na inserção
-    return res.status(500).json({ error: 'Erro ao inserir o fundo.', errorDetails: error.message });
+    // Log do erro para depuração
+    console.error('Erro ao cadastrar fundos:',error);
+
+    // Retorna um erro genérico para o client
+    return res.status(400).json({ error: error.message });
   }
 }
+//#endregion
 
-
-//#region função listar fundos -  (ativos/inativos)
+//#region função listar fundos -  
 export async function listarFundos(req, res) {
   try {
 
     // Chama a função do repositório para listar os fundos
-    const listarFundos = 
-      await listarFundosService();
+    const listarFundos = await listarFundosService();
 
     // Retorna os resultados da consulta em formato JSON
     res.status(200).json(listarFundos);
 
-  //
   } catch (error) {
     // Log do erro para depuração
-    console.error('Erro ao listar fundos:', error); 
+    console.error('Erro ao listar fundos:', error);
 
     // Retorna um erro genérico para o cliente
     return res.status(500).json({ error: 'Erro ao listar fundos.' });

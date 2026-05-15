@@ -34,7 +34,7 @@ export const useOperacoes = () => {
 
       setOperacoes(formatadas);
     } catch (error) {
-      handleError(error, 'Erro ao buscar operações.');
+      handleError(error);
       setOperacoes([]);
     } finally {
       setLoading(false);
@@ -62,7 +62,7 @@ export const useOperacoes = () => {
 
       setChartData(mesesIniciais);
     } catch (error) {
-      handleError(error, 'Erro ao buscar dados do gráfico.');
+      handleError(error);
     }
   }, []);
 
@@ -72,7 +72,7 @@ export const useOperacoes = () => {
       const data = await operacoesService.listarAtivos();
       setAtivos(data);
     } catch (error) {
-      handleError(error, 'Erro ao carregar ativos.');
+      handleError(error);
     }
   }, []);
 
@@ -84,7 +84,7 @@ export const useOperacoes = () => {
       getOperacoes({ mes, ano });
       getChartData({ ano });
     } catch (error) {
-      handleError(error, 'Erro ao lançar operação.');
+      handleError(error);
     }
   };
 
@@ -96,7 +96,7 @@ export const useOperacoes = () => {
       getOperacoes({ mes, ano });
       getChartData({ ano });
     } catch (error) {
-      handleError(error, 'Erro ao excluir operação.');
+      handleError(error);
     }
   };
 

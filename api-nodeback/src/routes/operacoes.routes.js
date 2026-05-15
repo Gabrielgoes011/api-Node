@@ -8,7 +8,7 @@ import {
   carregaAtivosDropList,
   carregaDadosGraficoOperacoes,
   excluirOperacao
-} from '../controllers/operacoes/operacoes.controller.js';
+} from '../controllers/operacoes.controller.js';
 
 
 router.get('/ativosDropList', verificaJWT, carregaAtivosDropList);

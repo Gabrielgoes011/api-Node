@@ -40,7 +40,7 @@ export const useUsuarios = () => {
 
       setUsers(processedUsers);
     } catch (error) {
-      handleError(error, 'Erro ao carregar usuários.');
+      handleError(error);
     } finally {
       setLoading(false);
     }
@@ -55,9 +55,7 @@ export const useUsuarios = () => {
         total: result.total ?? 0
       });
     } catch (error) {
-      handleError(error, 'Erro ao carregar contagem de usuários.');
-    }
-  }, []);
+      handleError(error);
 
   const handleAddUser = async (novoUsuario) => {
     try {
@@ -67,7 +65,7 @@ export const useUsuarios = () => {
       resetForm();
       setShowFormModal(false);
     } catch (error) {
-      handleError(error, 'Erro ao cadastrar usuário.');
+      handleError(error);
     }
   };
 
@@ -79,7 +77,7 @@ export const useUsuarios = () => {
       resetForm();
       setShowFormModal(false);
     } catch (error) {
-      handleError(error, 'Erro ao atualizar usuário.');
+      handleError(error);
     }
   };
 
@@ -89,7 +87,7 @@ export const useUsuarios = () => {
       toastSuccess('Usuário deletado com sucesso!');
       getUsers();
     } catch (error) {
-      handleError(error, 'Erro ao deletar usuário.');
+      handleError(error);
     }
   };
 
@@ -99,7 +97,7 @@ export const useUsuarios = () => {
       toastSuccess('Usuário inativado com sucesso!');
       getUsers();
     } catch (error) {
-      handleError(error, 'Erro ao inativar usuário.');
+      handleError(error);
     }
   };
 
@@ -109,7 +107,7 @@ export const useUsuarios = () => {
       toastSuccess('Usuário reativado com sucesso!');
       getUsers();
     } catch (error) {
-      handleError(error, 'Erro ao reativar usuário.');
+      handleError(error);
     }
   };
 

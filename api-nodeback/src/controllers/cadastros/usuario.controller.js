@@ -1,5 +1,5 @@
 import { openDb } from "../../config/configDb.js";
-import { validaEmailExistente } from '../../utils/validacoes/validaUser.js';
+import { validaEmailExistente } from '../../utils/validaUser.js';
 
 // ─────────────────────────────────────────────
 // FUNÇÕES AUXILIARES

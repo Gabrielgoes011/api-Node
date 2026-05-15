@@ -17,7 +17,7 @@ export const meusFiisService = {
   // Criar novo FII
   criar: async (fiiData) => {
     try {
-      const res = await api.post('/meusFundos', fiiData);
+      const res = await api.post('/meusFundos/cadastrar', fiiData);
       return res.data;
     } catch (error) {
       throw error;

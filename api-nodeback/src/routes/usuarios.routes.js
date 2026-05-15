@@ -10,7 +10,7 @@ import {
   atualizarUser,
   inativaReativaUser,
   deleteUser
-} from '../controllers/cadastros/usuarios/usuario.controller.js';
+} from '../controllers/cadastros/usuario.controller.js';
 
 // Rotas para usuários
 router.get('/users', verificaJWT, listarUsuarios);

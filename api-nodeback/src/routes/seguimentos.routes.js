@@ -8,7 +8,7 @@ import {
   cadastrarSeguimento,
   deleteSeguimento,
   updateSeguimento
-} from '../controllers/cadastros/seguimentos/seguimentos.controller.js';
+} from '../controllers/cadastros/seguimentos.controller.js';
 
 router.get('/seguimentos', verificaJWT, listarSeguimentos);
 router.get('/seguimentos/contar', verificaJWT, contarSeguimentos);

@@ -6,14 +6,12 @@ import {
   cadastrarFundos,
   listarFundos,
   contarFundosAtivos
-
-} from '../controllers/cadastros/meusFundos/meusFundos.controller.js';
-
+} from '../controllers/cadastros/meusFundos.controller.js';
 
 // Rotas para meus fundos
 router.get('/meusFundos', verificaJWT, listarFundos);
 router.get('/meusFundos/contar', verificaJWT, contarFundosAtivos);
-router.post('/meusFundos', verificaJWT, cadastrarFundos);
+router.post('/meusFundos/cadastrar', verificaJWT, cadastrarFundos);
 
 
 export default router;

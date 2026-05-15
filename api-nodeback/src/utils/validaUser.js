@@ -1,4 +1,4 @@
-import { openDb } from "../../config/configDb.js"
+import { openDb } from "../config/configDb.js"
 
 //exporta a função de validação do usuário
 export async function validaEmailExistente(email, db) {
