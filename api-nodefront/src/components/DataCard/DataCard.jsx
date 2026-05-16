@@ -5,44 +5,22 @@ import { TableAcoes } from '../TableAcoes';
 /**
  * DataCard — container padrão de tabela da aplicação.
  *
- * Replica 100% o layout do card de tabela de operacoes.jsx:
- *  - Header com título, filtros opcionais e botão de ação
- *  - TableAcoes com busca, paginação e ações
- *  - Rodapé informativo
- *
  * Props:
- *  titulo          string              — título do card
- *  subtitulo       string?             — ex: "(42 registros)"
- *  botaoLabel      string?             — label do botão principal (omite botão se vazio)
- *  onBotaoClick    () => void?         — callback do botão principal
- *  filtros         ReactNode?          — selects/inputs extras no header (lado esquerdo)
- *  rodape          string?             — texto do rodapé (usa padrão se omitido)
- *
+ *  titulo          string
+ *  subtitulo       string?
+ *  botaoLabel      string?
+ *  onBotaoClick    () => void?
+ *  filtros         ReactNode?
+ *  rodape          string?
  *  — props repassadas ao TableAcoes —
- *  coluna          ITabela[]
- *  data            any[]
- *  itemsPerPage    number?
- *  labelpesquisa   string?
- *  usaVisualizar   bool?   acaoVisualizar  fn?
- *  usaEditar       bool?   acaoEditar      fn?
- *  usaExcluir      bool?   acaoExcluir     fn?
- *  usaResetarSenha bool?   acaoResetarSenha fn?
- *  usaInativar     bool?   acaoInativar    fn?
- *  usaReativar     bool?   acaoReativar    fn?
+ *  coluna, data, itemsPerPage, labelpesquisa,
+ *  usaVisualizar, acaoVisualizar, usaEditar, acaoEditar,
+ *  usaExcluir, acaoExcluir, usaResetarSenha, acaoResetarSenha,
+ *  usaInativar, acaoInativar, usaReativar, acaoReativar
  */
 export default function DataCard({
-  // header
-  titulo,
-  subtitulo,
-  botaoLabel,
-  onBotaoClick,
-  filtros,
-  rodape,
-  // tabela
-  coluna,
-  data,
-  itemsPerPage,
-  labelpesquisa,
+  titulo, subtitulo, botaoLabel, onBotaoClick, filtros, rodape,
+  coluna, data, itemsPerPage, labelpesquisa,
   usaVisualizar,   acaoVisualizar,
   usaEditar,       acaoEditar,
   usaExcluir,      acaoExcluir,
@@ -52,58 +30,66 @@ export default function DataCard({
 }) {
   return (
     <div style={{
-      backgroundColor: '#ffffff',
-      borderRadius: '0.75rem',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-      border: '1px solid #e2e8f0',
+      background: '#0f172a',
+      borderRadius: '12px',
+      border: '1px solid #1e293b',
       overflow: 'hidden',
+      boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
     }}>
+
       {/* ── Header ── */}
       <div style={{
-        padding: '1rem',
-        borderBottom: '1px solid #e2e8f0',
+        padding: '1rem 1.25rem',
+        borderBottom: '1px solid #1e293b',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#f8fafc',
+        background: 'rgba(255,255,255,0.02)',
         flexWrap: 'wrap',
         gap: '1rem',
       }}>
-        {/* lado esquerdo: título + filtros opcionais */}
+        {/* Título + filtros */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-            <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1e293b', margin: 0 }}>
+            <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#f8fafc', margin: 0 }}>
               {titulo}
             </h2>
             {subtitulo && (
-              <span style={{ fontSize: '13px', color: '#64748b' }}>{subtitulo}</span>
+              <span style={{ fontSize: '12px', color: '#64748b' }}>{subtitulo}</span>
             )}
           </div>
           {filtros}
         </div>
 
-        {/* lado direito: botão principal */}
+        {/* Botão principal */}
         {botaoLabel && onBotaoClick && (
           <button
             onClick={onBotaoClick}
             style={{
-              backgroundColor: '#2563eb',
-              color: '#ffffff',
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              color: '#fff',
               fontWeight: 600,
               padding: '0.5rem 1rem',
-              borderRadius: '0.375rem',
+              borderRadius: '8px',
               border: 'none',
               cursor: 'pointer',
-              transition: 'background-color 0.2s',
+              transition: 'all 0.2s',
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
+              fontSize: '13px',
+              boxShadow: '0 2px 12px rgba(16,185,129,0.3)',
             }}
-            onMouseOver={e => e.currentTarget.style.backgroundColor = '#1d4ed8'}
-            onMouseOut={e => e.currentTarget.style.backgroundColor = '#2563eb'}
+            onMouseOver={e => {
+              e.currentTarget.style.transform = 'translateY(-1px)';
+              e.currentTarget.style.boxShadow = '0 4px 20px rgba(16,185,129,0.45)';
+            }}
+            onMouseOut={e => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 12px rgba(16,185,129,0.3)';
+            }}
           >
-            <AiOutlinePlus size={18} />
+            <AiOutlinePlus size={16} />
             {botaoLabel}
           </button>
         )}
@@ -126,11 +112,11 @@ export default function DataCard({
 
       {/* ── Rodapé ── */}
       <div style={{
-        padding: '1rem',
-        backgroundColor: '#f8fafc',
-        borderTop: '1px solid #e2e8f0',
-        fontSize: '12px',
-        color: '#64748b',
+        padding: '0.75rem 1.25rem',
+        background: 'rgba(255,255,255,0.02)',
+        borderTop: '1px solid #1e293b',
+        fontSize: '11px',
+        color: '#334155',
         textAlign: 'center',
       }}>
         {rodape || 'Os dados são fornecidos para fins informativos. Simulação de ambiente Web.'}

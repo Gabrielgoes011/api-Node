@@ -8,7 +8,7 @@ function Layout({ children, onLogout }) {
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#0a0f1e' }}>
 
       {/* Sidebar lateral */}
       <Sidebar
@@ -24,14 +24,14 @@ function Layout({ children, onLogout }) {
       <div style={{
         marginLeft: sidebarOpen ? '250px' : '0px',
         flex: 1,
-        backgroundColor: '#f0f2f5',
+        background: '#0a0f1e',
         minHeight: '100vh',
         position: 'relative',
         transition: 'margin-left 0.3s ease',
-        paddingTop: '60px', // offset da TopBar
+        paddingTop: '60px',
       }}>
         <div style={{
-          padding: '20px',
+          padding: '24px',
           maxWidth: '1400px',
           margin: '0 auto',
         }}>

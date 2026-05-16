@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { AiOutlineEye, AiOutlineEdit, AiOutlineDelete, AiOutlineKey, AiOutlinePoweroff, AiOutlinePlayCircle, AiOutlineClose } from 'react-icons/ai';
+import {
+  AiOutlineEye, AiOutlineEdit, AiOutlineDelete,
+  AiOutlineKey, AiOutlinePoweroff, AiOutlinePlayCircle, AiOutlineClose,
+} from 'react-icons/ai';
 
 // Formatação de datas com fallback
 let formatarDataBR;
@@ -14,7 +17,7 @@ try {
 }
 
 /**
- * TableAcoes — tabela universal da aplicação.
+ * TableAcoes — tabela universal da aplicação (tema dark FIITrack).
  *
  * Quando _embutido=true (usado dentro do DataCard) não renderiza o wrapper
  * externo com borda/sombra — o DataCard já provê o container.
@@ -30,17 +33,16 @@ const TableAcoes = ({
   usaResetarSenha = false, acaoResetarSenha,
   usaInativar     = false, acaoInativar,
   usaReativar     = false, acaoReativar,
-  // props legadas (mantidas para não quebrar uso existente)
+  // props legadas
   paddingHead     = '4px 8px',
   paddingBody     = '4px 8px',
   tamanhoIcones   = 'fs-5',
   tamanhoFontBody = '13px',
   tamanhoFontHead = '13px',
-  // quando true, omite wrapper externo (DataCard já provê o container)
   _embutido       = false,
 }) => {
-  const [currentPage,        setCurrentPage]        = useState(1);
-  const [buscar,             setBuscar]             = useState('');
+  const [currentPage,         setCurrentPage]         = useState(1);
+  const [buscar,              setBuscar]              = useState('');
   const [currentItemsPerPage, setCurrentItemsPerPage] = useState(itemsPerPage);
 
   const temAcoes = usaVisualizar || usaEditar || usaExcluir || usaResetarSenha || usaInativar || usaReativar;
@@ -61,134 +63,187 @@ const TableAcoes = ({
   const start      = (currentPage - 1) * perPage;
   const pageData   = filteredData.slice(start, start + perPage);
 
-  // ── estilos de botão de ação ──
+  // ── botão de ação base ──
   const btnBase = {
-    color: '#cbd5e1', cursor: 'pointer', padding: '0.375rem',
-    borderRadius: '0.375rem', backgroundColor: 'transparent',
+    color: '#475569', cursor: 'pointer', padding: '6px',
+    borderRadius: '6px', background: 'transparent',
     border: 'none', display: 'inline-flex', alignItems: 'center',
-    justifyContent: 'center', transition: 'all 0.2s',
+    justifyContent: 'center', transition: 'all 0.15s',
   };
 
   // ── conteúdo interno ──
   const inner = (
     <>
-      {/* Busca */}
+      {/* ── Barra de busca ── */}
       <div style={{
         display: 'flex', gap: '10px', alignItems: 'center',
-        padding: '1rem',
-        borderBottom: '1px solid #e2e8f0',
-        backgroundColor: '#ffffff',
+        padding: '0.875rem 1rem',
+        borderBottom: '1px solid #1e293b',
+        background: 'rgba(255,255,255,0.01)',
       }}>
         <input
           type="text"
           placeholder={labelpesquisa}
           value={buscar}
           onChange={e => { setBuscar(e.target.value); setCurrentPage(1); }}
-          style={{ padding: '0.5rem 1rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', flex: 1, outline: 'none', color: '#334155', fontSize: '14px' }}
+          style={{
+            padding: '0.5rem 0.875rem',
+            background: '#1e293b',
+            border: '1px solid #334155',
+            borderRadius: '8px',
+            flex: 1, outline: 'none',
+            color: '#f8fafc', fontSize: '13px',
+            transition: 'border-color 0.2s',
+          }}
+          onFocus={e => e.target.style.borderColor = '#10b981'}
+          onBlur={e => e.target.style.borderColor = '#334155'}
         />
         {buscar && (
           <button
             onClick={() => setBuscar('')}
-            style={{ padding: '0.5rem', background: '#f1f5f9', border: 'none', borderRadius: '0.375rem', color: '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+            style={{
+              padding: '6px', background: '#1e293b',
+              border: '1px solid #334155', borderRadius: '8px',
+              color: '#64748b', cursor: 'pointer',
+              display: 'flex', alignItems: 'center',
+              transition: 'all 0.15s',
+            }}
             title="Limpar busca"
+            onMouseOver={e => { e.currentTarget.style.borderColor = '#475569'; e.currentTarget.style.color = '#94a3b8'; }}
+            onMouseOut={e => { e.currentTarget.style.borderColor = '#334155'; e.currentTarget.style.color = '#64748b'; }}
           >
-            <AiOutlineClose size={18} />
+            <AiOutlineClose size={16} />
           </button>
         )}
       </div>
 
-      {/* Tabela */}
+      {/* ── Tabela ── */}
       <div style={{ overflowX: 'auto', width: '100%' }}>
         <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ backgroundColor: '#dbeafe', color: '#334155', fontSize: '14px', borderBottom: '2px solid #93c5fd' }}>
+            <tr style={{
+              background: 'rgba(16,185,129,0.06)',
+              borderBottom: '1px solid rgba(16,185,129,0.15)',
+            }}>
               {coluna.map((col, i) => (
-                <th key={i} style={{ padding: '1rem', fontWeight: 600, width: col.width || 'auto', textAlign: col.align || 'left', whiteSpace: 'nowrap' }}>
+                <th key={i} style={{
+                  padding: '0.75rem 1rem',
+                  fontWeight: 600, fontSize: '11px',
+                  color: '#64748b',
+                  textTransform: 'uppercase', letterSpacing: '0.5px',
+                  width: col.width || 'auto',
+                  textAlign: col.align || 'left',
+                  whiteSpace: 'nowrap',
+                }}>
                   {col.titulo}
                 </th>
               ))}
               {temAcoes && (
-                <th style={{ padding: '1rem 2rem 1rem 1rem', fontWeight: 600, textAlign: 'center', width: '160px', whiteSpace: 'nowrap' }}>
+                <th style={{
+                  padding: '0.75rem 1.5rem 0.75rem 1rem',
+                  fontWeight: 600, fontSize: '11px',
+                  color: '#64748b',
+                  textTransform: 'uppercase', letterSpacing: '0.5px',
+                  textAlign: 'center', width: '160px', whiteSpace: 'nowrap',
+                }}>
                   Ações
                 </th>
               )}
             </tr>
           </thead>
-          <tbody style={{ fontSize: '14px' }}>
+          <tbody>
             {pageData.length === 0 ? (
               <tr>
-                <td colSpan={coluna.length + (temAcoes ? 1 : 0)} style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
+                <td
+                  colSpan={coluna.length + (temAcoes ? 1 : 0)}
+                  style={{ padding: '2.5rem', textAlign: 'center', color: '#475569', fontSize: '13px' }}
+                >
                   Nenhum registro encontrado.
                 </td>
               </tr>
             ) : pageData.map((row, ri) => (
               <tr
                 key={ri}
-                style={{ borderBottom: '1px solid #e2e8f0', backgroundColor: ri % 2 === 0 ? '#ffffff' : '#fafbfc', transition: 'background-color 0.2s' }}
-                onMouseOver={e => e.currentTarget.style.backgroundColor = '#f1f5f9'}
-                onMouseOut={e => e.currentTarget.style.backgroundColor = ri % 2 === 0 ? '#ffffff' : '#fafbfc'}
+                style={{
+                  borderBottom: '1px solid #1e293b',
+                  background: ri % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)',
+                  transition: 'background 0.15s',
+                }}
+                onMouseOver={e => e.currentTarget.style.background = 'rgba(16,185,129,0.04)'}
+                onMouseOut={e => e.currentTarget.style.background = ri % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)'}
               >
                 {coluna.map((col, ci) => {
                   const val = row[col.acesso];
                   let display;
                   if (col.render) {
-                    // renderização customizada — recebe (valor, linha)
                     display = col.render(val, row);
                   } else {
                     display = val ?? '';
                     if (val && (col.acesso.toLowerCase().includes('data') || col.acesso.toLowerCase().includes('cadastro'))) {
-                      display = col.acesso.toLowerCase().includes('hora') ? formatarDataComHora(val) : formatarDataBR(val);
+                      display = col.acesso.toLowerCase().includes('hora')
+                        ? formatarDataComHora(val)
+                        : formatarDataBR(val);
                     }
                   }
                   return (
-                    <td key={ci} style={{ padding: '1rem', fontWeight: 500, color: '#334155', width: col.width || 'auto', textAlign: col.align || 'left', overflow: col.truncate ? 'hidden' : 'visible', textOverflow: col.truncate ? 'ellipsis' : 'clip', whiteSpace: col.truncate ? 'nowrap' : 'normal', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                    <td key={ci} style={{
+                      padding: '0.875rem 1rem',
+                      fontWeight: 400, fontSize: '13px',
+                      color: '#cbd5e1',
+                      width: col.width || 'auto',
+                      textAlign: col.align || 'left',
+                      overflow: col.truncate ? 'hidden' : 'visible',
+                      textOverflow: col.truncate ? 'ellipsis' : 'clip',
+                      whiteSpace: col.truncate ? 'nowrap' : 'normal',
+                      wordBreak: 'break-word', overflowWrap: 'anywhere',
+                    }}>
                       {display}
                     </td>
                   );
                 })}
                 {temAcoes && (
-                  <td style={{ padding: '1rem 2rem 1rem 1rem', textAlign: 'center' }}>
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem' }}>
+                  <td style={{ padding: '0.875rem 1.5rem 0.875rem 1rem', textAlign: 'center' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '4px' }}>
                       {usaVisualizar && acaoVisualizar && (
                         <button onClick={() => acaoVisualizar(row)} style={btnBase} title="Visualizar"
-                          onMouseOver={e => { e.currentTarget.style.color = '#3b82f6'; e.currentTarget.style.backgroundColor = '#dbeafe'; }}
-                          onMouseOut={e => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }}>
-                          <AiOutlineEye size={18} />
+                          onMouseOver={e => { e.currentTarget.style.color = '#06b6d4'; e.currentTarget.style.background = 'rgba(6,182,212,0.1)'; }}
+                          onMouseOut={e => { e.currentTarget.style.color = '#475569'; e.currentTarget.style.background = 'transparent'; }}>
+                          <AiOutlineEye size={17} />
                         </button>
                       )}
                       {usaEditar && acaoEditar && (
                         <button onClick={() => acaoEditar(row)} style={btnBase} title="Editar"
-                          onMouseOver={e => { e.currentTarget.style.color = '#3b82f6'; e.currentTarget.style.backgroundColor = '#dbeafe'; }}
-                          onMouseOut={e => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }}>
-                          <AiOutlineEdit size={18} />
+                          onMouseOver={e => { e.currentTarget.style.color = '#10b981'; e.currentTarget.style.background = 'rgba(16,185,129,0.1)'; }}
+                          onMouseOut={e => { e.currentTarget.style.color = '#475569'; e.currentTarget.style.background = 'transparent'; }}>
+                          <AiOutlineEdit size={17} />
                         </button>
                       )}
                       {usaResetarSenha && acaoResetarSenha && (
                         <button onClick={() => acaoResetarSenha(row)} style={btnBase} title="Resetar Senha"
-                          onMouseOver={e => { e.currentTarget.style.color = '#f59e0b'; e.currentTarget.style.backgroundColor = '#fef3c7'; }}
-                          onMouseOut={e => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }}>
-                          <AiOutlineKey size={18} />
+                          onMouseOver={e => { e.currentTarget.style.color = '#f59e0b'; e.currentTarget.style.background = 'rgba(245,158,11,0.1)'; }}
+                          onMouseOut={e => { e.currentTarget.style.color = '#475569'; e.currentTarget.style.background = 'transparent'; }}>
+                          <AiOutlineKey size={17} />
                         </button>
                       )}
                       {usaReativar && acaoReativar && (
                         <button onClick={() => acaoReativar(row)} style={btnBase} title="Reativar"
-                          onMouseOver={e => { e.currentTarget.style.color = '#10b981'; e.currentTarget.style.backgroundColor = '#d1fae5'; }}
-                          onMouseOut={e => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }}>
-                          <AiOutlinePlayCircle size={18} />
+                          onMouseOver={e => { e.currentTarget.style.color = '#10b981'; e.currentTarget.style.background = 'rgba(16,185,129,0.1)'; }}
+                          onMouseOut={e => { e.currentTarget.style.color = '#475569'; e.currentTarget.style.background = 'transparent'; }}>
+                          <AiOutlinePlayCircle size={17} />
                         </button>
                       )}
                       {usaInativar && acaoInativar && (
                         <button onClick={() => acaoInativar(row)} style={btnBase} title="Inativar"
-                          onMouseOver={e => { e.currentTarget.style.color = '#64748b'; e.currentTarget.style.backgroundColor = '#f1f5f9'; }}
-                          onMouseOut={e => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }}>
-                          <AiOutlinePoweroff size={18} />
+                          onMouseOver={e => { e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.background = 'rgba(148,163,184,0.1)'; }}
+                          onMouseOut={e => { e.currentTarget.style.color = '#475569'; e.currentTarget.style.background = 'transparent'; }}>
+                          <AiOutlinePoweroff size={17} />
                         </button>
                       )}
                       {usaExcluir && acaoExcluir && (
                         <button onClick={() => acaoExcluir(row)} style={btnBase} title="Excluir"
-                          onMouseOver={e => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.backgroundColor = '#fee2e2'; }}
-                          onMouseOut={e => { e.currentTarget.style.color = '#cbd5e1'; e.currentTarget.style.backgroundColor = 'transparent'; }}>
-                          <AiOutlineDelete size={18} />
+                          onMouseOver={e => { e.currentTarget.style.color = '#f87171'; e.currentTarget.style.background = 'rgba(248,113,113,0.1)'; }}
+                          onMouseOut={e => { e.currentTarget.style.color = '#475569'; e.currentTarget.style.background = 'transparent'; }}>
+                          <AiOutlineDelete size={17} />
                         </button>
                       )}
                     </div>
@@ -200,30 +255,69 @@ const TableAcoes = ({
         </table>
       </div>
 
-      {/* Paginação */}
-      <div style={{ padding: '1rem', backgroundColor: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', fontSize: '14px', color: '#475569' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+      {/* ── Paginação ── */}
+      <div style={{
+        padding: '0.875rem 1rem',
+        background: 'rgba(255,255,255,0.01)',
+        borderTop: '1px solid #1e293b',
+        display: 'flex', justifyContent: 'space-between',
+        alignItems: 'center', flexWrap: 'wrap', gap: '1rem',
+        fontSize: '13px', color: '#64748b',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span>Mostrar</span>
           <input
             type="number" min="1" value={currentItemsPerPage}
             onChange={e => { setCurrentItemsPerPage(e.target.value === '' ? '' : Number(e.target.value)); setCurrentPage(1); }}
             onBlur={e => { if (!e.target.value || Number(e.target.value) < 1) setCurrentItemsPerPage(10); }}
-            style={{ width: '70px', padding: '0.375rem 0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', outline: 'none', color: '#334155', fontSize: '14px', textAlign: 'center' }}
+            style={{
+              width: '64px', padding: '4px 8px',
+              background: '#1e293b', border: '1px solid #334155',
+              borderRadius: '6px', outline: 'none',
+              color: '#f8fafc', fontSize: '13px', textAlign: 'center',
+            }}
           />
           <span>linhas</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
-            style={{ padding: '0.375rem 0.75rem', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '0.375rem', color: '#334155', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', fontWeight: 500, opacity: currentPage === 1 ? 0.5 : 1 }}
-            onMouseOver={e => { if (currentPage !== 1) e.currentTarget.style.backgroundColor = '#f1f5f9'; }}
-            onMouseOut={e => { if (currentPage !== 1) e.currentTarget.style.backgroundColor = '#ffffff'; }}>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            style={{
+              padding: '5px 12px',
+              background: '#1e293b', border: '1px solid #334155',
+              borderRadius: '6px', color: '#94a3b8',
+              cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+              fontSize: '13px', fontWeight: 500,
+              opacity: currentPage === 1 ? 0.4 : 1,
+              transition: 'all 0.15s',
+            }}
+            onMouseOver={e => { if (currentPage !== 1) { e.currentTarget.style.borderColor = '#10b981'; e.currentTarget.style.color = '#10b981'; } }}
+            onMouseOut={e => { e.currentTarget.style.borderColor = '#334155'; e.currentTarget.style.color = '#94a3b8'; }}
+          >
             Anterior
           </button>
-          <span style={{ fontWeight: 500 }}>Página {currentPage} de {Math.max(1, totalPages)}</span>
-          <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage >= totalPages || totalPages === 0}
-            style={{ padding: '0.375rem 0.75rem', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '0.375rem', color: '#334155', cursor: (currentPage >= totalPages || totalPages === 0) ? 'not-allowed' : 'pointer', fontWeight: 500, opacity: (currentPage >= totalPages || totalPages === 0) ? 0.5 : 1 }}
-            onMouseOver={e => { if (currentPage < totalPages) e.currentTarget.style.backgroundColor = '#f1f5f9'; }}
-            onMouseOut={e => { if (currentPage < totalPages) e.currentTarget.style.backgroundColor = '#ffffff'; }}>
+
+          <span style={{ fontWeight: 500, color: '#94a3b8', minWidth: '100px', textAlign: 'center' }}>
+            Página {currentPage} de {Math.max(1, totalPages)}
+          </span>
+
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage >= totalPages || totalPages === 0}
+            style={{
+              padding: '5px 12px',
+              background: '#1e293b', border: '1px solid #334155',
+              borderRadius: '6px', color: '#94a3b8',
+              cursor: (currentPage >= totalPages || totalPages === 0) ? 'not-allowed' : 'pointer',
+              fontSize: '13px', fontWeight: 500,
+              opacity: (currentPage >= totalPages || totalPages === 0) ? 0.4 : 1,
+              transition: 'all 0.15s',
+            }}
+            onMouseOver={e => { if (currentPage < totalPages) { e.currentTarget.style.borderColor = '#10b981'; e.currentTarget.style.color = '#10b981'; } }}
+            onMouseOut={e => { e.currentTarget.style.borderColor = '#334155'; e.currentTarget.style.color = '#94a3b8'; }}
+          >
             Próxima
           </button>
         </div>
@@ -231,12 +325,17 @@ const TableAcoes = ({
     </>
   );
 
-  // quando embutido no DataCard, não precisa de wrapper próprio
   if (_embutido) return inner;
 
   return (
-    <div style={{ fontFamily: 'sans-serif' }}>
-      <div style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+    <div style={{ fontFamily: 'Inter, sans-serif' }}>
+      <div style={{
+        background: '#0f172a',
+        borderRadius: '12px',
+        border: '1px solid #1e293b',
+        overflow: 'hidden',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+      }}>
         {inner}
       </div>
     </div>

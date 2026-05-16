@@ -1,87 +1,196 @@
 import React from 'react';
+import { FiTrendingUp, FiBarChart2, FiPieChart, FiArrowUpRight } from 'react-icons/fi';
+import { FaWallet, FaExchangeAlt, FaChartLine } from 'react-icons/fa';
+
+const cards = [
+  {
+    icon: FaWallet,
+    iconColor: '#10b981',
+    iconBg: 'rgba(16,185,129,0.12)',
+    title: 'Carteira de FIIs',
+    desc: 'Acompanhe seus fundos imobiliários e a evolução do seu patrimônio.',
+    tag: 'Ativos',
+    tagColor: '#10b981',
+    tagBg: 'rgba(16,185,129,0.1)',
+  },
+  {
+    icon: FaChartLine,
+    iconColor: '#06b6d4',
+    iconBg: 'rgba(6,182,212,0.12)',
+    title: 'Rendimentos',
+    desc: 'Controle os dividendos e proventos recebidos mensalmente.',
+    tag: 'Mensal',
+    tagColor: '#06b6d4',
+    tagBg: 'rgba(6,182,212,0.1)',
+  },
+  {
+    icon: FaExchangeAlt,
+    iconColor: '#8b5cf6',
+    iconBg: 'rgba(139,92,246,0.12)',
+    title: 'Compras e Vendas',
+    desc: 'Registre e consulte o histórico de ordens executadas.',
+    tag: 'Histórico',
+    tagColor: '#8b5cf6',
+    tagBg: 'rgba(139,92,246,0.1)',
+  },
+];
+
+const stats = [
+  { icon: FiTrendingUp, label: 'Rendimento Médio', value: '+12,4%', color: '#10b981', bg: 'rgba(16,185,129,0.1)' },
+  { icon: FiBarChart2,  label: 'Operações',         value: '248',    color: '#06b6d4', bg: 'rgba(6,182,212,0.1)' },
+  { icon: FiPieChart,   label: 'Fundos na Carteira', value: '32',     color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)' },
+];
 
 function PaginaDashboard() {
   return (
-    <div style={{ marginTop: '60px' }}>
-      {/* Cabeçalho */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '500px',
-        textAlign: 'center'
-      }}>
-        <h1 style={{
-          fontSize: '48px',
-          color: '#2c3e50',
-          marginBottom: '20px',
-          fontWeight: 'bold'
-        }}>
-          Dashboard de Ativos 👋
-        </h1>
-
-        <p style={{
-          fontSize: '24px',
-          color: '#7f8c8d',
-          marginBottom: '40px',
-          maxWidth: '600px',
-          lineHeight: '1.6'
-        }}>
-          Bem-vindo ao gerenciador de Fundos Imobiliários. <br />
-          Utilize o menu para controlar sua carteira, rendimentos e movimentações.
-        </p>
-
-        {/* Cards de informações */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '20px',
-          maxWidth: '800px',
-          marginTop: '50px'
-        }}>
+    <div>
+      {/* ── Header ── */}
+      <div style={{ marginBottom: '2rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
           <div style={{
-            backgroundColor: '#fff',
-            padding: '25px',
-            borderRadius: '10px',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-            transition: 'transform 0.2s ease'
-          }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-          >
-            <h3 style={{ color: '#3498db', marginBottom: '10px' }}>🏢 Carteira de FIIs</h3>
-            <p style={{ color: '#7f8c8d' }}>Acompanhe seus fundos imobiliários e a evolução do seu patrimônio.</p>
+            width: '40px', height: '40px', borderRadius: '10px',
+            background: 'linear-gradient(135deg, #10b981, #059669)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 0 20px rgba(16,185,129,0.3)',
+          }}>
+            <FiTrendingUp size={20} color="#fff" />
           </div>
-
-          <div style={{
-            backgroundColor: '#fff',
-            padding: '25px',
-            borderRadius: '10px',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-            transition: 'transform 0.2s ease'
-          }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-          >
-            <h3 style={{ color: '#2ecc71', marginBottom: '10px' }}>💰 Rendimentos</h3>
-            <p style={{ color: '#7f8c8d' }}>Controle os dividendos e proventos recebidos mensalmente.</p>
-          </div>
-
-          <div style={{
-            backgroundColor: '#fff',
-            padding: '25px',
-            borderRadius: '10px',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-            transition: 'transform 0.2s ease'
-          }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-          >
-            <h3 style={{ color: '#e74c3c', marginBottom: '10px' }}>🔄 Compras e Vendas</h3>
-            <p style={{ color: '#7f8c8d' }}>Registre e consulte o histórico de ordens executadas.</p>
+          <div>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+              Dashboard
+            </h1>
+            <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
+              Visão geral da sua carteira de FIIs
+            </p>
           </div>
         </div>
+      </div>
+
+      {/* ── Stats ── */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: '16px',
+        marginBottom: '2rem',
+      }}>
+        {stats.map((s) => {
+          const Icon = s.icon;
+          return (
+            <div
+              key={s.label}
+              style={{
+                background: '#0f172a',
+                border: '1px solid #1e293b',
+                borderRadius: '12px',
+                padding: '1.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                transition: 'border-color 0.2s, transform 0.2s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = s.color;
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = '#1e293b';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              <div style={{
+                width: '44px', height: '44px', borderRadius: '10px',
+                background: s.bg,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                <Icon size={20} color={s.color} />
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>
+                  {s.label}
+                </div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: s.color }}>
+                  {s.value}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── Cards de navegação ── */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+        gap: '16px',
+      }}>
+        {cards.map((c) => {
+          const Icon = c.icon;
+          return (
+            <div
+              key={c.title}
+              style={{
+                background: '#0f172a',
+                border: '1px solid #1e293b',
+                borderRadius: '14px',
+                padding: '1.5rem',
+                cursor: 'default',
+                transition: 'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = c.iconColor;
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = `0 8px 30px rgba(0,0,0,0.3)`;
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = '#1e293b';
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              {/* Glow de fundo */}
+              <div style={{
+                position: 'absolute', top: '-30px', right: '-30px',
+                width: '100px', height: '100px', borderRadius: '50%',
+                background: `radial-gradient(circle, ${c.iconBg} 0%, transparent 70%)`,
+                pointerEvents: 'none',
+              }} />
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <div style={{
+                  width: '44px', height: '44px', borderRadius: '10px',
+                  background: c.iconBg,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Icon size={20} color={c.iconColor} />
+                </div>
+                <span style={{
+                  fontSize: '11px', fontWeight: 600, color: c.tagColor,
+                  background: c.tagBg, padding: '3px 10px',
+                  borderRadius: '20px', letterSpacing: '0.3px',
+                }}>
+                  {c.tag}
+                </span>
+              </div>
+
+              <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#f8fafc', margin: '0 0 6px' }}>
+                {c.title}
+              </h3>
+              <p style={{ fontSize: '13px', color: '#64748b', margin: 0, lineHeight: 1.5 }}>
+                {c.desc}
+              </p>
+
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '4px',
+                marginTop: '1rem', fontSize: '12px', color: c.iconColor, fontWeight: 600,
+              }}>
+                Acessar <FiArrowUpRight size={14} />
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
