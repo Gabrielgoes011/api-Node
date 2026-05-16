@@ -6,8 +6,11 @@ const { Pool } = pkg;
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false },
-    idleTimeoutMillis: 30000, // Fecha conexões ociosas após 30s
-    connectionTimeoutMillis: 2000, // Timeout de conexão de 2s
+    max: 20, // Máximo de conexões simultâneas
+    min: 2, // Mínimo de conexões mantidas
+    idleTimeoutMillis: 60000, // Fecha conexões ociosas após 60s
+    connectionTimeoutMillis: 10000, // Timeout de conexão de 10s
+    statement_timeout: 30000, // Timeout de query de 30s
 });
 
 // Testa a conexão com um pequeno atraso para as mensagens do servidor aparecerem primeiro

@@ -1,12 +1,15 @@
 import { openDb } from "../../config/configDb.js";
-import { 
+import {
   listarFundosService,
-  cadastrarFundosService
- } from "../../services/cadastros/meusFundos.services.js";
+  cadastrarFundosService,
+  contarFundosService,
+  deletarFundoService
+} from "../../services/cadastros/meusFundos.services.js";
 
+import apiResponse from '../../utils/httpResponse.js';
 
 //#region => cadastrar meus fundos
-export async function cadastrarFundos(req, res) {
+async function cadastrarFundos(req, res) {
   //recebe os dados do corpo da requisição
   const dados = req.body;
 
@@ -16,56 +19,87 @@ export async function cadastrarFundos(req, res) {
     const cadastrarFundos = await cadastrarFundosService(dados);
 
     // Retorna os resultados da consulta em formato JSON
-    return res.status(201).json({
-      message: 'Fundo cadastrado com sucesso',
-      fundo: cadastrarFundos
-    });
-
+    apiResponse.success(res,
+      'Fundos cadastrados com sucesso!', cadastrarFundos, 201, true
+    );
+    
   } catch (error) {
-
     // Log do erro para depuração
-    console.error('Erro ao cadastrar fundos:',error);
-
-    // Retorna um erro genérico para o client
-    return res.status(400).json({ error: error.message });
+    console.error('Erro ao cadastrar fundos:', error);
+    
+    // Retorna a mensagem detalhada do erro
+    return apiResponse.error(res, error.message);
   }
 }
 //#endregion
 
 //#region função listar fundos -  
-export async function listarFundos(req, res) {
+async function listarFundos(req, res) {
   try {
 
     // Chama a função do repositório para listar os fundos
     const listarFundos = await listarFundosService();
 
     // Retorna os resultados da consulta em formato JSON
-    res.status(200).json(listarFundos);
+    apiResponse.success(res,
+      'Fundos listados com sucesso!', listarFundos, 200, true
+    );
 
   } catch (error) {
-    // Log do erro para depuração
-    console.error('Erro ao listar fundos:', error);
 
-    // Retorna um erro genérico para o cliente
-    return res.status(500).json({ error: 'Erro ao listar fundos.' });
-
+    // Retorna a mensagem detalhada do erro
+    return apiResponse.error(res, error.message);
   }
 }
 
 //#endregion
 
 //#region função de contar fundos ativos
-export async function contarFundosAtivos(req, res) {
-  const db = await openDb();
+async function contarFundosAtivos(req, res) {
   try {
-    const resultado = await db.query(`
-        SELECT COUNT(*) AS total
-        FROM ativos
-    `);
-    res.status(200).json({ total: parseInt(resultado.rows[0].total, 10) });
+
+    // Chama a função do repositório para contar os fundos ativos
+    const contarFundos = await contarFundosService();
+
+    // Retorna os resultados da consulta em formato JSON
+    apiResponse.success(res,
+      'Fundos ativos contados com sucesso!', contarFundos, 200, true
+    );
+
   } catch (error) {
-    console.error('Erro ao contar fundos ativos:', error);
-    res.status(500).json({ error: 'Erro ao contar fundos ativos.' });
+
+    // Retorna a mensagem detalhada do erro
+    return apiResponse.error(res, error.message);
   }
 }
-//#endregion
+//#endregion 
+
+//#region função de deletar um fundo
+async function deletarFundo(req, res) {
+  //recebe o id do fundo a ser deletado
+  const { id } = req.params;
+
+  try {
+
+    // Chama a função do serviço para deletar o fundo 
+    const deletarFundo = await deletarFundoService(id);
+
+    // Retorna os resultados da consulta em formato JSON
+    apiResponse.success(res,
+      'Fundo deletado com sucesso!', deletarFundo, 200, true
+    );
+  } catch (error) {
+
+    // Retorna a mensagem detalhada do erro
+    return apiResponse.error(res, error.message);
+  }
+}
+//#endregion  
+
+
+export {  
+  listarFundos,
+  cadastrarFundos,
+  contarFundosAtivos,
+  deletarFundo
+}

@@ -9,6 +9,7 @@ async function listarFundosRepository() {
     //Executa a consulta SQL para listar os fundos
     const resultadoFundos = await db.query(`
         SELECT
+            a.id,
             a.ticker,
             a."nomeFundo",
             a.cnpj,
@@ -44,7 +45,22 @@ async function buscarFundosRepository(ticker) {
     return resultado.rows[0];
 }
 
-//2º passo: se o ticker não existir, cadastra o fundo
+//2º passo: se o ticker não existir, verifica se o cnpj já existe
+async function checkCnpjRepository(cnpj) {
+
+    //executa a consulta para verificar se ja existe
+    const db = await openDb();
+    const resultadoCnpj = await db.query(`
+        SELECT id
+        FROM ativos
+        WHERE cnpj = $1`, [cnpj]
+    );
+
+    //retorna o resultado da consulta
+    return resultadoCnpj.rows[0];
+}
+
+//3º passo: se o ticker não existir, cadastra o fundo
 async function cadastrarFundosRepository(dados) {
 
     //abre a conexão com o banco de dados
@@ -56,7 +72,7 @@ async function cadastrarFundosRepository(dados) {
             ("ticker", "nomeFundo", cnpj, "idSeguimento", "dtCadastro")  
         VALUES
             ($1, $2, $3, $4, now())
-        RETURNING id`,
+        RETURNING id, "ticker", "nomeFundo"`,
         [
             dados.ticker,
             dados.nomeFundo,
@@ -71,7 +87,7 @@ async function cadastrarFundosRepository(dados) {
 //#endregion
 
 //#region => Query para contar fundos ativos
-async function contarFundosAtivosRepository() {
+async function contarFundosRepository() {
     //abre a conexão com o banco de dados
     const db = await openDb();
 
@@ -95,7 +111,7 @@ async function checkOperacaoRepository(id) {
 
     //Executa a consulta SQL para deletar um fundo
     const resultado = await db.query(`
-        SELECT COUNT (*) linhas
+        SELECT id
         FROM operacoes
         WHERE "idAtivo" = $1`, [id]
     );
@@ -122,12 +138,12 @@ async function deletarFundoRepository(id) {
 //#endregion
 
 
-
 export {
     listarFundosRepository,
     buscarFundosRepository,
+    checkCnpjRepository,
     cadastrarFundosRepository,
-    contarFundosAtivosRepository,
+    contarFundosRepository,
     checkOperacaoRepository,
     deletarFundoRepository
 

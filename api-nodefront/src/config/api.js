@@ -23,9 +23,28 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Interceptor de RESPONSE — captura 401 e redireciona para o login
+// Interceptor de RESPONSE — padroniza respostas e trata erros
+//exemplo de uso
+/*
+api.get('/usuarios')
+  .then(response => {
+    console.log(response.data);
+  })
+  .catch(error => {
+    console.error(error);
+  }
+);
+*/
+
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Se a resposta segue o padrão { success: true, message: "...", data: ... }
+    // extrai automaticamente o data para simplificar consumo no front
+    if (response.data?.success && response.data?.data !== undefined) {
+      response.data = response.data.data;
+    }
+    return response;
+  },
   (error) => {
     const isLoginRoute = error.config?.url?.includes('/auth/login');
 

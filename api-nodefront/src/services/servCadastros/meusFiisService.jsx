@@ -37,7 +37,7 @@ export const meusFiisService = {
   // Excluir FII
   excluir: async (id) => {
     try {
-      const res = await api.delete(`/meus-fiis/delete/${id}`);
+      const res = await api.delete(`/meusFundos/deletar/${id}`);
       return res.data;
     } catch (error) {
       throw error;

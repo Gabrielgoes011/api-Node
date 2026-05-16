@@ -56,6 +56,8 @@ export const useUsuarios = () => {
       });
     } catch (error) {
       handleError(error);
+    }
+  }, []);
 
   const handleAddUser = async (novoUsuario) => {
     try {

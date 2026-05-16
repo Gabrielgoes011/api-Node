@@ -41,7 +41,8 @@ export const useMeusFiis = () => {
   const getDashboard = useCallback(async () => {
     try {
       const data = await meusFiisService.contar();
-      const totalCount = Array.isArray(data) ? data.length : (Number(data.total) || 0);
+      // O backend retorna apenas o número total (string do PostgreSQL)
+      const totalCount = Number(data) || 0;
       setDashboard({ total: totalCount });
     } catch (error) {
       handleError(error);
@@ -97,7 +98,10 @@ export const useMeusFiis = () => {
   };
 
   const executeConfirmedAction = async () => {
-    if (!itemSelected) return;
+    if (!itemSelected || !itemSelected.id) {
+      toastWarn('Erro ao identificar o fundo. Por favor tente novamente.');
+      return;
+    }
 
     try {
       if (modalAction === 'delete') {
@@ -133,6 +137,14 @@ export const useMeusFiis = () => {
   };
 
   const handleOpenModal = (item, action) => {
+    console.log('🔍 Item selecionado para ação:', item); // DEBUG
+    console.log('Tem ID?', item?.id); // DEBUG
+    
+    if (!item || !item.id) {
+      console.warn('⚠️ Item sem ID:', item);
+      toastWarn('Erro ao selecionar fundo. Item inválido.');
+      return;
+    }
     setItemSelected(item);
     setModalAction(action);
     setShowModal(true);
