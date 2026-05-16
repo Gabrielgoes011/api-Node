@@ -248,9 +248,9 @@ Problemas e melhorias identificadas diretamente no código atual.
 
 ### 📦 Meus Fundos (`meusFundos.controller.js`)
 
-- [ ] **`contarFundosAtivos` fora da arquitetura** — esta função ainda acessa o banco diretamente no controller, enquanto as demais funções do mesmo módulo já usam Service → Repository. Migrar para completar o padrão
+- [x] **`contarFundosAtivos` fora da arquitetura** — esta função ainda acessa o banco diretamente no controller, enquanto as demais funções do mesmo módulo já usam Service → Repository. Migrar para completar o padrão
 - [ ] **Sem edição de fundo** — não existe rota/função para atualizar os dados de um fundo cadastrado (nome, CNPJ, seguimento)
-- [ ] **Sem exclusão de fundo** — não existe rota/função para remover um fundo da carteira
+- [x]**Sem exclusão de fundo** — não existe rota/função para remover um fundo da carteira
 
 ---
 
