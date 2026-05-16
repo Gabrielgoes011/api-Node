@@ -74,27 +74,29 @@ export const useMeusFiis = () => {
   };
 
   const handleUpdateFii = async (data) => {
-    try {
-      const payload = { ...data };
+    toastWarn('⚙️ Funcionalidade em desenvolvimento...');
+    return;
+    // try {
+    //   const payload = { ...data };
 
-      if (payload.idSegmento) {
-        payload.idSeguimento = payload.idSegmento;
-        delete payload.idSegmento;
-      }
+    //   if (payload.idSegmento) {
+    //     payload.idSeguimento = payload.idSegmento;
+    //     delete payload.idSegmento;
+    //   }
 
-      if (!payload.idSeguimento || payload.idSeguimento === '') {
-        toastWarn('Por favor, selecione um Seguimento para o fundo!');
-        return;
-      }
+    //   if (!payload.idSeguimento || payload.idSeguimento === '') {
+    //     toastWarn('Por favor, selecione um Seguimento para o fundo!');
+    //     return;
+    //   }
 
-      await meusFiisService.atualizar(onEdit.id, payload);
-      toastSuccess('Fundo atualizado com sucesso!');
-      closeFormModal();
-      getFiis();
-      getDashboard();
-    } catch (error) {
-      handleError(error);
-    }
+    //   await meusFiisService.atualizar(onEdit.id, payload);
+    //   toastSuccess('Fundo atualizado com sucesso!');
+    //   closeFormModal();
+    //   getFiis();
+    //   getDashboard();
+    // } catch (error) {
+    //   handleError(error);
+    // }
   };
 
   const executeConfirmedAction = async () => {
@@ -126,14 +128,16 @@ export const useMeusFiis = () => {
   };
 
   const handleEdit = (item) => {
-    setOnEdit(item);
-    setFormData({
-      ticker: item.ticker,
-      nomeFundo: item.nomeFundo,
-      cnpj: item.cnpj,
-      idSeguimento: item.idSeguimento || ''
-    });
-    setShowFormModal(true);
+    toastWarn('⚙️ Funcionalidade em desenvolvimento...');
+    return;
+    // setOnEdit(item);
+    // setFormData({
+    //   ticker: item.ticker,
+    //   nomeFundo: item.nomeFundo,
+    //   cnpj: item.cnpj,
+    //   idSeguimento: item.idSeguimento || ''
+    // });
+    // setShowFormModal(true);
   };
 
   const handleOpenModal = (item, action) => {

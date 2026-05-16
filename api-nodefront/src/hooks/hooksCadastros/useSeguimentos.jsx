@@ -50,15 +50,17 @@ export const useSeguimentos = () => {
   };
 
   const handleUpdateSeguimento = async (data) => {
-    try {
-      await seguimentosService.atualizar(onEdit.id, data);
-      toastSuccess('Seguimento atualizado com sucesso!');
-      closeFormModal();
-      getSeguimentos();
-      getDashboard();
-    } catch (error) {
-      handleError(error);
-    }
+    toastInfo('⚙️ Funcionalidade em desenvolvimento...');
+    return;
+    // try {
+    //   await seguimentosService.atualizar(onEdit.id, data);
+    //   toastSuccess('Seguimento atualizado com sucesso!');
+    //   closeFormModal();
+    //   getSeguimentos();
+    //   getDashboard();
+    // } catch (error) {
+    //   handleError(error);
+    // }
   };
 
   const executeConfirmedAction = async () => {
@@ -87,9 +89,11 @@ export const useSeguimentos = () => {
   };
 
   const handleEdit = (item) => {
-    setOnEdit(item);
-    setFormData({ nome: item.nome });
-    setShowFormModal(true);
+    toastInfo('⚙️ Funcionalidade em desenvolvimento...');
+    return;
+    // setOnEdit(item);
+    // setFormData({ nome: item.nome });
+    // setShowFormModal(true);
   };
 
   const handleOpenModal = (item, action) => {

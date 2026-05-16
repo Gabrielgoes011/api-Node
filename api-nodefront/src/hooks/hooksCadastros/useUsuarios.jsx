@@ -72,15 +72,8 @@ export const useUsuarios = () => {
   };
 
   const handleUpdateUser = async (usuarioAtualizado) => {
-    try {
-      await usuariosService.atualizar(onEdit.id, usuarioAtualizado);
-      toastSuccess('Usuário atualizado com sucesso!');
-      getUsers();
-      resetForm();
-      setShowFormModal(false);
-    } catch (error) {
-      handleError(error);
-    }
+    toastInfo('⚙️ Funcionalidade em desenvolvimento...');
+    return;
   };
 
   const handleDeleteUser = async (userId) => {
@@ -94,23 +87,13 @@ export const useUsuarios = () => {
   };
 
   const handleInactivateUser = async (user) => {
-    try {
-      await usuariosService.inativarReativar(user.id);
-      toastSuccess('Usuário inativado com sucesso!');
-      getUsers();
-    } catch (error) {
-      handleError(error);
-    }
+    toastInfo('⚙️ Funcionalidade em desenvolvimento...');
+    return;
   };
 
   const handleReactivateUser = async (user) => {
-    try {
-      await usuariosService.inativarReativar(user.id);
-      toastSuccess('Usuário reativado com sucesso!');
-      getUsers();
-    } catch (error) {
-      handleError(error);
-    }
+    toastInfo('⚙️ Funcionalidade em desenvolvimento...');
+    return;
   };
 
   const handleOpenCreate = () => {
@@ -120,15 +103,8 @@ export const useUsuarios = () => {
   };
 
   const handleEdit = (user) => {
-    setOnEdit(user);
-    setFormData({
-      nome: user.nome,
-      dataNascimento: user.dataNascimento || '',
-      email: user.email,
-      cpf: user.cpf,
-      foto: user.foto || null
-    });
-    setShowFormModal(true);
+    toastInfo('⚙️ Funcionalidade em desenvolvimento...');
+    return;
   };
 
   const handleOpenModal = (user, action) => {
