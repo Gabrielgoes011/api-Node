@@ -18,6 +18,7 @@ async function listarFundosRepository() {
             a."dtCadastro" 
         FROM ativos a INNER JOIN seguimentos b 
         ON a."idSeguimento" = b.id
+        ORDER BY a.ticker ASC
      `
     );
 
@@ -137,6 +138,27 @@ async function deletarFundoRepository(id) {
 }
 //#endregion
 
+//#region => Query para alterar nome do fundo
+async function editarNomeFundoRepository(id, nomeFundo) {
+    //abre a conexão com o banco de dados
+    const db = await openDb();
+
+    //Executa a consulta SQL para alterar o nome do fundo
+    const resultado = await db.query(`
+        UPDATE ativos
+        SET "nomeFundo" = $1
+        WHERE id = $2
+        RETURNING id, "nomeFundo"`, [nomeFundo, id]
+    );
+
+    //retorna o resultado da consulta
+    return resultado.rows[0];
+}
+
+
+
+
+
 
 export {
     listarFundosRepository,
@@ -145,6 +167,6 @@ export {
     cadastrarFundosRepository,
     contarFundosRepository,
     checkOperacaoRepository,
-    deletarFundoRepository
-
+    deletarFundoRepository,
+    editarNomeFundoRepository
 }

@@ -3,7 +3,8 @@ import {
   listarFundosService,
   cadastrarFundosService,
   contarFundosService,
-  deletarFundoService
+  deletarFundoService,
+  editarNomeFundoService
 } from "../../services/cadastros/meusFundos.services.js";
 
 import apiResponse from '../../utils/httpResponse.js';
@@ -22,11 +23,11 @@ async function cadastrarFundos(req, res) {
     apiResponse.success(res,
       'Fundos cadastrados com sucesso!', cadastrarFundos, 201, true
     );
-    
+
   } catch (error) {
     // Log do erro para depuração
     console.error('Erro ao cadastrar fundos:', error);
-    
+
     // Retorna a mensagem detalhada do erro
     return apiResponse.error(res, error.message);
   }
@@ -96,10 +97,37 @@ async function deletarFundo(req, res) {
 }
 //#endregion  
 
+//#region função de editar nome do fundo - implementar depois de implementar tabela de logs
+async function editarNomeFundo(req, res) {
 
-export {  
+  //recebe o id do fundo a ser editado e o novo nome do fundo
+  const { id } = req.params;
+  const { nomeFundo } = req.body;
+
+  try {
+
+    // Chama a função do serviço para editar o nome do fundo 
+    const editarNomeFundo = await editarNomeFundoService(id, nomeFundo);
+
+    // Retorna os resultados da consulta em formato JSON
+    apiResponse.success(res,
+      'Nome do fundo editado com sucesso!', editarNomeFundo, 200, true
+    );
+
+  } catch (error) {
+
+    // Retorna a mensagem detalhada do erro
+    return apiResponse.error(res, error.message);
+  }
+}
+//#endregion
+
+// #region => exportação das funções
+export {
   listarFundos,
   cadastrarFundos,
   contarFundosAtivos,
-  deletarFundo
+  deletarFundo,
+  editarNomeFundo
 }
+//#endregion

@@ -1,15 +1,16 @@
-import { 
+import {
     listarFundosRepository, //lista no grid
     buscarFundosRepository, //verifica se o ticker já existe
     cadastrarFundosRepository, //cadastra os fundos
     checkCnpjRepository, //verifica se o cnpj já existe
     checkOperacaoRepository, //verifica se o fundo tem operações cadastradas
     deletarFundoRepository, //deleta um fundo
-    contarFundosRepository //conta os fundos
+    contarFundosRepository, //conta os fundos
+    editarNomeFundoRepository //edita o nome do fundo
 } from "../../repositories/cadastros/meuFundos.repositories.js";
 
 //#region => Service para listar os fundos cadastrados
- async function listarFundosService() {
+async function listarFundosService() {
 
     //Chama a função do repositório para listar os fundos
     const listarFundos = await listarFundosRepository();
@@ -30,7 +31,7 @@ async function cadastrarFundosService(dados) {
     }
 
     //verifica o CNPJ tem 14 caracteres
-    if(dados.cnpj.length !== 14) {
+    if (dados.cnpj.length !== 14) {
         throw new Error(
             'O campo CNPJ deve conter 14 caracteres');
     }
@@ -41,7 +42,7 @@ async function cadastrarFundosService(dados) {
     if (existeTicker) {
         throw new Error(
             'O ticker informado já está cadastrado');
-    }   
+    }
 
     //techo para garantir que cnpj ja nao esta cadastrado
     const checkCnpj = await checkCnpjRepository(dados.cnpj);
@@ -55,18 +56,18 @@ async function cadastrarFundosService(dados) {
     const cadastrarFundos = await cadastrarFundosRepository(dados);
 
     //retorna o resultado
-    return cadastrarFundos; 
+    return cadastrarFundos;
 }
 //#endregion
 
 //#region => Service para contar fundos ativos
-async function contarFundosService() {    
+async function contarFundosService() {
 
     //Chama a função do repositório para contar os fundos ativos
     const contarFundos = await contarFundosRepository();
 
     //retorna o resultado
-    return contarFundos; 
+    return contarFundos;
 }
 //#endregion
 
@@ -90,6 +91,23 @@ async function deletarFundoService(id) {
 }
 //#endregion
 
+//#region => Service para editar o nome do fundo
+async function editarNomeFundoService(id, nomeFundo) {
+
+    //nome nao pode ser nullo nem vazio
+    if (!nomeFundo) {
+        throw new Error(
+            'O campo nome nao pode ser vazio');
+    }
+
+    //chama a função do repositório para editar o nome do fundo
+    const editarNomeFundo = await editarNomeFundoRepository(id, nomeFundo);
+
+    //retorna o resultado   
+    return editarNomeFundo;
+
+}
+//#endregion
 
 
 
@@ -98,5 +116,6 @@ export {
     listarFundosService,
     cadastrarFundosService,
     contarFundosService,
-    deletarFundoService
+    deletarFundoService,
+    editarNomeFundoService
 }

@@ -27,7 +27,7 @@ export const meusFiisService = {
   // Atualizar FII
   atualizar: async (id, fiiData) => {
     try {
-      const res = await api.put(`/meus-fiis/update/${id}`, fiiData);
+      const res = await api.put(`/meusFundos/editar/${id}`, fiiData);
       return res.data;
     } catch (error) {
       throw error;

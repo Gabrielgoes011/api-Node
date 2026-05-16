@@ -61,9 +61,16 @@ function PaginaMeusFiis() {
     e.preventDefault();
 
     // Validações
-    if (!formData.ticker || !formData.nomeFundo || !formData.cnpj || !formData.idSeguimento) {
-      alert('Por favor, preencha todos os campos obrigatórios!');
-      return;
+    if (onEdit) {
+      if (!formData.nomeFundo) {
+        alert('Por favor, informe o nome do fundo.');
+        return;
+      }
+    } else {
+      if (!formData.ticker || !formData.nomeFundo || !formData.cnpj || !formData.idSeguimento) {
+        alert('Por favor, preencha todos os campos obrigatórios!');
+        return;
+      }
     }
 
     // Submeter
@@ -137,20 +144,71 @@ function PaginaMeusFiis() {
               </h2>
 
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                  <input type="text" placeholder="Ticker (ex: MXRF11)" value={formData.ticker || ''} onChange={(e) => setFormData({ ...formData, ticker: e.target.value.toUpperCase() })} style={inputStyle} autoFocus />
-                  <input
-                    type="text"
-                    placeholder="CNPJ (apenas números)"
-                    value={formData.cnpj || ''}
-                    maxLength={14}
-                    onChange={(e) => {
-                      const onlyNums = e.target.value.replace(/\D/g, '').substring(0, 14);
-                      setFormData({ ...formData, cnpj: onlyNums });
-                    }}
-                    style={inputStyle}
-                  />
-                </div>
+                {!onEdit && (
+                  <>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                      <input type="text" placeholder="Ticker (ex: MXRF11)" value={formData.ticker || ''} onChange={(e) => setFormData({ ...formData, ticker: e.target.value.toUpperCase() })} style={inputStyle} autoFocus />
+                      <input
+                        type="text"
+                        placeholder="CNPJ (apenas números)"
+                        value={formData.cnpj || ''}
+                        maxLength={14}
+                        onChange={(e) => {
+                          const onlyNums = e.target.value.replace(/\D/g, '').substring(0, 14);
+                          setFormData({ ...formData, cnpj: onlyNums });
+                        }}
+                        style={inputStyle}
+                      />
+                    </div>
+
+                    {/* Select Customizado com Pesquisa */}
+                    <div
+                      tabIndex={0}
+                      onBlur={(e) => {
+                        // Fecha o select automaticamente ao clicar fora
+                        if (!e.currentTarget.contains(e.relatedTarget)) {
+                          setIsSelectOpen(false);
+                          setSegmentoSearch('');
+                        }
+                      }}
+                      style={{ position: 'relative', width: '100%', outline: 'none' }}
+                    >
+                      <input
+                        type="text"
+                        placeholder="Selecione ou pesquise o segmento..."
+                        value={isSelectOpen ? segmentoSearch : nomeSeguimentoSelecionado}
+                        onChange={(e) => {
+                          setSegmentoSearch(e.target.value);
+                          setIsSelectOpen(true);
+                          setFormData({ ...formData, idSeguimento: null });
+                        }}
+                        onClick={() => setIsSelectOpen(true)}
+                        style={{ ...inputStyle, cursor: 'pointer', backgroundColor: '#fff' }}
+                      />
+                      <span style={{ position: 'absolute', top: '50%', right: '1rem', transform: 'translateY(-50%)', pointerEvents: 'none', fontSize: '0.8rem', color: '#64748b' }}>▼</span>
+
+                      {isSelectOpen && (
+                        <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', background: '#fff', border: '1px solid #cbd5e1', borderRadius: '0.5rem', marginTop: '4px', zIndex: 10, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', overflow: 'hidden' }}>
+                          <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                            {filteredSegmentos.length > 0 ? (
+                              filteredSegmentos.map(seg => (
+                                <div key={seg.id} onClick={() => {
+                                  setFormData({ ...formData, idSeguimento: seg.id });
+                                  setIsSelectOpen(false);
+                                  setSegmentoSearch('');
+                                }} style={{ padding: '0.75rem 1rem', cursor: 'pointer', fontSize: '0.95rem', backgroundColor: String(formData.idSeguimento) === String(seg.id) ? '#e2e8f0' : 'transparent' }} onMouseEnter={(e) => e.target.style.backgroundColor = '#f1f5f9'} onMouseLeave={(e) => e.target.style.backgroundColor = String(formData.idSeguimento) === String(seg.id) ? '#e2e8f0' : 'transparent'}>
+                                  {seg.nome || seg.nomeSeguimento}
+                                </div>
+                              ))
+                            ) : (
+                              <div style={{ padding: '0.75rem', color: '#64748b', textAlign: 'center', fontSize: '0.95rem' }}>Nenhum segmento encontrado.</div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
 
                 <input
                   type="text"
@@ -162,53 +220,6 @@ function PaginaMeusFiis() {
                   }}
                   style={inputStyle}
                 />
-
-                {/* Select Customizado com Pesquisa */}
-                <div
-                  tabIndex={0}
-                  onBlur={(e) => {
-                    // Fecha o select automaticamente ao clicar fora
-                    if (!e.currentTarget.contains(e.relatedTarget)) {
-                      setIsSelectOpen(false);
-                      setSegmentoSearch('');
-                    }
-                  }}
-                  style={{ position: 'relative', width: '100%', outline: 'none' }}
-                >
-                  <input
-                    type="text"
-                    placeholder="Selecione ou pesquise o segmento..."
-                    value={isSelectOpen ? segmentoSearch : nomeSeguimentoSelecionado}
-                    onChange={(e) => {
-                      setSegmentoSearch(e.target.value);
-                      setIsSelectOpen(true);
-                      setFormData({ ...formData, idSeguimento: null });
-                    }}
-                    onClick={() => setIsSelectOpen(true)}
-                    style={{ ...inputStyle, cursor: 'pointer', backgroundColor: '#fff' }}
-                  />
-                  <span style={{ position: 'absolute', top: '50%', right: '1rem', transform: 'translateY(-50%)', pointerEvents: 'none', fontSize: '0.8rem', color: '#64748b' }}>▼</span>
-
-                  {isSelectOpen && (
-                    <div style={{ position: 'absolute', top: '100%', left: 0, width: '100%', background: '#fff', border: '1px solid #cbd5e1', borderRadius: '0.5rem', marginTop: '4px', zIndex: 10, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', overflow: 'hidden' }}>
-                      <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                        {filteredSegmentos.length > 0 ? (
-                          filteredSegmentos.map(seg => (
-                            <div key={seg.id} onClick={() => {
-                              setFormData({ ...formData, idSeguimento: seg.id });
-                              setIsSelectOpen(false);
-                              setSegmentoSearch('');
-                            }} style={{ padding: '0.75rem 1rem', cursor: 'pointer', fontSize: '0.95rem', backgroundColor: String(formData.idSeguimento) === String(seg.id) ? '#e2e8f0' : 'transparent' }} onMouseEnter={(e) => e.target.style.backgroundColor = '#f1f5f9'} onMouseLeave={(e) => e.target.style.backgroundColor = String(formData.idSeguimento) === String(seg.id) ? '#e2e8f0' : 'transparent'}>
-                              {seg.nome || seg.nomeSeguimento}
-                            </div>
-                          ))
-                        ) : (
-                          <div style={{ padding: '0.75rem', color: '#64748b', textAlign: 'center', fontSize: '0.95rem' }}>Nenhum segmento encontrado.</div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
 
                 <button type="submit" style={{ padding: '0.75rem', backgroundColor: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '0.5rem', cursor: 'pointer', fontSize: '1rem', fontWeight: 600, marginTop: '0.5rem', transition: 'background-color 0.2s' }}>
                   {onEdit ? "Salvar Alterações" : "Cadastrar Fundo"}

@@ -6,7 +6,8 @@ import {
   cadastrarFundos,
   listarFundos,
   contarFundosAtivos,
-  deletarFundo
+  deletarFundo,
+  editarNomeFundo
 } from '../controllers/cadastros/meusFundos.controller.js';
 
 // Rotas para meus fundos
@@ -22,6 +23,9 @@ router.post('/meusFundos/cadastrar', verificaJWT, cadastrarFundos);
 router.delete('/meusFundos/deletar/:id', verificaJWT, deletarFundo);
 //header: id do fundo a ser deletado
 
+router.put('/meusFundos/editar/:id', verificaJWT, editarNomeFundo);
+//body: { nomeFundo: 'novo nome do fundo' }
+//header: id do fundo a ser editado
 
 export default router;
 

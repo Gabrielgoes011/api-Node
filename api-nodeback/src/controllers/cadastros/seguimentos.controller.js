@@ -3,7 +3,7 @@ import { openDb } from "../../config/configDb.js";
 
 //função auxiliar para buscar seguimento por id
 
-//#region função listar seguimentos -  (ativos/inativos)
+//#region função listar seguimentos 
 export async function listarSeguimentos(req, res) {
   const db = await openDb();
   try {
@@ -28,7 +28,6 @@ export async function listarSeguimentos(req, res) {
 //#endregion
 
 //#region função Contar Seguimentos 
-
 export async function contarSeguimentos(req, res) {
   const db = await openDb();
   try {
@@ -49,7 +48,6 @@ export async function contarSeguimentos(req, res) {
 //#endregion
 
 //#region Função para cadastrar seguimentos
-
 export async function cadastrarSeguimento(req, res) {
   const dados = req.body;
   const db = await openDb();
@@ -143,8 +141,8 @@ export async function updateSeguimento(req, res) {
       SET "nomeSeguimento" = $1
       WHERE id = $2`, [dados.nome, dados.idSeguimento]
       );
-      
-//implementar log de atualização de seguimento depois de implementar tabela de logs
+
+      //implementar log de atualização de seguimento depois de implementar tabela de logs
 
       return res.json({
         statusCode: 'Sucesso (200)',

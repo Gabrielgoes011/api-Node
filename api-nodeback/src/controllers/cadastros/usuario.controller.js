@@ -1,5 +1,10 @@
 import { openDb } from "../../config/configDb.js";
 import { validaEmailExistente } from '../../utils/validaUser.js';
+import apiResponse from '../../utils/httpResponse.js';
+import {
+  listarUsuariosService,
+} from "../../services/cadastros/usuarios.services.js";
+
 
 // ─────────────────────────────────────────────
 // FUNÇÕES AUXILIARES
@@ -36,23 +41,22 @@ export async function buscaUserId(id, db) {
 
 //#region função listarUsuarios - lista usuarios (ativos/inativos)
 export async function listarUsuarios(req, res) {
-  const db = await openDb();
   try {
-    const parametro = req.query.status || 'on';
-    const blvalor = parametro === 'on' ? true : false;
-    const resultado = await db.query(`        
-        SELECT id, nome, cpf, email, ativo,
-        EXTRACT(YEAR FROM AGE("dataNascimento")) AS idade
-        FROM usuarios   
-        WHERE ativo = $1 
-        ORDER BY id DESC `, [blvalor]
+
+    //verifica se o valor do parâmetro "status" é válido
+    const parametro = req.query.status;
+
+    //Chama a função do service para listar os usuários
+    const usuarios = await listarUsuariosService(parametro);
+
+    // Retorna os resultados da consulta em formato JSON
+    apiResponse.success(res,
+      'Usuários listados com sucesso!', usuarios, 200, true
     );
-    if (resultado.rows.length === 0) {
-      return res.status(200).json([]);
-    }
-    res.status(200).json(resultado.rows);
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao listar usuários.' });
+
+    apiResponse.error(res,
+      error.message || 'Erro ao listar usuários', 500);
   }
 }
 //#endregion
@@ -90,8 +94,6 @@ export async function contarUsuarios(req, res) {
   }
 }
 //#endregion
-
-// ─────────────────────────────────────────────────────────────────────────────────
 
 //#region Função para cadastrar usuarios
 export async function cadastrarUser(req, res) {

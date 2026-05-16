@@ -80,7 +80,7 @@ Authorization: Bearer <token>
 #### Usuários
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/users` | Lista todos os usuários |
+| GET | `/users` | Lista usuários filtrando por `status=on` ou `status=off` |
 | GET | `/users/dash/count` | Conta total de usuários |
 | POST | `/cadUsers` | Cadastra novo usuário |
 | PUT | `/users/update/:id` | Atualiza dados do usuário |
@@ -102,6 +102,7 @@ Authorization: Bearer <token>
 | GET | `/meusFundos` | Lista todos os fundos cadastrados |
 | GET | `/meusFundos/contar` | Conta total de fundos |
 | POST | `/meusFundos/cadastrar` | Cadastra novo fundo (ticker único) |
+| PUT | `/meusFundos/editar/:id` | Atualiza apenas o campo `nomeFundo` do fundo |
 
 #### Operações
 | Método | Rota | Descrição |
@@ -135,6 +136,14 @@ npm start
 ```
 
 O servidor sobe em `http://localhost:3000`.
+
+---
+
+## Atualizações recentes realizadas
+- `GET /users` agora aceita query string `status=on` ou `status=off` para listar usuários ativos ou inativos.
+- A rota de edição de fundo foi padronizada para `PUT /meusFundos/editar/:id` e atualiza somente `nomeFundo`.
+- O frontend `meusFiisService.atualizar` consome esse endpoint com `PUT /meusFundos/editar/${id}`.
+- O modal de edição no frontend passa a exibir apenas o campo `Nome do Fundo` quando `onEdit` está ativo.
 
 ---
 
