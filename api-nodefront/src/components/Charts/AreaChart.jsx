@@ -93,7 +93,7 @@ export default function AreaChart({ data, keys, colors, height = 160 }) {
                 <circle
                   key={`pt-${key}-${i}`}
                   cx={getX(i)} cy={getY(d[key] || 0)}
-                  r="4" fill="#ffffff" stroke={colors[key]} strokeWidth="2.5"
+                  r="4" fill="#0f172a" stroke={colors[key]} strokeWidth="2.5"
                   style={{ cursor: 'pointer' }}
                 >
                   <title>{key}: {(d[key] || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</title>
@@ -104,7 +104,7 @@ export default function AreaChart({ data, keys, colors, height = 160 }) {
         </svg>
 
         {/* Labels dos meses na base */}
-        <div style={{ display: 'flex', position: 'absolute', bottom: '-30px', left: 0, width: '100%', borderTop: '2px solid #f1f5f9', paddingTop: '8px' }}>
+        <div style={{ display: 'flex', position: 'absolute', bottom: '-30px', left: 0, width: '100%', borderTop: '2px solid #1e293b', paddingTop: '8px' }}>
           {data.map((item, idx) => (
             <div key={idx} style={{ flex: '1 1 0', textAlign: 'center' }}>
               <p style={{ fontSize: '11px', fontWeight: 600, color: '#64748b', margin: 0 }}>

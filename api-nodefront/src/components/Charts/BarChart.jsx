@@ -35,7 +35,7 @@ export default function BarChart({ data, keys, colors, height = 150, barMaxWidth
     <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', flex: 1, gap: '4px', overflowX: 'auto', padding: '15px 5px' }}>
       {data.map((item, idx) => (
         <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '1 1 0', minWidth: '40px' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '3px', height: `${height + 10}px`, width: '100%', justifyContent: 'center', borderBottom: '2px solid #f1f5f9', paddingBottom: '4px' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: '3px', height: `${height + 10}px`, width: '100%', justifyContent: 'center', borderBottom: '2px solid #1e293b', paddingBottom: '4px' }}>
             {keys.map((key, ki) => (
               <div
                 key={key}

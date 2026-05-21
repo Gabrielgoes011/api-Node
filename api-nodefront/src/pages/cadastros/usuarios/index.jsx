@@ -79,25 +79,25 @@ function PaginaUsuarios() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f1f5f9', color: '#0f172a', fontFamily: 'Inter, sans-serif', padding: '2rem 1rem' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#0b1120', color: '#f1f5f9', fontFamily: 'Inter, sans-serif', padding: '2rem 1rem' }}>
       <main style={{ maxWidth: '1100px', margin: '0 auto' }}>
 
         <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', gap: '1rem', flexWrap: 'wrap' }}>
           <div>
-            <h1 style={{ fontSize: '1.6rem', fontWeight: 700, marginBottom: '0.25rem' }}>Cadastro de Usuários</h1>
-            <p style={{ color: '#475569', margin: 0 }}>Gerencie usuários ativos e inativos com ações rápidas e filtros</p>
+            <h1 style={{ fontSize: '1.6rem', fontWeight: 700, marginBottom: '0.25rem', color: '#f8fafc' }}>Cadastro de Usuários</h1>
+            <p style={{ color: '#64748b', margin: 0 }}>Gerencie usuários ativos e inativos com ações rápidas e filtros</p>
           </div>
           <button
             onClick={handleOpenCreate}
             style={{
               padding: '0.65rem 1.1rem',
-              backgroundColor: '#1d4ed8',
+              background: 'linear-gradient(135deg, #10b981, #059669)',
               color: '#ffffff',
               border: 'none',
               borderRadius: '0.5rem',
               fontWeight: 600,
               cursor: 'pointer',
-              boxShadow: '0 4px 10px rgba(30,64,175,0.2)'
+              boxShadow: '0 4px 16px rgba(16,185,129,0.3)',
             }}
           >
             + Novo Usuário
@@ -106,22 +106,22 @@ function PaginaUsuarios() {
 
         {/* Cards de métricas */}
         <section style={{ display: 'grid', gridTemplateColumns: 'repeat(3,minmax(0,1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
-          <div style={{ background: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e2e8f0', padding: '1rem', boxShadow: '0 1px 4px rgba(15,23,42,0.08)' }}>
+          <div style={{ background: '#0f172a', borderRadius: '0.75rem', border: '1px solid #1e293b', padding: '1rem', boxShadow: '0 4px 24px rgba(0,0,0,0.3)' }}>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>Usuários Ativos</p>
-            <h2 style={{ margin: '0.4rem 0', fontSize: '1.4rem', fontWeight: 700, color: '#0f172a' }}>{dashboard.ativos}</h2>
+            <h2 style={{ margin: '0.4rem 0', fontSize: '1.4rem', fontWeight: 700, color: '#10b981' }}>{dashboard.ativos}</h2>
           </div>
-          <div style={{ background: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e2e8f0', padding: '1rem', boxShadow: '0 1px 4px rgba(15,23,42,0.08)' }}>
+          <div style={{ background: '#0f172a', borderRadius: '0.75rem', border: '1px solid #1e293b', padding: '1rem', boxShadow: '0 4px 24px rgba(0,0,0,0.3)' }}>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>Usuários Inativos</p>
-            <h2 style={{ margin: '0.4rem 0', fontSize: '1.4rem', fontWeight: 700, color: '#0f172a' }}>{dashboard.inativos}</h2>
+            <h2 style={{ margin: '0.4rem 0', fontSize: '1.4rem', fontWeight: 700, color: '#f87171' }}>{dashboard.inativos}</h2>
           </div>
-          <div style={{ background: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e2e8f0', padding: '1rem', boxShadow: '0 1px 4px rgba(15,23,42,0.08)' }}>
+          <div style={{ background: '#0f172a', borderRadius: '0.75rem', border: '1px solid #1e293b', padding: '1rem', boxShadow: '0 4px 24px rgba(0,0,0,0.3)' }}>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>Total de Usuários</p>
-            <h2 style={{ margin: '0.4rem 0', fontSize: '1.4rem', fontWeight: 700, color: '#0f172a' }}>{dashboard.total}</h2>
+            <h2 style={{ margin: '0.4rem 0', fontSize: '1.4rem', fontWeight: 700, color: '#60a5fa' }}>{dashboard.total}</h2>
           </div>
         </section>
 
         {/* Abas de filtros */}
-        <nav style={{ display: 'flex', backgroundColor: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.75rem', overflow: 'hidden', marginBottom: '1rem' }}>
+        <nav style={{ display: 'flex', backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '0.75rem', overflow: 'hidden', marginBottom: '1rem' }}>
           {['ativos', 'inativos'].map((tab) => (
             <button
               key={tab}
@@ -129,12 +129,13 @@ function PaginaUsuarios() {
               style={{
                 flex: 1,
                 padding: '0.75rem 1rem',
-                backgroundColor: activeTab === tab ? '#ffffff' : '#f8fafc',
-                color: activeTab === tab ? '#1d4ed8' : '#64748b',
+                backgroundColor: activeTab === tab ? 'rgba(16,185,129,0.1)' : 'transparent',
+                color: activeTab === tab ? '#10b981' : '#64748b',
                 border: 'none',
-                borderBottom: activeTab === tab ? '3px solid #1d4ed8' : '3px solid transparent',
+                borderBottom: activeTab === tab ? '3px solid #10b981' : '3px solid transparent',
                 fontWeight: 600,
-                cursor: 'pointer'
+                cursor: 'pointer',
+                transition: 'all 0.2s',
               }}
             >
               {tab === 'ativos' ? 'Ativos' : 'Inativos'}
@@ -143,7 +144,7 @@ function PaginaUsuarios() {
         </nav>
 
         {/* Tabela de usuários */}
-        <section style={{ backgroundColor: '#ffffff', borderRadius: '0.75rem', border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(15,23,42,0.08)', padding: '1rem' }}>
+        <section style={{ backgroundColor: '#0f172a', borderRadius: '0.75rem', border: '1px solid #1e293b', boxShadow: '0 4px 24px rgba(0,0,0,0.3)', padding: '1rem' }}>
           {loading ? (
             <SkeletonTable rows={5} cols={5} />
           ) : users.length === 0 ? (
@@ -175,7 +176,7 @@ function PaginaUsuarios() {
             />
           )}
 
-          <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: '#64748b' }}>
+          <div style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: '#475569' }}>
             Exibindo usuários {activeTab === 'ativos' ? 'ativos' : 'inativos'}.
           </div>
         </section>
