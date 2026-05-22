@@ -183,22 +183,22 @@ This implementation plan transforms the FIITrack fund management system from des
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 12. Adapt priority pages to use ResponsiveTable
-  - [ ] 12.1 Adapt /cadastros/meusfiis page
+- [x] 12. Adapt priority pages to use ResponsiveTable
+  - [x] 12.1 Adapt /cadastros/meusfiis page
     - Replace TableAcoes with ResponsiveTable in MeusFiis page
     - Configure primaryFields: ['ticker', 'name']
     - Configure secondaryFields: ['cnpj', 'segment']
     - Maintain all existing action handlers
     - _Requirements: 10.1, 17.1, 17.2, 19.1_
 
-  - [ ] 12.2 Adapt /cadastros/usuarios page
+  - [x] 12.2 Adapt /cadastros/usuarios page
     - Replace TableAcoes with ResponsiveTable in Usuarios page
     - Configure primaryFields: ['name', 'email']
     - Configure secondaryFields: ['role', 'status']
     - Maintain all existing action handlers
     - _Requirements: 10.2, 17.1, 17.2, 19.1_
 
-  - [ ] 12.3 Adapt /cadastros/seguimentos page
+  - [x] 12.3 Adapt /cadastros/seguimentos page
     - Replace TableAcoes with ResponsiveTable in Seguimentos page
     - Configure primaryFields: ['name']
     - Configure secondaryFields: ['description']
@@ -206,21 +206,21 @@ This implementation plan transforms the FIITrack fund management system from des
     - _Requirements: 10.3, 17.1, 17.2, 19.1_
 
 
-  - [ ] 12.4 Adapt /controle-ativos page
+  - [x] 12.4 Adapt /controle-ativos page
     - Replace TableAcoes with ResponsiveTable in ControleAtivos page
     - Configure primaryFields: ['asset', 'quantity']
     - Configure secondaryFields: ['averagePrice', 'currentValue']
     - Maintain all existing action handlers
     - _Requirements: 10.4, 17.1, 17.2, 19.1_
 
-  - [ ] 12.5 Adapt /operacoes page
+  - [x] 12.5 Adapt /operacoes page
     - Replace TableAcoes with ResponsiveTable in Operacoes page
     - Configure primaryFields: ['date', 'type']
     - Configure secondaryFields: ['asset', 'quantity', 'value']
     - Maintain all existing action handlers
     - _Requirements: 10.5, 17.1, 17.2, 19.1_
 
-  - [ ] 12.6 Adapt /rendimentos page
+  - [x] 12.6 Adapt /rendimentos page
     - Replace TableAcoes with ResponsiveTable in Rendimentos page
     - Configure primaryFields: ['date', 'asset']
     - Configure secondaryFields: ['value', 'type']
@@ -228,7 +228,7 @@ This implementation plan transforms the FIITrack fund management system from des
     - _Requirements: 10.6, 17.1, 17.2, 19.1_
 
 
-  - [ ] 12.7 Adapt /precificacao page
+  - [x] 12.7 Adapt /precificacao page
     - Replace TableAcoes with ResponsiveTable in Precificacao page
     - Configure primaryFields: ['asset', 'currentPrice']
     - Configure secondaryFields: ['variation']
