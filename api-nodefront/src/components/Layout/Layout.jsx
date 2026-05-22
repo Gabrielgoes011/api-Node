@@ -1,11 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
 import TopBar from '../TopBar/TopBar';
+import useBreakpoint from '../../hooks/useBreakpoint';
 
 function Layout({ children, onLogout }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { isMobile } = useBreakpoint();
+  const location = useLocation();
 
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  // On mobile the sidebar starts closed (Req 2.2); on desktop it starts open.
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
+
+  // When the breakpoint switches to mobile, close the sidebar (Req 2.2).
+  useEffect(() => {
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  }, [isMobile]);
+
+  const toggleSidebar = () => setSidebarOpen(prev => !prev);
+
+  // Content margin: 0 on mobile (sidebar is an overlay), 250px/0 on desktop (Req 2.8, 2.9).
+  const contentMarginLeft = isMobile ? '0px' : (sidebarOpen ? '250px' : '0px');
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: '#0a0f1e' }}>
@@ -22,7 +38,7 @@ function Layout({ children, onLogout }) {
 
       {/* Conteúdo principal */}
       <div style={{
-        marginLeft: sidebarOpen ? '250px' : '0px',
+        marginLeft: contentMarginLeft,
         flex: 1,
         background: '#0a0f1e',
         minHeight: '100vh',
@@ -31,7 +47,7 @@ function Layout({ children, onLogout }) {
         paddingTop: '60px',
       }}>
         <div style={{
-          padding: '24px',
+          padding: isMobile ? '16px' : '24px',
           maxWidth: '1400px',
           margin: '0 auto',
         }}>

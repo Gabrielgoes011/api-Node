@@ -15,18 +15,23 @@
     "react-router-dom": "^7.14.2",
     "react-toastify": "^11.0.5"
   },
-"scripts": {
-  "dev": "vite --mode development",
-  "demo": "vite --mode demo",
-  "build": "vite build --mode production",
-  "preview": "vite preview"
-},
+  "scripts": {
+    "dev": "vite --mode development",
+    "demo": "vite --mode demo",
+    "build": "vite build --mode production",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
   "devDependencies": {
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/coverage-v8": "^4.1.7",
     "autoprefixer": "^10.5.0",
+    "jsdom": "^29.1.1",
     "tailwindcss": "^3.4.19",
-    "vite": "^8.0.10"
+    "vite": "^8.0.10",
+    "vitest": "^4.1.7"
   }
 }
