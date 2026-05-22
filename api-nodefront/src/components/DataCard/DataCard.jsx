@@ -1,6 +1,6 @@
 import React from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
-import { TableAcoes } from '../TableAcoes';
+import ResponsiveTable from '../ResponsiveTable/ResponsiveTable';
 
 /**
  * DataCard — container padrão de tabela da aplicação.
@@ -12,11 +12,12 @@ import { TableAcoes } from '../TableAcoes';
  *  onBotaoClick    () => void?
  *  filtros         ReactNode?
  *  rodape          string?
- *  — props repassadas ao TableAcoes —
+ *  — props repassadas ao ResponsiveTable —
  *  coluna, data, itemsPerPage, labelpesquisa,
  *  usaVisualizar, acaoVisualizar, usaEditar, acaoEditar,
  *  usaExcluir, acaoExcluir, usaResetarSenha, acaoResetarSenha,
- *  usaInativar, acaoInativar, usaReativar, acaoReativar
+ *  usaInativar, acaoInativar, usaReativar, acaoReativar,
+ *  cardPrimaryFields, cardSecondaryFields
  */
 export default function DataCard({
   titulo, subtitulo, botaoLabel, onBotaoClick, filtros, rodape,
@@ -27,6 +28,7 @@ export default function DataCard({
   usaResetarSenha, acaoResetarSenha,
   usaInativar,     acaoInativar,
   usaReativar,     acaoReativar,
+  cardPrimaryFields,   cardSecondaryFields,
 }) {
   return (
     <div style={{
@@ -96,7 +98,7 @@ export default function DataCard({
       </div>
 
       {/* ── Tabela ── */}
-      <TableAcoes
+      <ResponsiveTable
         coluna={coluna}
         data={data}
         itemsPerPage={itemsPerPage}
@@ -107,6 +109,8 @@ export default function DataCard({
         usaResetarSenha={usaResetarSenha} acaoResetarSenha={acaoResetarSenha}
         usaInativar={usaInativar}         acaoInativar={acaoInativar}
         usaReativar={usaReativar}         acaoReativar={acaoReativar}
+        cardPrimaryFields={cardPrimaryFields}
+        cardSecondaryFields={cardSecondaryFields}
         _embutido
       />
 

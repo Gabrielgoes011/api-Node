@@ -16,7 +16,7 @@
     "react-toastify": "^11.0.5"
   },
   "scripts": {
-    "dev": "vite --mode development",
+    "dev": "vite --mode development --host",
     "demo": "vite --mode demo",
     "build": "vite build --mode production",
     "preview": "vite preview",

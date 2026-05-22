@@ -301,6 +301,8 @@ export default function PaginaRendimentos() {
               itemsPerPage={10}
               usaExcluir
               acaoExcluir={abrirModalExclusao}
+              cardPrimaryFields={['dtRendimento', 'ticker']}
+              cardSecondaryFields={['valorRecebido', 'nomeSeguimento']}
             />
           )}
 

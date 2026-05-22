@@ -199,6 +199,8 @@ export default function PaginaOperacoes() {
           itemsPerPage={10}
           usaExcluir
           acaoExcluir={abrirModalExclusao}
+          cardPrimaryFields={['data', 'operacao']}
+          cardSecondaryFields={['ativo', 'qtde', 'valorTotal']}
         />
 
       </main>

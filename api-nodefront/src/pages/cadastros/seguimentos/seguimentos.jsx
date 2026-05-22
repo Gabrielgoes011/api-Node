@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { TableAcoes } from '../../../components/TableAcoes';
+import ResponsiveTable from '../../../components/ResponsiveTable/ResponsiveTable';
 import { useSeguimentos } from '../../../hooks/hooksCadastros/useSeguimentos';
 import ModalConfirmacao from '../../../components/ModalDeConfirmacao/ModalConfirmacao';
 import SkeletonTable from '../../../components/SkeletonTable/SkeletonTable';
@@ -104,7 +104,7 @@ function PaginaSeguimentos() {
               Nenhum seguimento encontrado.
             </div>
           ) : (
-            <TableAcoes
+            <ResponsiveTable
               coluna={colunasSeguimentos}
               data={seguimentos}
               itemsPerPage={10}
@@ -124,6 +124,8 @@ function PaginaSeguimentos() {
               tamanhoIcones="fs-5"
               tamanhoFontBody="14px"
               tamanhoFontHead="14px"
+              cardPrimaryFields={['nome']}
+              cardSecondaryFields={['description']}
             />
           )}
         </section>

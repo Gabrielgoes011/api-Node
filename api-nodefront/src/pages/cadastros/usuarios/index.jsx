@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { TableAcoes } from '../../../components/TableAcoes';
+import ResponsiveTable from '../../../components/ResponsiveTable/ResponsiveTable';
 import { useUsuarios } from '../../../hooks/hooksCadastros/useUsuarios';
 import ModalFormulario from '../../../components/ModalFormulario/ModalFormulario';
 import ModalConfirmacao from '../../../components/ModalDeConfirmacao/ModalConfirmacao';
@@ -152,7 +152,7 @@ function PaginaUsuarios() {
               Nenhum usuário encontrado.
             </div>
           ) : (
-            <TableAcoes
+            <ResponsiveTable
               coluna={colunasUsuarios}
               data={users}
               itemsPerPage={10}
@@ -173,6 +173,8 @@ function PaginaUsuarios() {
               tamanhoIcones="fs-5"
               tamanhoFontBody="14px"
               tamanhoFontHead="14px"
+              cardPrimaryFields={['nome', 'email']}
+              cardSecondaryFields={['idade', 'cpf']}
             />
           )}
 

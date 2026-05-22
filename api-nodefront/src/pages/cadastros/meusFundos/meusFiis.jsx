@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { TableAcoes } from '../../../components/TableAcoes';
+import ResponsiveTable from '../../../components/ResponsiveTable/ResponsiveTable';
 import { useMeusFiis } from '../../../hooks/hooksCadastros/useMeusFiis';
 import ModalConfirmacao from '../../../components/ModalDeConfirmacao/ModalConfirmacao';
 import SkeletonTable from '../../../components/SkeletonTable/SkeletonTable';
@@ -120,7 +120,7 @@ function PaginaMeusFiis() {
               Nenhum fundo encontrado.
             </div>
           ) : (
-            <TableAcoes
+            <ResponsiveTable
               coluna={colunasFiis}
               data={fiis || []}
               itemsPerPage={10}
@@ -129,6 +129,8 @@ function PaginaMeusFiis() {
               acaoEditar={handleEdit}
               usaExcluir={true}
               acaoExcluir={(item) => handleOpenModal(item, 'delete')}
+              cardPrimaryFields={['ticker', 'nomeFundo']}
+              cardSecondaryFields={['cnpj', 'nomeSeguimento']}
             />
           )}
         </section>
