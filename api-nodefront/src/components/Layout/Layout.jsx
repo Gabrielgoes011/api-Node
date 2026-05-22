@@ -5,7 +5,7 @@ import TopBar from '../TopBar/TopBar';
 import useBreakpoint from '../../hooks/useBreakpoint';
 
 function Layout({ children, onLogout }) {
-  const { isMobile } = useBreakpoint();
+  const { isMobile, isTablet, isDesktop } = useBreakpoint();
   const location = useLocation();
 
   // On mobile the sidebar starts closed (Req 2.2); on desktop it starts open.
@@ -17,6 +17,13 @@ function Layout({ children, onLogout }) {
       setSidebarOpen(false);
     }
   }, [isMobile]);
+
+  // Close sidebar on route change when mobile (Req 2.8).
+  useEffect(() => {
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname, isMobile]);
 
   const toggleSidebar = () => setSidebarOpen(prev => !prev);
 
@@ -47,7 +54,7 @@ function Layout({ children, onLogout }) {
         paddingTop: '60px',
       }}>
         <div style={{
-          padding: isMobile ? '16px' : '24px',
+          padding: isMobile ? '16px' : isTablet ? '20px' : '24px',
           maxWidth: '1400px',
           margin: '0 auto',
         }}>
