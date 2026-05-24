@@ -10,7 +10,7 @@ export const usuariosService = {
   },
   criar: async (usuarioData) => {
     try {
-      const res = await api.post('/cadUsers', usuarioData);
+      const res = await api.post('/usuario/cadastrar', usuarioData);
       return res.data;
     } catch (error) { throw error; }
   },

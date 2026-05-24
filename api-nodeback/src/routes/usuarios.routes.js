@@ -17,7 +17,11 @@ router.get('/users', verificaJWT, listarUsuarios);
 
 
 router.get('/users/dash/count', verificaJWT, contarUsuarios);
-router.post('/cadUsers', verificaJWT, cadastrarUser);
+
+// Rota para cadastrar usuário
+router.post('/usuario/cadastrar', verificaJWT, cadastrarUser);
+//body: { nome, email, password, cpf  }
+
 router.put('/inativaUser/:id', verificaJWT, inativaReativaUser);
 router.put('/users/update/:id', verificaJWT, atualizarUser);
 router.delete('/users/delete/:id', verificaJWT, deleteUser);

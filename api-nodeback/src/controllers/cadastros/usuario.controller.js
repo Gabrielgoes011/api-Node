@@ -3,12 +3,9 @@ import { validaEmailExistente } from '../../utils/validaUser.js';
 import apiResponse from '../../utils/httpResponse.js';
 import {
   listarUsuariosService,
+  cadastrarUserService
 } from "../../services/cadastros/usuarios.services.js";
 
-
-// ─────────────────────────────────────────────
-// FUNÇÕES AUXILIARES
-// ─────────────────────────────────────────────
 
 // Função para converter data de DD/MM/AAAA para YYYY-MM-DD
 function converterDataParaPostgres(dataString) {
@@ -18,11 +15,6 @@ function converterDataParaPostgres(dataString) {
   const [dia, mes, ano] = partes;
   return `${ano}-${mes}-${dia}`;
 }
-
-// ─────────────────────────────────────────────
-// FUNÇÕES AUXILIARES
-// ─────────────────────────────────────────────
-
 //#region função buscaUserId - busca usuario pelo id
 export async function buscaUserId(id, db) {
   try {
@@ -97,88 +89,20 @@ export async function contarUsuarios(req, res) {
 
 //#region Função para cadastrar usuarios
 export async function cadastrarUser(req, res) {
-  const user = req.body;
-  const db = await openDb();
-
-  if (!user.nome || !user.dataNascimento || !user.email || !user.cpf) {
-    return res.status(400).json({ error: 'Insira todos os campos obrigatorios !' });
-  }
-  if (!user.nome.trim().includes(' ')) {
-    return res.status(400).json({ error: 'Insira o nome e sobrenome!' });
-  }
-  if (user.cpf.length != 11) {
-    return res.status(400).json({ error: 'CPF deve conter 11 digitos !' });
-  }
-  if (!user.email.includes('@') || !user.email.includes('.')) {
-    return res.status(400).json({ error: 'Email inválido !' });
-  }
-
-  const existeEmail = await db.query(`
-      SELECT id 
-      FROM usuarios
-      WHERE email = $1 `, [user.email]
-  );
-  if (existeEmail.rows.length > 0) {
-    return res.status(400).json({ error: 'Email ja cadastrado!' });
-  }
-
-  const existeCpf = await db.query(`
-      SELECT id
-      FROM usuarios
-      WHERE cpf = $1 `, [user.cpf]
-  );
-  if (existeCpf.rows.length > 0) {
-    return res.status(400).json({ error: 'CPF já cadastrado !' });
-  }
-
-  //if (user.senha !== user.confirmaSenha) {
-  //  return res.status(400).json({ error: 'As senhas não coincidem !' });
-  //}
-  //if (user.senha.length < 8) {
-  //  return res.status(400).json({ error: 'A senha deve ter no mínimo 8 caracteres !' });
-  //}
-  //if (!/[A-Z]/.test(user.senha)) {
-  //  return res.status(400).json({ error: 'A senha deve conter pelo menos uma letra maiúscula !' });
-  //}
-
-  // Converte DD/MM/AAAA → AAAA-MM-DD (padrão PostgreSQL)
-  const [dia, mes, ano] = user.dataNascimento.split('/');
-  const dataFormatada = `${ano}-${mes}-${dia}`;
-
-
+  //recebe os dados do corpo da requisição
+  const dados = req.body;
+  //chama a função do serviço para cadastrar o usuário
   try {
-    const senhaPura = user.senha;
-    await db.query('BEGIN TRANSACTION');
-
-    const insertUser = await db.query(`
-        INSERT INTO usuarios
-           (nome, "dataNascimento", email, cpf)
-        VALUES 
-          ($1, $2, LOWER($3), $4)
-        RETURNING id`,
-      [user.nome, dataFormatada, user.email, user.cpf]
+    const cadastrarUser = await cadastrarUserService(dados);
+    // Retorna os resultados da consulta em formato JSON
+    apiResponse.success(res,
+      'Usuário cadastrado com sucesso!', cadastrarUser, 201, true
     );
-
-    //novoUserId é o id do usuário recém-criado, que é necessário para inserir a senha na tabela TabUserCred
-    const newUserId = insertUser.rows[0].id;
-
-    // Insere a senha padrão na tabela credenciaisUsuario associada ao novo usuário
-    await db.query(`
-        INSERT INTO "credenciaisUsuario"
-          ( "password", "idUser")
-        VALUES 
-          ('Padrão123', $1)`,
-      [newUserId]
-    );
-    await db.query('COMMIT');
-    return res.status(201).json({ message: 'Usuário cadastrado com sucesso! ' });
-
   } catch (error) {
-
-    await db.query('ROLLBACK');
-    console.error('Erro ao inserir o usuário:', error);
-
-    return res.status(500).json({ error: 'Erro ao inserir o usuário.', errorDetails: error.message });
+    // Log do erro para depuração
+    console.error('Erro ao cadastrar usuário:', error);
+    // Retorna a mensagem detalhada do erro
+    return apiResponse.error(res, error.message);
   }
 }
 //#endregion
