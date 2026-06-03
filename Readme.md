@@ -28,6 +28,7 @@ api-Node/
 | jsonwebtoken | ^9.0.3 | Autenticação JWT |
 | multer | ^2.1.1 | Upload de arquivos |
 | @aws-sdk/client-s3 | ^3.x | Armazenamento S3 (AWS) |
+| bcrypt | ^5.x | Hash de senhas |
 | dotenv | ^17.x | Variáveis de ambiente |
 | uuid | ^13.x | Geração de IDs únicos |
 | nodemon | ^3.x | Hot-reload em desenvolvimento |
@@ -82,7 +83,7 @@ Authorization: Bearer <token>
 |---|---|---|
 | GET | `/users` | Lista usuários filtrando por `status=on` ou `status=off` |
 | GET | `/users/dash/count` | Conta total de usuários |
-| POST | `/cadUsers` | Cadastra novo usuário |
+| POST | `/usuario/cadastrar` | Cadastra novo usuário (senha padrão com hash bcrypt) |
 | PUT | `/users/update/:id` | Atualiza dados do usuário |
 | PUT | `/inativaUser/:id` | Inativa ou reativa usuário |
 | DELETE | `/users/delete/:id` | Remove usuário |
@@ -144,6 +145,10 @@ O servidor sobe em `http://localhost:3000`.
 - A rota de edição de fundo foi padronizada para `PUT /meusFundos/editar/:id` e atualiza somente `nomeFundo`.
 - O frontend `meusFiisService.atualizar` consome esse endpoint com `PUT /meusFundos/editar/${id}`.
 - O modal de edição no frontend passa a exibir apenas o campo `Nome do Fundo` quando `onEdit` está ativo.
+- Módulo de usuários migrado para `Controller → Service → Repository`.
+- Rota de cadastro de usuário alterada de `POST /cadUsers` para `POST /usuario/cadastrar`.
+- Senha padrão do novo usuário (`Track@123`) agora é armazenada com hash `bcrypt` (10 rounds) — texto puro removido do banco.
+- `bcrypt` adicionado como dependência do backend.
 
 ---
 
@@ -233,7 +238,7 @@ Problemas e melhorias identificadas diretamente no código atual.
 
 ### 🔐 Login (`login.controller.js`)
 
-- [ ] **Senha em texto puro** — a comparação de senha usa texto puro. Implementar hash com `bcrypt` (`bcrypt.compare`). O comentário no código já indica: *"troque por bcrypt quando implementar hash"*
+- [ ] **Senha em texto puro** — a comparação de senha no login ainda usa texto puro. Implementar `bcrypt.compare` para validar o hash. Pendente após a migração das senhas existentes no banco
 
 ---
 
@@ -241,8 +246,8 @@ Problemas e melhorias identificadas diretamente no código atual.
 
 - [ ] **Tabela errada no `atualizarUser`** — a query de UPDATE referencia `dbo."tabUser"` (nome antigo do SQLite) em vez da tabela correta `usuarios` do PostgreSQL. A função está quebrando em produção para edições de usuário
 - [ ] **Tabela errada no `validaUser.js`** — a função `validaEmailExistente` também aponta para `dbo."tabUser"`. Precisa apontar para `usuarios`
-- [ ] **Senha padrão hardcoded** — ao cadastrar um novo usuário, a senha é inserida como `'Padrão123'` fixo no código. Implementar geração de senha temporária ou receber a senha pelo body do cadastro
-- [ ] **Validações de senha comentadas** — as validações de confirmação de senha, tamanho mínimo (8 chars) e letra maiúscula estão comentadas no `cadastrarUser`. Reativar após implementar o `bcrypt`
+- [x] **Senha padrão com hash** — ao cadastrar um novo usuário, a senha padrão `Track@123` é gerada e armazenada com hash `bcrypt` (10 rounds). O módulo foi migrado para a arquitetura `Controller → Service → Repository`
+- [ ] **Validações de senha comentadas** — as validações de confirmação de senha, tamanho mínimo (8 chars) e letra maiúscula estão comentadas. Reativar quando o fluxo de definição de senha pelo usuário for implementado
 - [ ] **CPF sem validação real** — o cadastro só valida se o CPF tem 11 dígitos. Não há validação dos dígitos verificadores
 
 ---

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { AiOutlinePlus, AiOutlineDelete, AiOutlineBarChart, AiOutlineAreaChart } from 'react-icons/ai';
+import { AiOutlineBarChart, AiOutlineAreaChart } from 'react-icons/ai';
 import NovaOperacaoModal from './components/modalNovaOperacao';
 import { BarChart, AreaChart } from '../../components/Charts';
 import { useOperacoes } from '../../hooks/hooksOperacoes/useOperacoes';
 import { DataCard } from '../../components/DataCard';
+import SlideModal from '../../components/SlideModal/SlideModal';
+import { FiAlertTriangle } from 'react-icons/fi';
 
 const CHART_KEYS   = ['Compra', 'Venda', 'Liquido'];
 const CHART_COLORS = {
@@ -210,41 +212,78 @@ export default function PaginaOperacoes() {
       />
       
       {/* Modal de Confirmação de Exclusão */}
-      {modalExclusaoAberto && operacaoParaExcluir && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0, 0, 0, 0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999, backdropFilter: 'blur(2px)' }}>
-          <div style={{ backgroundColor: '#1e293b', border: '1px solid #334155', padding: '2rem', borderRadius: '16px', boxShadow: '0 24px 60px rgba(0,0,0,0.6)', width: '100%', maxWidth: '400px', fontFamily: 'sans-serif' }}>
-            <h3 style={{ margin: '0 0 15px 0', color: '#f8fafc', fontSize: '1.1rem', textAlign: 'center', fontWeight: 700 }}>Excluir Operação</h3>
-            <p style={{ margin: '0 0 20px 0', color: '#94a3b8', fontSize: '14px', textAlign: 'center' }}>
-              Tem certeza que deseja excluir essa operação?
-            </p>
-            
-            <div style={{ backgroundColor: 'rgba(255,255,255,0.04)', padding: '15px', borderRadius: '8px', marginBottom: '25px', border: '1px solid #334155' }}>
-              <p style={{ margin: '0 0 8px 0', color: '#cbd5e1' }}><strong style={{ color: '#94a3b8' }}>Ativo:</strong> {operacaoParaExcluir.ativo}</p>
-              <p style={{ margin: '0 0 8px 0', color: '#cbd5e1' }}><strong style={{ color: '#94a3b8' }}>Quantidade:</strong> {operacaoParaExcluir.qtde}</p>
-              <p style={{ margin: 0, color: '#cbd5e1' }}><strong style={{ color: '#94a3b8' }}>Total:</strong> {fmt(operacaoParaExcluir.qtde * operacaoParaExcluir.preco)}</p>
+      <SlideModal
+        isOpen={modalExclusaoAberto && !!operacaoParaExcluir}
+        onClose={() => { setModalExclusaoAberto(false); setOperacaoParaExcluir(null); }}
+        title="Excluir Operação"
+        width="400px"
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', paddingTop: '4px' }}>
+          {/* Ícone */}
+          <div style={{
+            width: '52px', height: '52px', borderRadius: '50%',
+            background: 'rgba(192,57,43,0.15)',
+            border: '1px solid rgba(192,57,43,0.3)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <FiAlertTriangle size={22} color="#e74c3c" />
+          </div>
+
+          <p style={{ fontSize: '13px', color: '#8a9bb5', textAlign: 'center', lineHeight: 1.65, margin: 0 }}>
+            Tem certeza que deseja excluir essa operação? Esta ação não pode ser desfeita.
+          </p>
+
+          {operacaoParaExcluir && (
+            <div style={{
+              width: '100%', padding: '12px 16px',
+              background: '#0d1520', border: '1px solid #1e2d3d',
+              borderRadius: '10px', display: 'flex', flexDirection: 'column', gap: '6px',
+            }}>
+              {[
+                ['Ativo',      operacaoParaExcluir.ativo],
+                ['Quantidade', operacaoParaExcluir.qtde],
+                ['Total',      fmt(operacaoParaExcluir.qtde * operacaoParaExcluir.preco)],
+              ].map(([k, v]) => (
+                <div key={k} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
+                  <span style={{ color: '#4e6480' }}>{k}</span>
+                  <span style={{ color: '#cdd8e8', fontWeight: 600 }}>{v}</span>
+                </div>
+              ))}
             </div>
-            
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button
-                onClick={() => { setModalExclusaoAberto(false); setOperacaoParaExcluir(null); }}
-                style={{ flex: 1, padding: '10px', background: 'transparent', color: '#94a3b8', border: '1px solid #334155', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px', transition: 'all 0.15s' }}
-                onMouseEnter={(e) => { e.target.style.borderColor = '#475569'; e.target.style.color = '#f8fafc'; }}
-                onMouseLeave={(e) => { e.target.style.borderColor = '#334155'; e.target.style.color = '#94a3b8'; }}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmarExclusao}
-                style={{ flex: 1, padding: '10px', background: 'linear-gradient(135deg, #ef4444, #dc2626)', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px', boxShadow: '0 4px 16px rgba(239,68,68,0.3)', transition: 'all 0.15s' }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.filter = 'brightness(1.1)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.filter = 'none'; }}
-              >
-                Excluir
-              </button>
-            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: '8px', width: '100%', paddingTop: '4px' }}>
+            <button
+              onClick={() => { setModalExclusaoAberto(false); setOperacaoParaExcluir(null); }}
+              style={{
+                flex: 1, padding: '9px', background: 'transparent',
+                border: '1px solid #243040', color: '#7a8fa8',
+                borderRadius: '8px', fontWeight: 600, fontSize: '13px',
+                cursor: 'pointer', transition: 'all 0.15s',
+              }}
+              onMouseOver={e => { e.currentTarget.style.borderColor = '#334d66'; e.currentTarget.style.color = '#cdd8e8'; }}
+              onMouseOut={e => { e.currentTarget.style.borderColor = '#243040'; e.currentTarget.style.color = '#7a8fa8'; }}
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={confirmarExclusao}
+              style={{
+                flex: 1, padding: '9px',
+                background: '#c0392b', border: '1px solid #c0392b',
+                color: '#fff', borderRadius: '8px',
+                fontWeight: 600, fontSize: '13px',
+                boxShadow: '0 2px 8px rgba(192,57,43,0.35)',
+                cursor: 'pointer', transition: 'all 0.15s',
+              }}
+              onMouseOver={e => { e.currentTarget.style.background = '#e74c3c'; e.currentTarget.style.borderColor = '#e74c3c'; }}
+              onMouseOut={e => { e.currentTarget.style.background = '#c0392b'; e.currentTarget.style.borderColor = '#c0392b'; }}
+            >
+              Excluir
+            </button>
           </div>
         </div>
-      )}
+      </SlideModal>
 
     </div>
   );
