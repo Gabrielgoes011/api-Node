@@ -2,7 +2,7 @@ import { openDb } from "../config/configDb.js";
 
 
 //#region => Query para listar os dados do card
-async function getCardsHome(req, res) {
+async function getCardsHome() {
 
     //abre conexão com o banco de dados
     const db = await openDb();
