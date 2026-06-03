@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FiTrendingUp, FiBarChart2, FiPieChart, FiArrowUpRight } from 'react-icons/fi';
 import { FaWallet, FaExchangeAlt, FaChartLine } from 'react-icons/fa';
+import { useHomeCards } from '../../hooks/useHomeCards';
 
-const cards = [
+const cardsTemplate = [
   {
     icon: FaWallet,
     iconColor: '#10b981',
@@ -12,6 +14,8 @@ const cards = [
     tag: 'Ativos',
     tagColor: '#10b981',
     tagBg: 'rgba(16,185,129,0.1)',
+    route: '/controle-ativos',
+    dataKey: 'fundos',
   },
   {
     icon: FaChartLine,
@@ -22,6 +26,7 @@ const cards = [
     tag: 'Mensal',
     tagColor: '#06b6d4',
     tagBg: 'rgba(6,182,212,0.1)',
+    route: '/rendimentos',
   },
   {
     icon: FaExchangeAlt,
@@ -32,16 +37,41 @@ const cards = [
     tag: 'Histórico',
     tagColor: '#8b5cf6',
     tagBg: 'rgba(139,92,246,0.1)',
+    route: '/operacoes',
+    dataKey: 'operacoes',
   },
 ];
 
-const stats = [
+const statsTemplate = [
   { icon: FiTrendingUp, label: 'Rendimento Médio', value: '+12,4%', color: '#10b981', bg: 'rgba(16,185,129,0.1)' },
-  { icon: FiBarChart2,  label: 'Operações',         value: '248',    color: '#06b6d4', bg: 'rgba(6,182,212,0.1)' },
-  { icon: FiPieChart,   label: 'Fundos na Carteira', value: '32',     color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)' },
+  { icon: FiBarChart2,  label: 'Operações',         color: '#06b6d4', bg: 'rgba(6,182,212,0.1)', dataKey: 'operacoes' },
+  { icon: FiPieChart,   label: 'Fundos na Carteira', color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)', dataKey: 'fundos' },
 ];
 
 function PaginaDashboard() {
+  const navigate = useNavigate();
+  const { cards, loading, error } = useHomeCards();
+
+  // Atualizar os stats com os dados reais da API
+  const stats = statsTemplate.map(stat => {
+    if (stat.dataKey && cards) {
+      return {
+        ...stat,
+        value: cards[stat.dataKey]?.toString() || '0'
+      };
+    }
+    return stat;
+  });
+
+  // Função para obter o subtítulo com contagem
+  const getSubtitleWithCount = (card) => {
+    if (card.dataKey && cards) {
+      const count = cards[card.dataKey] || 0;
+      return `${card.desc} (${count} item${count !== 1 ? 's' : ''})`;
+    }
+    return card.desc;
+  };
+
   return (
     <div>
       {/* ── Header ── */}
@@ -110,7 +140,7 @@ function PaginaDashboard() {
                   {s.label}
                 </div>
                 <div style={{ fontSize: '1.4rem', fontWeight: 800, color: s.color }}>
-                  {s.value}
+                  {loading ? '...' : (s.value || '0')}
                 </div>
               </div>
             </div>
@@ -118,23 +148,39 @@ function PaginaDashboard() {
         })}
       </div>
 
+      {/* ── Mensagem de erro (se houver) ── */}
+      {error && (
+        <div style={{
+          background: '#7f1d1d',
+          border: '1px solid #dc2626',
+          borderRadius: '8px',
+          padding: '12px 16px',
+          marginBottom: '2rem',
+          color: '#fca5a5',
+          fontSize: '14px',
+        }}>
+          Erro ao carregar dados: {error}
+        </div>
+      )}
+
       {/* ── Cards de navegação ── */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
         gap: '16px',
       }}>
-        {cards.map((c) => {
+        {cardsTemplate.map((c) => {
           const Icon = c.icon;
           return (
             <div
               key={c.title}
+              onClick={() => c.route && navigate(c.route)}
               style={{
                 background: '#0f172a',
                 border: '1px solid #1e293b',
                 borderRadius: '14px',
                 padding: '1.5rem',
-                cursor: 'default',
+                cursor: 'pointer',
                 transition: 'border-color 0.2s, transform 0.2s, box-shadow 0.2s',
                 position: 'relative',
                 overflow: 'hidden',
@@ -179,7 +225,7 @@ function PaginaDashboard() {
                 {c.title}
               </h3>
               <p style={{ fontSize: '13px', color: '#64748b', margin: 0, lineHeight: 1.5 }}>
-                {c.desc}
+                {loading ? 'Carregando...' : getSubtitleWithCount(c)}
               </p>
 
               <div style={{

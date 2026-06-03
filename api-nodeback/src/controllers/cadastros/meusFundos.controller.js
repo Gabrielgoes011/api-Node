@@ -11,6 +11,7 @@ import apiResponse from '../../utils/httpResponse.js';
 
 //#region => cadastrar meus fundos
 async function cadastrarFundos(req, res) {
+  
   //recebe os dados do corpo da requisição
   const dados = req.body;
 
