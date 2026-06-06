@@ -15,7 +15,6 @@ import {
 // Rotas para usuários
 router.get('/users', verificaJWT, listarUsuarios);
 
-
 router.get('/users/dash/count', verificaJWT, contarUsuarios);
 
 // Rota para cadastrar usuário

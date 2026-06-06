@@ -1,10 +1,10 @@
 import express from 'express';
 const router = express.Router();
 
-import { login } from '../../controllers/login.controller.js';
+import { loginController } from '../../controllers/login.controller.js';
 
 //rota de login
-router.post('/auth/login', login);
+router.post('/auth/login', loginController);
 //header 
 
 export default router;

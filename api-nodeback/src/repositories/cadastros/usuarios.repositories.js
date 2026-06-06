@@ -53,7 +53,7 @@ async function checkCpfRepository(cpf) {
   return resultadoCpf.rows.length > 0;
 }
 
-//3º passo: se o email e cpf não existirem, cadastra o usuário
+//3º passo: Cadastra o  usuarui se o email e cpf não existirem
 async function cadastrarUserRepository(dados) {
 
   //abre a conexão com o banco de dados
@@ -103,10 +103,45 @@ async function cadastrarUserRepository(dados) {
 }
 //#endregion
 
+//#Region => querys para Contar user
+async function countUserRepository() {
+
+  //abre a conexão com o banco de dados
+  const db = await openDb();
+
+  //Executa a consulta SQL para listar os usuários
+    const resultadoAtivo = await db.query(`
+        SELECT COUNT(id) AS totalUsers
+        FROM usuarios
+        WHERE ativo = true
+    `);
+
+    const resultadoInativo = await db.query(`
+        SELECT COUNT(id) AS totalUsers
+        FROM usuarios
+        WHERE ativo = false
+
+    `);
+    const resultadoTotal = await db.query(`
+        SELECT COUNT(id) AS totalUsers
+        FROM usuarios
+    `);
+
+  //retorna os resultados da consulta
+  return {
+     ativos: resultadoAtivo.rows[0].totalusers,
+     inativos: resultadoInativo.rows[0].totalusers, 
+     total: resultadoTotal.rows[0].totalusers
+    };
+}
+
+//#endregion
+
 export {
   listarUsuariosRepository,
   checkEmailRepository,
   checkCpfRepository,
-  cadastrarUserRepository
+  cadastrarUserRepository,
+  countUserRepository
 }
 

@@ -1,76 +1,32 @@
 import jwt from 'jsonwebtoken';
 import { openDb } from '../config/configDb.js';
+import { autenticarUsuario } from '../services/login.services.js';
 
-//#region Login
-async function login(req, res) {
+//#region => Lógica para login
+export async function loginController(req, res) {
   try {
-
-    //passa body
-    const {
-      email,
-      password
-    } = req.body;
-
-    // Validação básica dos campos
+    const { email, password } = req.body;
+    
+    // Valida campos
     if (!email || !password) {
       return res.status(400).json({ erro: 'E-mail e senha são obrigatórios.' });
     }
-
-    const db = await openDb();
-
-    // Busca o usuário e suas credenciais pelo e-mail
-    const dadosUsuario = await db.query(
-      `SELECT 
-        a.id, a.nome, a.email, b.password, a.ativo
-       FROM usuarios a INNER JOIN "credenciaisUsuario" b 
-       ON a.id = b."idUser"
-       WHERE LOWER(a.email) = LOWER($1)`,
-      [email]
-    );
-
-    // Usuário não encontrado
-    if (dadosUsuario.rows.length === 0) {
-      return res.status(401).json({ erro: 'E-mail ou senha inválidos.' });
-    }
-
-    //
-    const usuario = dadosUsuario.rows[0];
-
-    // Verifica se o usuário está ativo
-    if (usuario.ativo === false) {
-      return res.status(403).json({ erro: 'Usuário inativo. Entre em contato com o administrador.' });
-    }
-
-    // Compara a senha (texto puro — troque por bcrypt quando implementar hash)
-    if (password !== usuario.password) {
-      return res.status(401).json({ erro: 'E-mail ou senha inválidos.' });
-    }
-
-    // Gera o token JWT com os dados do usuário
-    const token = jwt.sign(
-      {
-        id: usuario.id,
-        nome: usuario.nome,
-        email: usuario.email,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
-
-    // Retorna o token e os dados públicos do usuário
+    
+    // Chama service para autenticar
+    const resultado = await autenticarUsuario(email, password);
+    
+    // Retorna resposta HTTP com token e dados do usuário
     return res.status(200).json({
-      token,
-      usuario: {
-        id: usuario.id,
-        nome: usuario.nome,
-        email: usuario.email,
-      },
+      message: 'Login bem-sucedido!',
+      token: resultado.token,
+      usuario: resultado.usuario
     });
 
   } catch (error) {
-    return res.status(500).json({ erro: 'Erro ao realizar login.', detalhes: error.message });
+    // Em caso de erro, captura e retorna resposta adequada
+    return res.status(401).json({ 
+      erro: error.message 
+    });
   }
 }
 //#endregion
-
-export { login };

@@ -1,38 +1,16 @@
 import { openDb } from "../../config/configDb.js";
 import { validaEmailExistente } from '../../utils/validaUser.js';
+import { converterDataParaPostgres } from '../../utils/dateUtils.js';
 import apiResponse from '../../utils/httpResponse.js';
 import {
   listarUsuariosService,
-  cadastrarUserService
+  cadastrarUserService,
+  countUserService
 } from "../../services/cadastros/usuarios.services.js";
 
 
-// Função para converter data de DD/MM/AAAA para YYYY-MM-DD
-function converterDataParaPostgres(dataString) {
-  if (!dataString) return null;
-  const partes = dataString.split('/');
-  if (partes.length !== 3) return null;
-  const [dia, mes, ano] = partes;
-  return `${ano}-${mes}-${dia}`;
-}
-//#region função buscaUserId - busca usuario pelo id
-export async function buscaUserId(id, db) {
-  try {
-    const resultado = await db.query(
-      `SELECT id, nome
-       FROM usuarios
-       WHERE id = $1 `, [id]
-    );
-    return resultado.rows[0];
-  } catch (error) {
-    console.error('Erro ao buscar o usuário pelo ID:', error);
-    throw error;
-  }
-}
-//#endregion
-
 //#region função listarUsuarios - lista usuarios (ativos/inativos)
-export async function listarUsuarios(req, res) {
+ async function listarUsuarios(req, res) {
   try {
 
     //verifica se o valor do parâmetro "status" é válido
@@ -54,41 +32,32 @@ export async function listarUsuarios(req, res) {
 //#endregion
 
 //#region função de contagem - contar usuarios - dashboard
-export async function contarUsuarios(req, res) {
-  const db = await openDb();
+ async function contarUsuarios(req, res) {
+
   try {
-    const resultadoAtivo = await db.query(`
-        SELECT COUNT(id) AS totalUsers
-        FROM usuarios
-        WHERE ativo = true
-    `);
 
-    const resultadoInativo = await db.query(`
-        SELECT COUNT(id) AS totalUsers
-        FROM usuarios
-        WHERE ativo = false
+    //chama a função do serviço para contar os usuários
+    const countUser = await countUserService();
 
-    `);
-    const resultadoTotal = await db.query(`
-        SELECT COUNT(id) AS totalUsers
-        FROM usuarios
-    `);
-
-    // Retorna a contagem de usuários ativos, inativos e total
-    res.status(200).json({
-      ativos: resultadoAtivo.rows[0].totalusers,
-      inativos: resultadoInativo.rows[0].totalusers,
-      total: resultadoTotal.rows[0].totalusers
-    });
-  } catch (error) {
+    // Retorna os resultados da consulta em formato JSON
+    apiResponse.success(res,
+      'Contagem de usuários realizada com sucesso!', countUser, 200, true
+    );
+  }
+  catch (error) {
+    
+    // Log do erro para depuração
     console.error('Erro ao contar usuários:', error);
-    res.status(500).json({ error: 'Erro ao contar usuários.' });
+
+    // Retorna a mensagem detalhada do erro
+    apiResponse.error(res,
+      error.message || 'Erro ao contar usuários', 500);
   }
 }
 //#endregion
 
 //#region Função para cadastrar usuarios
-export async function cadastrarUser(req, res) {
+async function cadastrarUser(req, res) {
   //recebe os dados do corpo da requisição
   const dados = req.body;
   //chama a função do serviço para cadastrar o usuário
@@ -106,6 +75,8 @@ export async function cadastrarUser(req, res) {
   }
 }
 //#endregion
+
+//NÂO MIGRADO ABAIXO - AINDA FALTA MIGRAR PARA SERVICE E REPOSITORY
 
 //#region PUT - atualizar usuario
 export async function atualizarUser(req, res) {
@@ -249,4 +220,15 @@ export async function deleteUser(req, res) {
   }
 }
 //#endregion
+
+
+export {
+  listarUsuarios,
+  cadastrarUser,
+  contarUsuarios
+  //atualizarUser,
+  //inativaReativaUser,
+  //deleteUser
+}
+
 

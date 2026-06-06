@@ -31,7 +31,7 @@ function Login({ onLogin }) {
       onLogin(true);
       setTimeout(() => navigate('/'), 800);
     } catch (error) {
-      handleError(error, 'Erro ao realizar login.');
+      handleError(error);
     } finally {
       setLoading(false);
     }

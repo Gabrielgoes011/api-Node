@@ -47,6 +47,24 @@ function PaginaUsuarios() {
     getDashboard();
   }, [getUsers, getDashboard]);
 
+  // Interceptador para aplicar a máscara de data no momento da digitação
+  const handleSetFormDataMask = (updater) => {
+    setFormData((prev) => {
+      // Pega o estado novo independentemente de ser passado via callback ou objeto
+      const newData = typeof updater === 'function' ? updater(prev) : { ...updater };
+      
+      // Aplica a máscara se o campo de data de nascimento estiver sendo alterado
+      if (newData.dataNascimento !== undefined) {
+        let v = newData.dataNascimento.replace(/\D/g, ''); // Remove tudo que não for número
+        if (v.length > 8) v = v.slice(0, 8); // Limita em 8 dígitos
+        if (v.length > 4) newData.dataNascimento = `${v.slice(0, 2)}/${v.slice(2, 4)}/${v.slice(4)}`;
+        else if (v.length > 2) newData.dataNascimento = `${v.slice(0, 2)}/${v.slice(2)}`;
+        else newData.dataNascimento = v;
+      }
+      return newData;
+    });
+  };
+
   // Handler para o submit do formulário
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -188,7 +206,7 @@ function PaginaUsuarios() {
             onSubmit={handleSubmit}
             isEditing={!!onEdit}
             formData={formData}
-            setFormData={setFormData}
+            setFormData={handleSetFormDataMask}
           />
         )}
 

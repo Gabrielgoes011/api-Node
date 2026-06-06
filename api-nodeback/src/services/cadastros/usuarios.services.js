@@ -3,7 +3,8 @@ import {
   listarUsuariosRepository,
   checkEmailRepository,
   checkCpfRepository,
-  cadastrarUserRepository
+  cadastrarUserRepository,
+  countUserRepository
 } from "../../repositories/cadastros/usuarios.repositories.js";
 
 //  #region => Service para listar os usuários cadastrados
@@ -105,8 +106,20 @@ async function cadastrarUserService(dados) {
 
 //#endregion
 
+//#region => Service para contar usuários - dashboard
+async function countUserService() {
+
+  //chama a função do repositório para contar os usuários
+  const countUser = await countUserRepository();
+
+  //retorna o resultado
+  return countUser;
+}
+//#endregion
 
 export {
   listarUsuariosService,
-  cadastrarUserService
+  cadastrarUserService,
+  countUserService
 }
+
