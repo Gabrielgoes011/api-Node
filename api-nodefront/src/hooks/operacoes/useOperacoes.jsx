@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { toastSuccess, handleError } from '../../utils/responseUtils';
-import { operacoesService } from '../../services/servOperacoes/operacoesService';
+import { operacoesService } from '../../services/operacoes/operacoesService';
 
 const MONTH_NAMES = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',

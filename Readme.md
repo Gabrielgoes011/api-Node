@@ -10,7 +10,7 @@ Aplicação fullstack para controle e acompanhamento de carteira de Fundos de In
 
 ```
 api-Node/
-├── api-nodeback/   # API REST — Node.js + Express + SQLite
+├── api-nodeback/   # API REST — Node.js + Express + PostgreSQL
 └── api-nodefront/  # SPA — React + Vite + Tailwind CSS
 ```
 
@@ -29,7 +29,6 @@ api-Node/
 | bcrypt | ^6.0.0 | Hash de senhas |
 | multer | ^2.1.1 | Upload de arquivos |
 | @aws-sdk/client-s3 | ^3.x | Armazenamento S3 (AWS) |
-| sqlite / sqlite3 | ^5.1.1 / ^5.1.7 | Legado (não utilizado) |
 | dotenv | ^17.x | Variáveis de ambiente |
 | uuid | ^13.x | Geração de IDs únicos |
 | nodemon | ^3.x | Hot-reload em desenvolvimento |

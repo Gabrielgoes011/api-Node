@@ -1,6 +1,6 @@
 # API Node — Backend
 
-API RESTful para gerenciamento de carteira de FIIs (Fundos de Investimento Imobiliário). Construída com **Node.js**, **Express 5**, **SQLite** e autenticação via **JWT**.
+API RESTful para gerenciamento de carteira de FIIs (Fundos de Investimento Imobiliário). Construída com **Node.js**, **Express 5**, **PostgreSQL** e autenticação via **JWT**.
 
 ---
 
@@ -27,8 +27,7 @@ API RESTful para gerenciamento de carteira de FIIs (Fundos de Investimento Imobi
 ```
 api-nodeback/
 ├── db/
-│   ├── createDb.sql        # Script de criação das tabelas
-│   └── database.db         # Banco de dados SQLite
+│   └── createDb.sql        # Script de criação das tabelas (PostgreSQL)
 ├── src/
 │   ├── app.js              # Configuração do Express e registro de rotas
 │   ├── config/
@@ -88,14 +87,13 @@ npm install
 
 ### Banco de dados
 
-Antes de rodar pela primeira vez, crie as tabelas executando o script SQL:
+Execute o script SQL no seu banco PostgreSQL para criar as tabelas:
 
 ```bash
-# Com o sqlite3 CLI
-sqlite3 db/database.db < db/createDb.sql
+psql -d sua_database -f db/createDb.sql
 ```
 
-Ou abra `db/database.db` no [DB Browser for SQLite](https://sqlitebrowser.org/) e execute o `createDb.sql`.
+Ou cole o conteúdo de `db/createDb.sql` direto no cliente que preferir (DBeaver, TablePlus, psql, etc.).
 
 ### Variáveis de ambiente
 

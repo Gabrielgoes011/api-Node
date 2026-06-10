@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import Layout from './components/Layout/Layout';
-import PaginaDashboard from './pages/Dashboard';
+import PaginaDashboard from './pages/dashboard';
 import PaginaUsuarios from './pages/cadastros/usuarios';
-import PaginaConfiguracoes from './pages/Configuracoes';
+import PaginaConfiguracoes from './pages/configuracoes';
 import PaginaControleAtivos from './pages/controleAtivos/controleAtivos';
 import PaginaRendimentos from './pages/rendimentos/rendimentos';
 import PaginaPrecificacao from './pages/precificacao/precificacao';

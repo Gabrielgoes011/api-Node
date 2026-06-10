@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AiOutlineBarChart, AiOutlineAreaChart } from 'react-icons/ai';
 import NovaOperacaoModal from './components/modalNovaOperacao';
 import { BarChart, AreaChart } from '../../components/Charts';
-import { useOperacoes } from '../../hooks/hooksOperacoes/useOperacoes';
+import { useOperacoes } from '../../hooks/operacoes/useOperacoes';
 import { DataCard } from '../../components/DataCard';
 import SlideModal from '../../components/SlideModal/SlideModal';
 import { FiAlertTriangle } from 'react-icons/fi';

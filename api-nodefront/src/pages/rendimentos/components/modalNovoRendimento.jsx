@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
-import { rendimentosService } from '../../../services/servRendimentos/rendimentosService';
+import { rendimentosService } from '../../../services/rendimentos/rendimentosService';
 
 export default function NovoRendimentoModal({ isOpen, onClose, onSuccess }) {
   const [data,       setData]       = useState('');

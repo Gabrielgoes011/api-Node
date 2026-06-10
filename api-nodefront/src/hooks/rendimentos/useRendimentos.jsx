@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { handleError } from '../../utils/responseUtils';
-import { rendimentosService } from '../../services/servRendimentos/rendimentosService';
+import { rendimentosService } from '../../services/rendimentos/rendimentosService';
 
 export const useRendimentos = () => {
   const [rendimentos,     setRendimentos]     = useState([]);

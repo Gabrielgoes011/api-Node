@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { toastWarn, toastSuccess, handleError } from '../../utils/responseUtils';
-import { meusFiisService } from '../../services/servCadastros/meusFiisService';
-import { seguimentosService } from '../../services/servCadastros/seguimentosService';
+import { meusFiisService } from '../../services/cadastros/meusFiisService';
+import { seguimentosService } from '../../services/cadastros/seguimentosService';
 
 export const useMeusFiis = () => {
   const [fiis, setFiis]           = useState([]);

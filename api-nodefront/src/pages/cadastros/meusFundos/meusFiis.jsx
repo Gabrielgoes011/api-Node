@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { GridDados } from '../../../components/GridDados';
-import { useMeusFiis } from '../../../hooks/hooksCadastros/useMeusFiis';
+import { useMeusFiis } from '../../../hooks/cadastros/useMeusFiis';
 import ModalConfirmacao from '../../../components/ModalDeConfirmacao/ModalConfirmacao';
 import SkeletonTable from '../../../components/SkeletonTable/SkeletonTable';
 

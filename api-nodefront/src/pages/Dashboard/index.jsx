@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiTrendingUp, FiBarChart2, FiPieChart, FiArrowUpRight } from 'react-icons/fi';
 import { FaWallet, FaExchangeAlt, FaChartLine } from 'react-icons/fa';
-import { useHomeCards } from '../../hooks/useHomeCards';
+import { useHomeCards } from '../../hooks/home/useHomeCards';
 
 const cardsTemplate = [
   {

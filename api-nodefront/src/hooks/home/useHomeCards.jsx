@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../config/api';
+import api from '../../config/api';
 
 export function useHomeCards() {
   const [cards, setCards] = useState(null);

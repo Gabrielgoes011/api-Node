@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { toastSuccess, toastInfo, handleError } from '../../utils/responseUtils';
-import { seguimentosService } from '../../services/servCadastros/seguimentosService';
+import { seguimentosService } from '../../services/cadastros/seguimentosService';
 
 export const useSeguimentos = () => {
   const [seguimentos, setSeguimentos] = useState([]);

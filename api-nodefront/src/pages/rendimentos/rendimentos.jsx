@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { BarChart, AreaChart } from '../../components/Charts';
 import NovoRendimentoModal from './components/modalNovoRendimento';
-import { useRendimentos } from '../../hooks/hooksRendimentos/useRendimentos';
+import { useRendimentos } from '../../hooks/rendimentos/useRendimentos';
 import { toastSuccess } from '../../utils/responseUtils';
 import { DataCard } from '../../components/DataCard';
 

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { toastSuccess, toastInfo, handleError } from '../../utils/responseUtils';
-import { usuariosService } from '../../services/servCadastros/usuariosService';
+import { usuariosService } from '../../services/cadastros/usuariosService';
 
 export const useUsuarios = () => {
   const [users, setUsers] = useState([]);

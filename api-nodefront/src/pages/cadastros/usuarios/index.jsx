@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { GridDados } from '../../../components/GridDados';
-import { useUsuarios } from '../../../hooks/hooksCadastros/useUsuarios';
+import { useUsuarios } from '../../../hooks/cadastros/useUsuarios';
 import ModalFormulario from '../../../components/ModalFormulario/ModalFormulario';
 import ModalConfirmacao from '../../../components/ModalDeConfirmacao/ModalConfirmacao';
 import SkeletonTable from '../../../components/SkeletonTable/SkeletonTable';
