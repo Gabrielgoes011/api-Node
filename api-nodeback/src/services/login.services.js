@@ -8,6 +8,11 @@ import {
 //#region => Logica  para login
 async function autenticarUsuario(email, password) {
 
+    //valida campos obrigatórios
+    if (!email || !password) {
+        throw new Error('E-mail e senha são obrigatórios.');
+    }
+
     // 1. Buscar user no BD (chama repository)
     const usuario = await findUserByEmail(email);
     if (!usuario) throw new Error('Usuário não encontrado');
@@ -16,7 +21,7 @@ async function autenticarUsuario(email, password) {
     const credenciais = await findUserCredentials(usuario.id);
 
     // 2.5 Validar se usuário está ativo
-    if (!usuario.ativo) {
+    if (usuario.ativo === false) {
         throw new Error('Usuário inativo. Entre em contato com o administrador.');
     }
 
@@ -28,15 +33,17 @@ async function autenticarUsuario(email, password) {
     //descriptografa a senha e compara com a senha do banco de dados
     const senhaValida = await bcrypt.compare(password, credenciais.password);
 
-
     // Se senha inválida, lança erro
     if (!senhaValida) {
         throw new Error('E-mail ou senha inválidos.');
     }
 
+    let defaultPassword = [];
+
     //se a senha for a senha padrão, solicita alteração
-    if (credenciais.password == 'Track@123') {
-        throw new Error('Senha padrão detectada. Por favor, altere sua senha antes de continuar.');
+    if (password === 'Track@123') {
+        //se a senha for padrão passa uma flag para o front solicitar alteração de senha
+        defaultPassword = true;
     }
 
     // 4. Gerar token JWT com dados do usuário
@@ -44,7 +51,8 @@ async function autenticarUsuario(email, password) {
         {
             id: usuario.id,
             nome: usuario.nome,
-            email: usuario.email
+            email: usuario.email,
+            defaultPassword: defaultPassword || false
         },
         process.env.JWT_SECRET,
         { expiresIn: '1h' }
@@ -55,7 +63,8 @@ async function autenticarUsuario(email, password) {
         usuario: {
             id: usuario.id,
             nome: usuario.nome,
-            email: usuario.email
+            email: usuario.email,
+            defaultPassword: defaultPassword || false
         }
     };
 }

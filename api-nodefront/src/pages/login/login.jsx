@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toastSuccess, handleError } from '../../utils/responseUtils';
+import { toastSuccess, toastWarn, handleError } from '../../utils/responseUtils';
 import api from '../../config/api';
 import {
   FiMail, FiLock, FiEye, FiEyeOff,
@@ -25,9 +25,19 @@ function Login({ onLogin }) {
     e.preventDefault();
     setLoading(true);
     try {
+      // O interceptor do api.js já extrai o "data" do envelope { success, message, data }
+      // Então res.data aqui já é direto: { token, usuario }
       const res = await api.post('/auth/login', { email, password });
-      localStorage.setItem('token', res.data.token);
-      toastSuccess('Login bem-sucedido! Redirecionando...');
+      const { token, usuario } = res.data;
+
+      localStorage.setItem('token', token);
+
+      if (usuario.defaultPassword) {
+        toastWarn('Você está usando a senha padrão. Considere alterá-la.');
+      } else {
+        toastSuccess('Login bem-sucedido!');
+      }
+
       onLogin(true);
       setTimeout(() => navigate('/'), 800);
     } catch (error) {

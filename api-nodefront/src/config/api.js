@@ -48,10 +48,18 @@ api.interceptors.response.use(
   (error) => {
     const isLoginRoute = error.config?.url?.includes('/auth/login');
 
-    // Só redireciona se NÃO for a rota de login (evita loop)
+    // Só trata 401 se NÃO for a rota de login (evita loop)
     if (error.response?.status === 401 && !isLoginRoute) {
+      const hadToken = !!error.config?.headers?.['Authorization'];
+
       localStorage.removeItem('token');
-      toastError('Sessão expirada. Faça login novamente.');
+
+      // Só exibe o toast se havia um token na requisição —
+      // evita mostrar "Sessão expirada" quando o usuário simplesmente não está logado
+      if (hadToken) {
+        toastError('Sessão expirada. Faça login novamente.');
+      }
+
       window.dispatchEvent(new Event('unauthorized'));
     }
     return Promise.reject(error);

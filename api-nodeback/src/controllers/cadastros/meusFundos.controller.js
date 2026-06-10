@@ -1,4 +1,5 @@
 import { openDb } from "../../config/configDb.js";
+import apiResponse from '../../utils/httpResponse.js';
 import {
   listarFundosService,
   cadastrarFundosService,
@@ -7,7 +8,6 @@ import {
   editarNomeFundoService
 } from "../../services/cadastros/meusFundos.services.js";
 
-import apiResponse from '../../utils/httpResponse.js';
 
 //#region => cadastrar meus fundos
 async function cadastrarFundos(req, res) {
@@ -26,11 +26,9 @@ async function cadastrarFundos(req, res) {
     );
 
   } catch (error) {
-    // Log do erro para depuração
-    console.error('Erro ao cadastrar fundos:', error);
-
     // Retorna a mensagem detalhada do erro
-    return apiResponse.error(res, error.message);
+    return apiResponse.error(res,
+      error.message);
   }
 }
 //#endregion
@@ -50,7 +48,8 @@ async function listarFundos(req, res) {
   } catch (error) {
 
     // Retorna a mensagem detalhada do erro
-    return apiResponse.error(res, error.message);
+    return apiResponse.error(res,
+      error.message);
   }
 }
 
@@ -93,7 +92,8 @@ async function deletarFundo(req, res) {
   } catch (error) {
 
     // Retorna a mensagem detalhada do erro
-    return apiResponse.error(res, error.message);
+    return apiResponse.error(res,
+      error.message);
   }
 }
 //#endregion  
@@ -118,7 +118,8 @@ async function editarNomeFundo(req, res) {
   } catch (error) {
 
     // Retorna a mensagem detalhada do erro
-    return apiResponse.error(res, error.message);
+    return apiResponse.error(res,
+      error.message);
   }
 }
 //#endregion
