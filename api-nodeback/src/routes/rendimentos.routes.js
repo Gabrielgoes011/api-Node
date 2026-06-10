@@ -1,5 +1,5 @@
 import express from 'express';
-import verificaJWT from '../middleware/auth/verificaJWT.js';
+import verificaToken from '../middleware/auth/verificaToken.js';
 const router = express.Router();
 
 import {
@@ -10,16 +10,16 @@ import {
 } from '../controllers/rendimentos.controller.js';
 
 
-router.post('/rendimentos', verificaJWT, listarRendimentos);
+router.post('/rendimentos', verificaToken, listarRendimentos);
 //body: { mes, ano }
 
-router.post('/carregarGraficoDashboard', verificaJWT, carregarGraficoDashboard);
+router.post('/carregarGraficoDashboard', verificaToken, carregarGraficoDashboard);
 //body: { ano }
 
-router.post('/carregarComparacaoAnual', verificaJWT, carregarComparacaoAnual);
+router.post('/carregarComparacaoAnual', verificaToken, carregarComparacaoAnual);
 //body: { anos: ['2023','2024','2025','2026'] }
 
-router.get('/carregarDadosModalNovoRendimento', verificaJWT, carregarDadosModalNovoRendimento);
+router.get('/carregarDadosModalNovoRendimento', verificaToken, carregarDadosModalNovoRendimento);
 // sem body — retorna [{ id, ticker, nomeSeguimento }]
 
 

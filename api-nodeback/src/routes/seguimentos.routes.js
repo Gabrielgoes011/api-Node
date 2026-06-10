@@ -1,5 +1,5 @@
 import express from 'express';
-import verificaJWT from '../middleware/auth/verificaJWT.js';
+import verificaToken from '../middleware/auth/verificaToken.js';
 const router = express.Router();
 
 import {
@@ -10,11 +10,11 @@ import {
   updateSeguimento
 } from '../controllers/cadastros/seguimentos.controller.js';
 
-router.get('/seguimentos', verificaJWT, listarSeguimentos);
-router.get('/seguimentos/contar', verificaJWT, contarSeguimentos);
-router.post('/seguimentos', verificaJWT, cadastrarSeguimento);
-router.delete('/seguimentos/delete/:id', verificaJWT, deleteSeguimento);
-router.put('/seguimentos/update', verificaJWT, updateSeguimento);
+router.get('/seguimentos', verificaToken, listarSeguimentos);
+router.get('/seguimentos/contar', verificaToken, contarSeguimentos);
+router.post('/seguimentos', verificaToken, cadastrarSeguimento);
+router.delete('/seguimentos/delete/:id', verificaToken, deleteSeguimento);
+router.put('/seguimentos/update', verificaToken, updateSeguimento);
 //router.put('/seguimentos/inativaReativa/:id', inativaReativaSeguimento);
 
 export default router;

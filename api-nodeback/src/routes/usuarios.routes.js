@@ -1,5 +1,5 @@
 import express from 'express';
-import verificaJWT from '../middleware/auth/verificaJWT.js';
+import verificaToken from '../middleware/auth/verificaToken.js';
 const router = express.Router();
 
 // Importa o controller de usuários
@@ -13,17 +13,17 @@ import {
 } from '../controllers/cadastros/usuario.controller.js';
 
 // Rotas para usuários
-router.get('/users', verificaJWT, listarUsuarios);
+router.get('/users', verificaToken, listarUsuarios);
 
-router.get('/users/dash/count', verificaJWT, contarUsuarios);
+router.get('/users/dash/count', verificaToken, contarUsuarios);
 
 // Rota para cadastrar usuário
-router.post('/usuario/cadastrar', verificaJWT, cadastrarUser);
+router.post('/usuario/cadastrar', verificaToken, cadastrarUser);
 //body: { nome, email, password, cpf  }
 
-router.put('/inativaUser/:id', verificaJWT, inativaReativaUser);
-router.put('/users/update/:id', verificaJWT, atualizarUser);
-router.delete('/users/delete/:id', verificaJWT, deleteUser);
+router.put('/inativaUser/:id', verificaToken, inativaReativaUser);
+router.put('/users/update/:id', verificaToken, atualizarUser);
+router.delete('/users/delete/:id', verificaToken, deleteUser);
 
 
 export default router;

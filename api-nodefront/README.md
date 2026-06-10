@@ -1,70 +1,150 @@
-# Getting Started with Create React App
+# API Node — Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Interface web para gerenciamento de carteira de FIIs (Fundos de Investimento Imobiliário). Construída com **React 19**, **Vite** e **Tailwind CSS**.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Tecnologias
 
-### `npm start`
+| Pacote | Versão | Uso |
+|---|---|---|
+| react / react-dom | ^19.2.4 | UI |
+| react-router-dom | ^7.14.2 | Roteamento SPA |
+| axios | ^1.13.6 | Requisições HTTP |
+| react-toastify | ^11.0.5 | Notificações toast |
+| react-icons | ^5.6.0 | Ícones |
+| react-bootstrap | ^2.10.10 | Componentes de UI |
+| tailwindcss | ^3.4.19 | Estilização utilitária |
+| vite | ^8.0.10 | Bundler / dev server |
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Estrutura do Projeto
 
-### `npm test`
+```
+api-nodefront/
+├── public/
+├── src/
+│   ├── App.jsx                 # Roteamento principal e controle de autenticação
+│   ├── index.jsx               # Entry point React
+│   ├── components/
+│   │   ├── Charts/             # Componentes de gráficos
+│   │   ├── DataCard/           # Card de dados genérico
+│   │   ├── EmptyState/         # Estado vazio de tabelas/listas
+│   │   ├── Layout/             # Layout principal com sidebar
+│   │   ├── ModalDeConfirmacao/ # Modal de confirmação de ações
+│   │   ├── ModalFormulario/    # Modal genérico de formulário
+│   │   ├── ResponsiveForm/     # Formulário responsivo
+│   │   ├── Sidebar/            # Menu lateral de navegação
+│   │   ├── SkeletonLoader/     # Loading skeleton
+│   │   ├── SkeletonTable/      # Loading skeleton para tabelas
+│   │   ├── TableAcoes/         # Tabela com ações (editar/deletar)
+│   │   ├── Toast/              # Wrapper de notificações
+│   │   └── TopBar/             # Barra superior
+│   ├── config/                 # Configurações globais (axios, etc.)
+│   ├── hooks/                  # Custom hooks
+│   ├── pages/
+│   │   ├── Dashboard/          # ✅ Dashboard com cards de navegação e stats
+│   │   ├── login/              # ✅ Tela de login com autenticação JWT
+│   │   ├── cadastros/
+│   │   │   ├── usuarios/       # ✅ CRUD de usuários
+│   │   │   ├── meusFundos/     # ✅ CRUD de FIIs da carteira
+│   │   │   └── seguimentos/    # ✅ CRUD de segmentos
+│   │   ├── operacoes/          # ✅ Compras e vendas — lançamento e histórico
+│   │   ├── rendimentos/        # ✅ Rendimentos — lançamento e histórico
+│   │   ├── controleAtivos/     # 🚧 Em desenvolvimento
+│   │   ├── precificacao/       # 🚧 Em desenvolvimento
+│   │   ├── relatorios/         # 🚧 Em desenvolvimento
+│   │   ├── Usuarios/           # ✅ Gestão de usuários (admin)
+│   │   └── Configuracoes/      # 🚧 Em desenvolvimento
+│   ├── services/               # Camada de serviços (chamadas à API)
+│   ├── styles/
+│   │   └── global.css          # Estilos globais
+│   └── utils/                  # Utilitários e helpers
+└── index.html
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## Pré-requisitos
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- [Node.js](https://nodejs.org/) v18+ (recomendado LTS)
+- npm
+- Backend rodando (ver `api-nodeback/README.md`)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Instalação
 
-### `npm run eject`
+```bash
+cd api-nodefront
+npm install
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Variáveis de ambiente
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Copie o `.env.example` e configure a URL do backend:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+cp .env.example .env.development
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```env
+VITE_API_URL=http://localhost:3000
+```
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Scripts
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+npm run dev       # Desenvolvimento (modo development)
+npm run demo      # Modo demo
+npm run build     # Build de produção
+npm run preview   # Preview do build de produção
+```
 
-### Code Splitting
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Rotas da Aplicação
 
-### Analyzing the Bundle Size
+| Rota | Página | Status |
+|---|---|---|
+| `/login` | Login | ✅ Pronto |
+| `/` | Dashboard | ✅ Pronto |
+| `/rendimentos` | Rendimentos | ✅ Pronto |
+| `/operacoes` | Compras e Vendas | ✅ Pronto |
+| `/cadastros/meusfiis` | Meus FIIs | ✅ Pronto |
+| `/cadastros/seguimentos` | Seguimentos | ✅ Pronto |
+| `/cadastros/usuarios` | Usuários | ✅ Pronto |
+| `/controle-ativos` | Controle de Ativos | 🚧 Em desenvolvimento |
+| `/precificacao` | Precificação | 🚧 Em desenvolvimento |
+| `/relatorios` | Relatórios | 🚧 Em desenvolvimento |
+| `/configuracoes` | Configurações | 🚧 Em desenvolvimento |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+> Todas as rotas exceto `/login` são protegidas. Sem token válido no `localStorage`, o usuário é redirecionado para `/login` automaticamente.
 
-### Making a Progressive Web App
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Autenticação
 
-### Advanced Configuration
+O token JWT é armazenado no `localStorage` e enviado automaticamente via interceptor do axios em todas as requisições. Ao receber um `401`, o interceptor dispara o evento `unauthorized`, que desloga o usuário e redireciona para o login.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+---
 
-### Deployment
+## 📋 Backlog
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Em andamento
 
-### `npm run build` fails to minify
+- [ ] Controle de Ativos — posição consolidada da carteira (preço médio, quantidade total, valor de mercado)
+- [ ] Precificação — cotação em tempo real dos FIIs
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Pendências
+
+- [ ] Página de Relatórios — exportação de dados por período (PDF / Excel)
+- [ ] Página de Configurações — preferências do usuário e configurações da conta
+- [ ] Gráfico de evolução patrimonial no Dashboard com dados reais da API
+- [ ] Responsividade mobile completa
+- [ ] Tema claro (atualmente apenas dark mode)
+- [ ] Testes automatizados com React Testing Library
+- [ ] Internacionalização (i18n)

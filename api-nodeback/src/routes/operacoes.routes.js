@@ -1,5 +1,5 @@
 import express from 'express';
-import verificaJWT from '../middleware/auth/verificaJWT.js';
+import verificaToken from '../middleware/auth/verificaToken.js';
 const router = express.Router();
 
 import {
@@ -11,19 +11,19 @@ import {
 } from '../controllers/operacoes.controller.js';
 
 
-router.get('/ativosDropList', verificaJWT, carregaAtivosDropList);
+router.get('/ativosDropList', verificaToken, carregaAtivosDropList);
 //body: {} - sem parâmetros, apenas para carregar a lista de ativos para o dropdown list no frontend
 
-router.post('/operacoes', verificaJWT, listarOperacoes);
+router.post('/operacoes', verificaToken, listarOperacoes);
 //body: { mes, ano }
 
-router.post('/lancarOperacao', verificaJWT, lancarOperacao);
+router.post('/lancarOperacao', verificaToken, lancarOperacao);
 //body: { idAtivo, dataOperacao, tipo, quantidade, preco }
 
-router.post('/excluirOperacao', verificaJWT, excluirOperacao);
+router.post('/excluirOperacao', verificaToken, excluirOperacao);
 // body: { id }
 
-router.post('/carregaDadosGraficoOperacoes', verificaJWT, carregaDadosGraficoOperacoes);
+router.post('/carregaDadosGraficoOperacoes', verificaToken, carregaDadosGraficoOperacoes);
 //body: { ano }
 
 export default router;

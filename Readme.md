@@ -1,4 +1,4 @@
-# Gerenciador de Fundos Imobiliários (FIIs)
+# Gerenciador de Fundos Imobiliários — FIITrack
 
 Aplicação fullstack para controle e acompanhamento de carteira de Fundos de Investimento Imobiliário (FIIs). Permite gerenciar ativos, registrar operações de compra/venda, acompanhar rendimentos recebidos e visualizar a performance da carteira.
 
@@ -10,7 +10,7 @@ Aplicação fullstack para controle e acompanhamento de carteira de Fundos de In
 
 ```
 api-Node/
-├── api-nodeback/   # API REST — Node.js + Express + PostgreSQL
+├── api-nodeback/   # API REST — Node.js + Express + SQLite
 └── api-nodefront/  # SPA — React + Vite + Tailwind CSS
 ```
 
@@ -22,13 +22,14 @@ api-Node/
 
 | Pacote | Versão | Uso |
 |---|---|---|
-| Node.js (ESM) | — | Runtime |
+| Node.js (ESM) | v18+ | Runtime |
 | Express | ^5.1.0 | Framework HTTP |
-| pg (node-postgres) | ^8.20.0 | Conexão com PostgreSQL |
+| pg (node-postgres) | ^8.20.0 | Conexão com PostgreSQL (Pool) |
 | jsonwebtoken | ^9.0.3 | Autenticação JWT |
+| bcrypt | ^6.0.0 | Hash de senhas |
 | multer | ^2.1.1 | Upload de arquivos |
 | @aws-sdk/client-s3 | ^3.x | Armazenamento S3 (AWS) |
-| bcrypt | ^5.x | Hash de senhas |
+| sqlite / sqlite3 | ^5.1.1 / ^5.1.7 | Legado (não utilizado) |
 | dotenv | ^17.x | Variáveis de ambiente |
 | uuid | ^13.x | Geração de IDs únicos |
 | nodemon | ^3.x | Hot-reload em desenvolvimento |
@@ -41,25 +42,25 @@ O backend está em migração progressiva para a separação de responsabilidade
 Routes  →  Controller  →  Service  →  Repository  →  Banco de Dados
 ```
 
-- **Routes** — define os endpoints HTTP e aplica middlewares (ex: `verificaJWT`)
+- **Routes** — define os endpoints HTTP e aplica middlewares (ex: `verificaToken`)
 - **Controller** — recebe a requisição, chama o Service e devolve a resposta HTTP
-- **Service** — contém as regras de negócio e validações (ex: verificar se ticker já existe)
-- **Repository** — executa diretamente as queries SQL no PostgreSQL
+- **Service** — contém as regras de negócio e validações
+- **Repository** — executa diretamente as queries SQL
 
 > Módulos ainda não migrados (ex: `operacoes`, `rendimentos`) têm a lógica diretamente no controller. A migração é incremental.
 
-### Banco de Dados
+### Middleware de Autenticação
 
-PostgreSQL hospedado no [Neon](https://neon.tech) com conexão via `Pool` e SSL habilitado.
+`src/middleware/auth/verificaToken.js`
 
-O arquivo `src/config/configDb.js` expõe a função `openDb()` que retorna o pool compartilhado — **nunca feche o pool dentro das rotas**.
+Valida o JWT no header `Authorization: Bearer <token>`. Retorna `401` se ausente ou inválido. Injeta `req.user` com os dados do token para uso nos controllers.
 
 ### Variáveis de Ambiente
 
-Crie um arquivo `.env` na raiz de `api-nodeback/` com as seguintes chaves:
+Crie `.env.development` na raiz de `api-nodeback/` com base no `.env.example`:
 
 ```env
-DATABASE_URL=postgresql://usuario:senha@host/banco?sslmode=require
+PORT=3000
 JWT_SECRET=sua_chave_secreta_aqui
 AWS_REGION=us-east-1
 AWS_ACCESS_KEY=sua_access_key
@@ -78,12 +79,17 @@ Authorization: Bearer <token>
 |---|---|---|
 | POST | `/auth/login` | Autentica o usuário e retorna o JWT |
 
+#### Home / Dashboard
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `/home/cards` | Dados dos cards do dashboard |
+
 #### Usuários
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/users` | Lista usuários filtrando por `status=on` ou `status=off` |
+| GET | `/users` | Lista usuários |
 | GET | `/users/dash/count` | Conta total de usuários |
-| POST | `/usuario/cadastrar` | Cadastra novo usuário (senha padrão com hash bcrypt) |
+| POST | `/usuario/cadastrar` | Cadastra novo usuário |
 | PUT | `/users/update/:id` | Atualiza dados do usuário |
 | PUT | `/inativaUser/:id` | Inativa ou reativa usuário |
 | DELETE | `/users/delete/:id` | Remove usuário |
@@ -97,58 +103,42 @@ Authorization: Bearer <token>
 | PUT | `/seguimentos/update` | Atualiza seguimento |
 | DELETE | `/seguimentos/delete/:id` | Remove seguimento |
 
-#### Meus Fundos (Ativos)
+#### Meus Fundos (FIIs)
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/meusFundos` | Lista todos os fundos cadastrados |
-| GET | `/meusFundos/contar` | Conta total de fundos |
-| POST | `/meusFundos/cadastrar` | Cadastra novo fundo (ticker único) |
-| PUT | `/meusFundos/editar/:id` | Atualiza apenas o campo `nomeFundo` do fundo |
+| GET | `/meusFundos` | Lista fundos do usuário logado |
+| GET | `/meusFundos/contar` | Conta fundos ativos |
+| POST | `/meusFundos/cadastrar` | Cadastra novo fundo |
+| PUT | `/meusFundos/editar/:id` | Atualiza nome do fundo |
+| DELETE | `/meusFundos/deletar/:id` | Remove fundo |
 
-#### Operações
+#### Operações (Compras e Vendas)
 | Método | Rota | Descrição |
 |---|---|---|
 | GET | `/ativosDropList` | Lista ativos para dropdown |
 | POST | `/operacoes` | Lista operações filtradas por mês/ano |
 | POST | `/lancarOperacao` | Registra nova operação (compra/venda) |
 | POST | `/excluirOperacao` | Remove uma operação pelo ID |
-| POST | `/carregaDadosGraficoOperacoes` | Dados para gráfico de operações por ano |
+| POST | `/carregaDadosGraficoOperacoes` | Dados do gráfico de operações por ano |
 
 #### Rendimentos
 | Método | Rota | Descrição |
 |---|---|---|
 | POST | `/rendimentos` | Lista rendimentos filtrados por mês/ano |
-| POST | `/carregarGraficoDashboard` | Dados para gráfico do dashboard por ano |
+| POST | `/carregarGraficoDashboard` | Dados do gráfico do dashboard por ano |
 | POST | `/carregarComparacaoAnual` | Comparativo de rendimentos entre anos |
 | GET | `/carregarDadosModalNovoRendimento` | Ativos disponíveis para lançar rendimento |
 
 ### Como Executar
 
 ```bash
-# Instalar dependências
 cd api-nodeback
 npm install
-
-# Desenvolvimento (com hot-reload)
-npm run dev
-
-# Produção
-npm start
+npm run dev     # desenvolvimento com hot-reload
+npm start       # produção
 ```
 
 O servidor sobe em `http://localhost:3000`.
-
----
-
-## Atualizações recentes realizadas
-- `GET /users` agora aceita query string `status=on` ou `status=off` para listar usuários ativos ou inativos.
-- A rota de edição de fundo foi padronizada para `PUT /meusFundos/editar/:id` e atualiza somente `nomeFundo`.
-- O frontend `meusFiisService.atualizar` consome esse endpoint com `PUT /meusFundos/editar/${id}`.
-- O modal de edição no frontend passa a exibir apenas o campo `Nome do Fundo` quando `onEdit` está ativo.
-- Módulo de usuários migrado para `Controller → Service → Repository`.
-- Rota de cadastro de usuário alterada de `POST /cadUsers` para `POST /usuario/cadastrar`.
-- Senha padrão do novo usuário (`Track@123`) agora é armazenada com hash `bcrypt` (10 rounds) — texto puro removido do banco.
-- `bcrypt` adicionado como dependência do backend.
 
 ---
 
@@ -169,147 +159,120 @@ O servidor sobe em `http://localhost:3000`.
 
 ### Páginas
 
-| Página | Rota | Descrição |
+| Rota | Página | Status |
 |---|---|---|
-| Login | `/login` | Autenticação do usuário |
-| Dashboard | `/dashboard` | Visão geral da carteira |
-| Meus Fundos | `/cadastros/meusFundos` | CRUD de fundos imobiliários |
-| Seguimentos | `/cadastros/seguimentos` | CRUD de segmentos |
-| Usuários | `/cadastros/usuarios` | Gerenciamento de usuários |
-| Operações | `/operacoes` | Registro e histórico de operações |
-| Rendimentos | `/rendimentos` | Lançamento e histórico de rendimentos |
-| Controle de Ativos | `/controleAtivos` | Acompanhamento da carteira |
-| Precificação | `/precificacao` | Análise de preços |
-| Relatórios | `/relatorios` | Relatórios gerenciais |
-| Configurações | `/configuracoes` | Preferências da aplicação |
+| `/login` | Login | ✅ Pronto |
+| `/` | Dashboard | ✅ Pronto |
+| `/rendimentos` | Rendimentos | ✅ Pronto |
+| `/operacoes` | Compras e Vendas | ✅ Pronto |
+| `/cadastros/meusfiis` | Meus FIIs | ✅ Pronto |
+| `/cadastros/seguimentos` | Seguimentos | ✅ Pronto |
+| `/cadastros/usuarios` | Usuários | ✅ Pronto |
+| `/controle-ativos` | Controle de Ativos | 🚧 Em desenvolvimento |
+| `/precificacao` | Precificação | 🚧 Em desenvolvimento |
+| `/relatorios` | Relatórios | 🚧 Em desenvolvimento |
+| `/configuracoes` | Configurações | 🚧 Em desenvolvimento |
 
-### Estrutura de Componentes
-
-```
-src/
-├── components/
-│   ├── Charts/          # AreaChart, BarChart (recharts)
-│   ├── DataCard/        # Cards de métricas
-│   ├── Layout/          # Shell da aplicação (sidebar + topbar)
-│   ├── Sidebar/         # Menu lateral de navegação
-│   ├── TopBar/          # Barra superior
-│   ├── TableAcoes/      # Tabela reutilizável com ações (editar/excluir)
-│   ├── ModalFormulario/ # Modal genérico de formulários
-│   ├── ModalDeConfirmacao/ # Modal de confirmação de ações destrutivas
-│   └── SkeletonTable/   # Skeleton loader para tabelas
-├── hooks/               # Custom hooks por domínio
-├── services/            # Funções de chamada à API (axios)
-├── pages/               # Páginas organizadas por domínio
-├── config/
-│   └── api.js           # Instância do axios com baseURL e interceptor 401
-└── utils/
-    ├── dateUtils.jsx
-    └── responseUtils.jsx
-```
+> Todas as rotas exceto `/login` são protegidas. Sem token válido no `localStorage`, o usuário é redirecionado automaticamente.
 
 ### Autenticação no Frontend
 
-O token JWT é armazenado no `localStorage`. Um interceptor no Axios dispara o evento `unauthorized` quando a API retorna `401`, forçando o logout automático sem refresh de página.
+O token JWT é armazenado no `localStorage`. Um interceptor no Axios dispara o evento `unauthorized` ao receber `401`, forçando logout automático sem refresh de página.
 
 ### Modos de Build
 
 ```bash
-# Instalar dependências
 cd api-nodefront
 npm install
-
-# Desenvolvimento
-npm run dev
-
-# Demo (modo demonstração)
-npm run demo
-
-# Build de produção
-npm run build
+npm run dev      # desenvolvimento
+npm run demo     # modo demonstração
+npm run build    # build de produção
+npm run preview  # preview do build
 ```
-
----
-
-## Backlog de Pendências (Funções Existentes)
-
-Problemas e melhorias identificadas diretamente no código atual.
-
----
-
-### 🔐 Login (`login.controller.js`)
-
-- [ ] **Senha em texto puro** — a comparação de senha no login ainda usa texto puro. Implementar `bcrypt.compare` para validar o hash. Pendente após a migração das senhas existentes no banco
-
----
-
-### 👤 Usuários (`usuario.controller.js` · `validaUser.js`)
-
-- [ ] **Tabela errada no `atualizarUser`** — a query de UPDATE referencia `dbo."tabUser"` (nome antigo do SQLite) em vez da tabela correta `usuarios` do PostgreSQL. A função está quebrando em produção para edições de usuário
-- [ ] **Tabela errada no `validaUser.js`** — a função `validaEmailExistente` também aponta para `dbo."tabUser"`. Precisa apontar para `usuarios`
-- [x] **Senha padrão com hash** — ao cadastrar um novo usuário, a senha padrão `Track@123` é gerada e armazenada com hash `bcrypt` (10 rounds). O módulo foi migrado para a arquitetura `Controller → Service → Repository`
-- [ ] **Validações de senha comentadas** — as validações de confirmação de senha, tamanho mínimo (8 chars) e letra maiúscula estão comentadas. Reativar quando o fluxo de definição de senha pelo usuário for implementado
-- [ ] **CPF sem validação real** — o cadastro só valida se o CPF tem 11 dígitos. Não há validação dos dígitos verificadores
-
----
-
-### 🏷️ Seguimentos (`seguimentos.controller.js`)
-
-- [ ] **Delete sem verificação de vínculos** — `deleteSeguimento` exclui o seguimento sem verificar se existem ativos (`ativos`) cadastrados com aquele seguimento. Pode causar erro de integridade referencial no banco
-- [ ] **Mensagem de erro errada no `contarSeguimentos`** — o `catch` retorna `'Erro ao contar usuários.'` em vez de `'Erro ao contar seguimentos.'`
-- [ ] **Log de alterações pendente** — o próprio código tem o comentário: *"implementar log de atualização de seguimento depois de implementar tabela de logs"*
-
----
-
-### 📦 Meus Fundos (`meusFundos.controller.js`)
-
-- [x] **`contarFundosAtivos` fora da arquitetura** — esta função ainda acessa o banco diretamente no controller, enquanto as demais funções do mesmo módulo já usam Service → Repository. Migrar para completar o padrão
-- [ ] **Sem edição de fundo** — não existe rota/função para atualizar os dados de um fundo cadastrado (nome, CNPJ, seguimento)
-- [x]**Sem exclusão de fundo** — não existe rota/função para remover um fundo da carteira
-
----
-
-### 📊 Operações (`operacoes.controller.js`)
-
-- [ ] **Módulo sem migração** — nenhuma função do módulo foi migrada para Controller → Service → Repository. Todo acesso ao banco está direto no controller
-- [ ] **`lancarOperacao` sem validação de tipo** — o campo `tipo` é inserido sem validar se o valor é `'Compra'` ou `'Venda'`. Qualquer string é aceita pelo banco
-- [ ] **`excluirOperacao` sem controle de propriedade** — qualquer usuário autenticado pode excluir qualquer operação pelo ID. Não há verificação se a operação pertence ao usuário que fez a requisição
-
----
-
-### 💰 Rendimentos (`rendimentos.controller.js`)
-
-- [ ] **Módulo sem migração** — nenhuma função foi migrada para Controller → Service → Repository
-- [ ] **Sem função de lançar rendimento** — existe a rota/modal para carregar os dados (`carregarDadosModalNovoRendimento`), mas não existe a função `POST` para de fato salvar um novo rendimento no banco
-- [ ] **Sem edição ou exclusão de rendimento** — não é possível corrigir ou remover um rendimento lançado incorretamente
-
----
-
-### 🛠️ Utilitários (`httpResponse.js`)
-
-- [ ] **`httpResponse.js` não utilizado** — o arquivo com funções padronizadas de resposta HTTP foi criado mas não está sendo usado em nenhum controller. Adotar gradualmente para padronizar as respostas da API
-
----
-
-## Roadmap Geral
-
-- [ ] Migrar todos os controllers para a arquitetura `Controller → Service → Repository`
-- [ ] Implementar hash de senhas com `bcrypt` no login
-- [ ] Finalizar páginas de Rendimentos, Controle de Ativos e Precificação
-- [ ] Tornar a aplicação responsiva para uso em smartphones e tablets
-- [ ] Completar integração com AWS S3 (upload de documentos/comprovantes)
-- [ ] Criar relatórios exportáveis (PDF/Excel)
-- [ ] Adicionar suporte a múltiplos usuários com controle de acesso por perfil
 
 ---
 
 ## Banco de Dados
 
-O script de criação das tabelas está em `api-nodeback/db/script.sql`.
+PostgreSQL hospedado no [Neon](https://neon.tech), acessado via `Pool` de conexões com SSL habilitado (`pg`). A configuração fica em `api-nodeback/src/config/configDb.js`.
+
+Script de criação das tabelas em `api-nodeback/db/createDb.sql`.
 
 Tabelas principais:
-- `usuarios` — dados cadastrais dos usuários
-- `credenciaisUsuario` — senhas (relacionada a `usuarios`)
-- `seguimentos` — segmentos/categorias de fundos (ex: Lajes Corporativas, Logística)
-- `ativos` — fundos cadastrados (ticker, nome, CNPJ, seguimento)
-- `operacoes` — compras e vendas de cotas
-- `rendimentos` — proventos recebidos por ativo
+
+| Tabela | Descrição |
+|---|---|
+| `usuarios` | Dados cadastrais dos usuários |
+| `credenciaisUsuario` | Senhas com hash (relacionada a `usuarios`) |
+| `seguimentos` | Segmentos/categorias de fundos (ex: Logística, Lajes) |
+| `ativos` | Fundos cadastrados (ticker, nome, CNPJ, seguimento) |
+| `operacoes` | Compras e vendas de cotas |
+| `rendimentos` | Proventos recebidos por ativo |
+
+---
+
+## Atualizações Recentes
+
+- Middleware renomeado de `verificaJWT` para `verificaToken` — arquivo e todas as referências atualizados
+- Arquivo do middleware renomeado de `verificaJWT.js` para `verificaToken.js`
+- Cards do Dashboard agora navegam para as telas correspondentes ao clicar (`/rendimentos`, `/operacoes`, `/controle-ativos`)
+- Senha padrão de novos usuários (`Track@123`) armazenada com hash `bcrypt` (10 rounds)
+- Módulo de usuários migrado para `Controller → Service → Repository`
+- Rota de cadastro de usuário alterada de `POST /cadUsers` para `POST /usuario/cadastrar`
+- Rota de edição de fundo padronizada para `PUT /meusFundos/editar/:id`
+- `bcrypt` adicionado e instalado como dependência do backend
+
+---
+
+## 📋 Backlog
+
+### 🚧 Em andamento
+
+- [ ] **Controle de Ativos** — tela e endpoints para posição consolidada da carteira (preço médio, quantidade total, valor de mercado)
+- [ ] **Precificação** — integração com API externa para cotação em tempo real dos FIIs
+
+### 🔐 Autenticação
+
+- [ ] Rota de refresh de token JWT
+- [ ] Comparação de senha no login com `bcrypt.compare` (atualmente valida em texto puro)
+
+### 👤 Usuários
+
+- [ ] Corrigir query do `atualizarUser` — referencia tabela antiga (`dbo."tabUser"`) em vez de `usuarios`
+- [ ] Corrigir `validaEmailExistente` no `validaUser.js` — mesma referência errada
+- [ ] Reativar validações de senha comentadas (confirmação, tamanho mínimo, letra maiúscula)
+- [ ] Validação real de CPF (dígitos verificadores)
+
+### 🏷️ Seguimentos
+
+- [ ] Bloquear `deleteSeguimento` se houver ativos vinculados ao seguimento
+- [ ] Corrigir mensagem de erro no `catch` do `contarSeguimentos` ("Erro ao contar usuários" → "Erro ao contar seguimentos")
+- [ ] Implementar log de alterações (aguardando tabela de logs)
+
+### 📦 Meus Fundos
+
+- [ ] Migrar `contarFundosAtivos` para a camada Service/Repository
+
+### 📊 Operações
+
+- [ ] Migrar módulo inteiro para `Controller → Service → Repository`
+- [ ] Validar campo `tipo` em `lancarOperacao` (aceitar apenas `'Compra'` ou `'Venda'`)
+- [ ] Verificar propriedade da operação antes de excluir (qualquer usuário autenticado pode excluir hoje)
+
+### 💰 Rendimentos
+
+- [ ] Migrar módulo inteiro para `Controller → Service → Repository`
+- [ ] Criar `POST /rendimentos/lancar` para salvar novo rendimento
+- [ ] Criar rotas de edição e exclusão de rendimento
+
+### 🛠️ Geral
+
+- [ ] Adotar `httpResponse.js` nos controllers (arquivo existe mas não está sendo usado)
+- [ ] Paginação nas rotas de listagem (`/users`, `/operacoes`, `/rendimentos`)
+- [ ] Upload de extrato para lançamento em lote (multer + S3 já configurados)
+- [ ] Página de Relatórios — exportação por período (PDF / Excel)
+- [ ] Página de Configurações — preferências do usuário
+- [ ] Responsividade mobile
+- [ ] Testes automatizados (backend e frontend)
+- [ ] Dockerização da aplicação
+- [ ] Documentação Swagger / OpenAPI

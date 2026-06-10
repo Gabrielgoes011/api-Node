@@ -1,139 +1,233 @@
-# API de Gerenciamento de Usuários
+# API Node — Backend
 
-API RESTful para realizar um CRUD (Criar, Ler, Atualizar, Deletar) completo de usuários. Este projeto foi construído com **Node.js**, **Express** e **SQLite**, e serve como um excelente exemplo de uma aplicação backend com persistência de dados, validações de entrada, e operações seguras com o banco de dados.
+API RESTful para gerenciamento de carteira de FIIs (Fundos de Investimento Imobiliário). Construída com **Node.js**, **Express 5**, **SQLite** e autenticação via **JWT**.
 
-## ✨ Funcionalidades
+---
 
-*   **Cadastro Seguro de Usuários:** Rota `POST` para criar novos usuários usando **transações** no banco de dados, garantindo que os dados só sejam salvos se todas as operações forem bem-sucedidas.
-*   **Listagem de Usuários:** Rota `GET` para visualizar todos os usuários cadastrados.
-*   **Busca por ID:** Rota `GET` para encontrar um usuário específico pelo seu `id`.
-*   **Atualização de Usuários:** Rota `PUT` para atualizar as informações de um usuário existente.
-*   **Login Básico:** Rota `POST` para autenticar um usuário com base em seu e-mail e senha.
-*   **Dashboard:** Rota `GET` para contar o número total de usuários cadastrados.
-*   **Validações Robustas:**
-    *   Verificação de campos obrigatórios.
-    *   Exigência de nome e sobrenome.
-    *   Validação de formato de e-mail.
-    *   Validação de tamanho do CPF.
-    *   Validação de complexidade e confirmação de senha.
-    *   Verificação de duplicidade para e-mail e CPF no banco de dados.
-*   **Código Organizado:** A lógica de negócio está sendo separada do arquivo principal de rotas, sendo movida para `controllers` para melhor organização e manutenibilidade.
+## Tecnologias
+
+| Pacote | Versão | Uso |
+|---|---|---|
+| express | ^5.1.0 | Servidor e roteamento |
+| pg (node-postgres) | ^8.20.0 | Conexão com PostgreSQL (Pool) |
+| jsonwebtoken | ^9.0.3 | Autenticação JWT |
+| bcrypt | ^6.0.0 | Hash de senhas |
+| dotenv | ^17.4.2 | Variáveis de ambiente |
+| uuid | ^13.0.0 | Geração de IDs únicos |
+| multer | ^2.1.1 | Upload de arquivos |
+| @aws-sdk/client-s3 | ^3.1009.0 | Integração com S3 |
+| pg | ^8.20.0 | Driver PostgreSQL (reserva) |
+| cors | ^2.8.5 | Liberação de CORS |
+| nodemon | ^3.1.14 | Hot reload em desenvolvimento |
+
+---
+
+## Estrutura do Projeto
+
+```
+api-nodeback/
+├── db/
+│   ├── createDb.sql        # Script de criação das tabelas
+│   └── database.db         # Banco de dados SQLite
+├── src/
+│   ├── app.js              # Configuração do Express e registro de rotas
+│   ├── config/
+│   │   ├── configDb.js     # Conexão com o banco de dados
+│   │   ├── env.js          # Carregamento das variáveis de ambiente
+│   │   └── s3.js           # Configuração do cliente S3
+│   ├── controllers/
+│   │   ├── login.controller.js
+│   │   ├── operacoes.controller.js
+│   │   ├── rendimentos.controller.js
+│   │   └── cadastros/
+│   │       ├── meusFundos.controller.js
+│   │       ├── seguimentos.controller.js
+│   │       └── usuario.controller.js
+│   ├── middleware/
+│   │   └── auth/
+│   │       └── verificaToken.js    # Middleware de autenticação JWT
+│   ├── repositories/
+│   │   ├── login.repositories.js
+│   │   └── cadastros/
+│   │       ├── meuFundos.repositories.js
+│   │       └── usuarios.repositories.js
+│   ├── routes/
+│   │   ├── auth/
+│   │   │   └── auth.routes.js
+│   │   ├── home.routes.js
+│   │   ├── meusFundos.routes.js
+│   │   ├── operacoes.routes.js
+│   │   ├── rendimentos.routes.js
+│   │   ├── seguimentos.routes.js
+│   │   └── usuarios.routes.js
+│   ├── services/
+│   │   └── cadastros/
+│   │       ├── meusFundos.services.js
+│   │       └── usuarios.services.js
+│   └── utils/
+│       ├── httpResponse.js     # Helpers de resposta HTTP padronizada
+│       └── validaUser.js       # Validações de campos de usuário
+└── server.js                   # Entry point — sobe o servidor
+```
+
+---
 
 ## Pré-requisitos
 
-Antes de começar, você vai precisar ter as seguintes ferramentas instaladas em sua máquina:
-*   [Node.js](https://nodejs.org/en/) (a versão LTS é recomendada)
-*   [npm](https://www.npmjs.com/) (geralmente instalado junto com o Node.js)
-*   Opcional: Um cliente de banco de dados SQLite como o DB Browser for SQLite para visualizar o banco de dados.
+- [Node.js](https://nodejs.org/) v18+ (recomendado LTS)
+- npm
+
+---
 
 ## Instalação
 
-Siga os passos abaixo para configurar o ambiente de desenvolvimento.
+```bash
+cd api-nodeback
+npm install
+```
 
-1.  **Clone o repositório** (ou simplesmente descompacte os arquivos em uma pasta de sua preferência).
+### Banco de dados
 
-2.  **Navegue até a pasta do projeto** pelo seu terminal:
-    ```bash
-    cd caminho/para/api-Node
-    ```
-
-3.  **Instale as dependências** do projeto usando o npm. Este comando irá ler o arquivo `package.json` e baixar tudo o que é necessário.
-
-    ```bash
-    npm install
-    ```
-
-## 🛠️ Tecnologias e Dependências
-
-Este projeto utiliza as seguintes dependências:
-
-*   `express`: Framework web para criar o servidor e gerenciar as rotas da API.
-*   `sqlite`: Biblioteca que fornece uma API moderna (baseada em Promises) para interagir com o banco de dados SQLite.
-*   `sqlite3`: O driver que permite ao Node.js se comunicar com o arquivo do banco de dados.
-*   `nodemon`: Ferramenta de desenvolvimento que reinicia o servidor automaticamente a cada alteração no código.
-
-## 🚀 Como Rodar a Aplicação
-
-Após a instalação das dependências, você pode iniciar o servidor.
-
-> **Importante:** O servidor não cria a tabela do banco de dados automaticamente. Antes de iniciar, você precisa executar o script `script.sql` no arquivo `database.db` que será criado na raiz do projeto. Você pode fazer isso usando um cliente de banco de dados (como o DB Browser for SQLite) ou via linha de comando do SQLite.
-
-1.  **Inicie o servidor em modo de desenvolvimento:**
-
-Use o script `dev` definido no `package.json`, que utiliza o `nodemon` para iniciar a aplicação em modo de desenvolvimento:
+Antes de rodar pela primeira vez, crie as tabelas executando o script SQL:
 
 ```bash
-npm run dev
+# Com o sqlite3 CLI
+sqlite3 db/database.db < db/createDb.sql
 ```
 
-Ao executar o comando, você verá a seguinte mensagem no console, indicando que o servidor está no ar e pronto para receber requisições:
+Ou abra `db/database.db` no [DB Browser for SQLite](https://sqlitebrowser.org/) e execute o `createDb.sql`.
 
+### Variáveis de ambiente
+
+Copie o `.env.example` e preencha os valores:
+
+```bash
+cp .env.example .env.development
 ```
-🚀 - Servidor iniciado na porta 3000
+
+Variáveis necessárias:
+
+```env
+PORT=3000
+JWT_SECRET=sua_chave_secreta
+# demais variáveis conforme .env.example
 ```
 
-## Rotas da API (Endpoints)
+---
 
-A API possui as seguintes rotas disponíveis:
+## Scripts
 
-### `GET /`
-*   **Descrição:** Rota raiz que retorna uma mensagem de boas-vindas.
-*   **Resposta de Sucesso (200):**
-    ```json
-    {
-        "status": 200,
-        "mensagem": "Bem vindos a Minha primeira Api!",
-        "Versão": "1.0"
-    }
-    ```
+```bash
+npm run dev     # Desenvolvimento com hot reload (nodemon)
+npm run start   # Produção
+```
 
-### `GET /users`
-*   **Descrição:** Retorna uma lista com todos os usuários cadastrados.
-*   **Resposta de Sucesso (200):**
-    ```json
-    [
-        { "id": 2, "nome": "Jane Doe", "idade": 30, "email": "jane@example.com" },
-        { "id": 1, "nome": "John Doe", "idade": 25, "email": "john@example.com" }
-    ]
-    ```
+---
 
-### `GET /users/dash/count`
-*   **Descrição:** Retorna a contagem total de usuários no banco de dados.
-*   **Resposta de Sucesso (200):** `{"totalUsers": 15}`
+## Endpoints
 
-### `GET /users/:id`
-*   **Descrição:** Busca e retorna um usuário específico com base no `id` fornecido na URL.
-*   **Resposta de Sucesso (200):** `{"id": 1, "nome": "John Doe", "idade": 25, "email": "john@example.com"}`
-*   **Resposta de Erro (404):** `Usuário não encontrado !`
+Todas as rotas protegidas exigem o header:
+```
+Authorization: Bearer <token>
+```
 
-### `POST /cadUsers`
-*   **Descrição:** Cria um novo usuário. Realiza múltiplas validações e usa uma transação para garantir a integridade dos dados.
-*   **Corpo da Requisição (Exemplo):**
-    ```json
-    {
-        "nome": "Fulano de Tal",
-        "idade": 28,
-        "email": "fulano.tal@example.com",
-        "cpf": "12345678901",
-        "senha": "SenhaForte123",
-        "confirmaSenha": "SenhaForte123"
-    }
-    ```
-*   **Resposta de Sucesso (201):** `{"message": "Usuário cadastrado com sucesso!"}`
+### Autenticação
 
-### `POST /login`
-*   **Descrição:** Autentica um usuário com base no e-mail e senha.
-*   **Corpo da Requisição (Exemplo):** `{"email": "fulano.tal@example.com", "senha": "SenhaForte123"}`
-*   **Resposta de Sucesso (200):** `{"message": "Login realizado com sucesso!", "user": {"id": 3, "nome": "Fulano de Tal", "email": "fulano.tal@example.com"}}`
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| POST | `/auth/login` | Login — retorna JWT | ❌ |
 
-### `PUT /users/update/:id`
-*   **Descrição:** Atualiza os dados de um usuário existente.
-*   **Corpo da Requisição (Exemplo):**
-    ```json
-    {
-        "nome": "Fulano de Tal Silva",
-        "idade": 29,
-        "email": "fulano.silva@example.com"
-    }
-    ```
-*   **Resposta de Sucesso (200):** `{"message": "Usuário atualizado com sucesso!"}`
+### Home / Dashboard
+
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| GET | `/home/cards` | Dados dos cards do dashboard | ✅ |
+
+### Usuários
+
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| GET | `/users` | Listar todos os usuários | ✅ |
+| GET | `/users/dash/count` | Contar total de usuários | ✅ |
+| POST | `/usuario/cadastrar` | Cadastrar novo usuário | ✅ |
+| PUT | `/users/update/:id` | Atualizar usuário | ✅ |
+| PUT | `/inativaUser/:id` | Inativar / reativar usuário | ✅ |
+| DELETE | `/users/delete/:id` | Deletar usuário | ✅ |
+
+**Body POST /usuario/cadastrar:**
+```json
+{ "nome": "string", "email": "string", "password": "string", "cpf": "string" }
+```
+
+### Meus Fundos (FIIs)
+
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| GET | `/meusFundos` | Listar fundos do usuário logado | ✅ |
+| GET | `/meusFundos/contar` | Contar fundos ativos | ✅ |
+| POST | `/meusFundos/cadastrar` | Cadastrar novo FII | ✅ |
+| PUT | `/meusFundos/editar/:id` | Editar nome do fundo | ✅ |
+| DELETE | `/meusFundos/deletar/:id` | Deletar fundo | ✅ |
+
+### Seguimentos (Segmentos)
+
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| GET | `/seguimentos` | Listar seguimentos | ✅ |
+| GET | `/seguimentos/contar` | Contar seguimentos | ✅ |
+| POST | `/seguimentos` | Cadastrar seguimento | ✅ |
+| PUT | `/seguimentos/update` | Atualizar seguimento | ✅ |
+| DELETE | `/seguimentos/delete/:id` | Deletar seguimento | ✅ |
+
+### Operações (Compras e Vendas)
+
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| GET | `/ativosDropList` | Lista de ativos para dropdown | ✅ |
+| POST | `/operacoes` | Listar operações por mês/ano | ✅ |
+| POST | `/lancarOperacao` | Lançar nova operação | ✅ |
+| POST | `/excluirOperacao` | Excluir operação | ✅ |
+| POST | `/carregaDadosGraficoOperacoes` | Dados do gráfico por ano | ✅ |
+
+**Body POST /lancarOperacao:**
+```json
+{ "idAtivo": "uuid", "dataOperacao": "YYYY-MM-DD", "tipo": "C|V", "quantidade": 10, "preco": 95.50 }
+```
+
+### Rendimentos
+
+| Método | Rota | Descrição | Auth |
+|---|---|---|---|
+| POST | `/rendimentos` | Listar rendimentos por mês/ano | ✅ |
+| POST | `/carregarGraficoDashboard` | Dados do gráfico por ano | ✅ |
+| POST | `/carregarComparacaoAnual` | Comparação entre anos | ✅ |
+| GET | `/carregarDadosModalNovoRendimento` | Dados para modal de lançamento | ✅ |
+
+---
+
+## Middleware
+
+### `verificaToken`
+Localização: `src/middleware/auth/verificaToken.js`
+
+Valida o JWT no header `Authorization: Bearer <token>`. Em caso de token inválido ou ausente retorna `401`. Injeta `req.user` com os dados decodificados do token para uso nos controllers.
+
+---
+
+## 📋 Backlog
+
+### Em andamento
+
+- [ ] Controle de Ativos — endpoints para posição consolidada da carteira (preço médio, quantidade, valor atual)
+- [ ] Precificação — integração com API externa para cotação em tempo real dos FIIs
+
+### Pendências
+
+- [ ] Rota de refresh de token JWT
+- [ ] Paginação nas rotas de listagem (`/users`, `/operacoes`, `/rendimentos`)
+- [ ] Cadastro de rendimento via `POST /rendimentos/lancar`
+- [ ] Upload de extrato para lançamento em lote de rendimentos / operações (multer + S3 já configurados)
+- [ ] Endpoint de relatório consolidado por período
+- [ ] Testes automatizados (unitários e de integração)
+- [ ] Dockerização da aplicação
+- [ ] Documentação Swagger / OpenAPI

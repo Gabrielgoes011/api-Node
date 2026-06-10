@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // Middleware para verificar o token JWT
-const verificaJWT = (req, res, next) => {
+const verificaToken = (req, res, next) => {
   try {
     // Lê o header: "Authorization: Bearer eyJhbGci..."
     const authHeader = req.headers['authorization'];
@@ -27,4 +27,4 @@ const verificaJWT = (req, res, next) => {
   }
 };
 
-export default verificaJWT;
+export default verificaToken;
