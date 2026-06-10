@@ -1,1 +1,0 @@
-export { default as TableAcoes } from './TableAcoes.jsx';

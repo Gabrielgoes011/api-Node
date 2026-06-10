@@ -1,6 +1,6 @@
 import React from 'react';
 import { AiOutlinePlus } from 'react-icons/ai';
-import { TableAcoes } from '../TableAcoes';
+import { GridDados } from '../GridDados';
 
 /**
  * DataCard — container padrão de tabela da aplicação.
@@ -12,7 +12,7 @@ import { TableAcoes } from '../TableAcoes';
  *  onBotaoClick    () => void?
  *  filtros         ReactNode?
  *  rodape          string?
- *  — props repassadas ao TableAcoes —
+ *  — props repassadas ao GridDados —
  *  coluna, data, itemsPerPage, labelpesquisa,
  *  usaVisualizar, acaoVisualizar, usaEditar, acaoEditar,
  *  usaExcluir, acaoExcluir, usaResetarSenha, acaoResetarSenha,
@@ -96,7 +96,7 @@ export default function DataCard({
       </div>
 
       {/* ── Tabela ── */}
-      <TableAcoes
+      <GridDados
         coluna={coluna}
         data={data}
         itemsPerPage={itemsPerPage}

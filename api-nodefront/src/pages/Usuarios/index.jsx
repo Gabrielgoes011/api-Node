@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { TableAcoes } from '../../../components/TableAcoes';
+import { GridDados } from '../../../components/GridDados';
 import { useUsuarios } from '../../../hooks/useUsuarios';
 import ModalFormulario from '../../../components/ModalFormulario/ModalFormulario';
 import ModalConfirmacao from '../../../components/ModalDeConfirmacao/ModalConfirmacao';
@@ -147,7 +147,7 @@ function PaginaUsuarios() {
               Nenhum usuário encontrado.
             </div>
           ) : (
-            <TableAcoes
+            <GridDados
               coluna={colunasUsuarios}
               data={users}
               itemsPerPage={10}

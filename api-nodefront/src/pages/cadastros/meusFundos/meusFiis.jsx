@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { TableAcoes } from '../../../components/TableAcoes';
+import { GridDados } from '../../../components/GridDados';
 import { useMeusFiis } from '../../../hooks/hooksCadastros/useMeusFiis';
 import ModalConfirmacao from '../../../components/ModalDeConfirmacao/ModalConfirmacao';
 import SkeletonTable from '../../../components/SkeletonTable/SkeletonTable';
@@ -120,7 +120,7 @@ function PaginaMeusFiis() {
               Nenhum fundo encontrado.
             </div>
           ) : (
-            <TableAcoes
+            <GridDados
               coluna={colunasFiis}
               data={fiis || []}
               itemsPerPage={10}

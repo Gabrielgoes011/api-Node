@@ -1,7 +1,7 @@
 /**
- * Interface para definição de colunas da TableAcoes
+ * Interface para definição de colunas do GridDados
  */
-export interface ITabela {
+export interface IColuna {
   titulo: string;
   acesso: string;
   width?: string; // Largura da coluna (ex: "100px", "20%", "auto")

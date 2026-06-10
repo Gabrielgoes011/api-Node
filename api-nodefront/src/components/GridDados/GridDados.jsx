@@ -17,12 +17,12 @@ try {
 }
 
 /**
- * TableAcoes — tabela universal da aplicação (tema dark FIITrack).
+ * GridDados — tabela universal da aplicação (tema dark FIITrack).
  *
  * Quando _embutido=true (usado dentro do DataCard) não renderiza o wrapper
  * externo com borda/sombra — o DataCard já provê o container.
  */
-const TableAcoes = ({
+const GridDados = ({
   coluna,
   data,
   itemsPerPage    = 10,
@@ -342,4 +342,4 @@ const TableAcoes = ({
   );
 };
 
-export default TableAcoes;
+export default GridDados;
