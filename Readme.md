@@ -166,7 +166,7 @@ O servidor sobe em `http://localhost:3000`.
 | `/operacoes` | Compras e Vendas | ✅ Pronto |
 | `/cadastros/meusfiis` | Meus FIIs | ✅ Pronto |
 | `/cadastros/seguimentos` | Seguimentos | ✅ Pronto |
-| `/cadastros/usuarios` | Usuários | ✅ Pronto |
+| `/cadastros/usuarios` | Usuários | 🚧 Em desenvolvimento |
 | `/controle-ativos` | Controle de Ativos | 🚧 Em desenvolvimento |
 | `/precificacao` | Precificação | 🚧 Em desenvolvimento |
 | `/relatorios` | Relatórios | 🚧 Em desenvolvimento |
@@ -212,14 +212,12 @@ Tabelas principais:
 
 ## Atualizações Recentes
 
-- Middleware renomeado de `verificaJWT` para `verificaToken` — arquivo e todas as referências atualizados
-- Arquivo do middleware renomeado de `verificaJWT.js` para `verificaToken.js`
 - Cards do Dashboard agora navegam para as telas correspondentes ao clicar (`/rendimentos`, `/operacoes`, `/controle-ativos`)
 - Senha padrão de novos usuários (`Track@123`) armazenada com hash `bcrypt` (10 rounds)
+- Login agora valida senha com `bcrypt.compare`
 - Módulo de usuários migrado para `Controller → Service → Repository`
 - Rota de cadastro de usuário alterada de `POST /cadUsers` para `POST /usuario/cadastrar`
 - Rota de edição de fundo padronizada para `PUT /meusFundos/editar/:id`
-- `bcrypt` adicionado e instalado como dependência do backend
 
 ---
 
@@ -233,7 +231,6 @@ Tabelas principais:
 ### 🔐 Autenticação
 
 - [ ] Rota de refresh de token JWT
-- [ ] Comparação de senha no login com `bcrypt.compare` (atualmente valida em texto puro)
 
 ### 👤 Usuários
 
@@ -271,7 +268,11 @@ Tabelas principais:
 - [ ] Upload de extrato para lançamento em lote (multer + S3 já configurados)
 - [ ] Página de Relatórios — exportação por período (PDF / Excel)
 - [ ] Página de Configurações — preferências do usuário
+
+### 🔮 Possibilidades Futuras
+
 - [ ] Responsividade mobile
 - [ ] Testes automatizados (backend e frontend)
 - [ ] Dockerização da aplicação
 - [ ] Documentação Swagger / OpenAPI
+- [ ] Integração com serviços AWS (ex: S3 para extratos, SES para notificações)
