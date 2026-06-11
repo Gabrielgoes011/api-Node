@@ -5,7 +5,8 @@ import apiResponse from '../../utils/httpResponse.js';
 import {
   listarUsuariosService,
   cadastrarUserService,
-  countUserService
+  countUserService,
+  onOffUserService
 } from "../../services/cadastros/usuarios.services.js";
 
 
@@ -143,41 +144,31 @@ export async function atualizarUser(req, res) {
 //#endregion
 
 //#region - Inativa ou Reativa User
-export async function inativaReativaUser(req, res) {
+async function onOffUserController(req, res) {
+
   const { id } = req.params;
-  const db = await openDb();
 
   try {
-    const resultado = await db.query(`
-      SELECT id, ativo 
-      FROM usuarios
-      WHERE id = $1 `, [id]
+
+    //chama a função do serviço para inativar ou reativar o usuário
+    const onOffUser = await onOffUserService(id);
+
+    // Retorna os resultados da consulta em formato JSON
+    apiResponse.success(res, 
+      onOffUser.ativo
+      ? 'Usuário Reativado Com Sucesso!'
+      : 'Usuário Inativado Com Sucesso!', onOffUser, 200, true
     );
+  }
+  catch (error) {
 
-    if (resultado.rows.length === 0) {
-      return res.status(404).json({ status: 404, message: 'Usuário não encontrado!' });
-    }
-
-    const usuario = resultado.rows[0];
-    const novoStatus = !usuario.ativo;
-    const msg = novoStatus ? 'Usuário reativado com sucesso!' : 'Usuário inativado com sucesso!';
-
-    const update = await db.query(
-      `UPDATE usuarios
-       SET ativo = $1
-       WHERE id = $2`, [novoStatus, id]
-    );
-
-    if (update.rowCount === 0) {
-      return res.status(400).json({ status: 400, message: 'Não foi possível atualizar o status.' });
-    }
-
-    return res.status(200).json({ status: 200, message: msg, ativo: novoStatus });
-  } catch (error) {
-    console.error('Erro ao alterar status do usuário:', error);
-    return res.status(500).json({ status: 500, message: 'Erro interno ao processar solicitação.' });
+    // Retorna a mensagem detalhada do erro
+    return apiResponse.error(res,
+      error.message);
   }
 }
+
+
 //#endregion
 
 //#region DELETE - deletar usuario
@@ -225,9 +216,9 @@ export async function deleteUser(req, res) {
 export {
   listarUsuarios,
   cadastrarUser,
-  contarUsuarios
+  contarUsuarios,
+  onOffUserController
   //atualizarUser,
-  //inativaReativaUser,
   //deleteUser
 }
 

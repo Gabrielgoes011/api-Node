@@ -8,7 +8,7 @@ import {
   listarUsuarios,
   cadastrarUser,
   atualizarUser,
-  inativaReativaUser,
+  onOffUserController,
   deleteUser
 } from '../controllers/cadastros/usuario.controller.js';
 
@@ -21,7 +21,9 @@ router.get('/users/dash/count', verificaToken, contarUsuarios);
 router.post('/usuario/cadastrar', verificaToken, cadastrarUser);
 //body: { nome, email, password, cpf  }
 
-router.put('/inativaUser/:id', verificaToken, inativaReativaUser);
+router.put('/users/on-off/:id',verificaToken, onOffUserController);
+//headers: /users/on-off/1
+
 router.put('/users/update/:id', verificaToken, atualizarUser);
 router.delete('/users/delete/:id', verificaToken, deleteUser);
 

@@ -15,7 +15,7 @@ async function autenticarUsuario(email, password) {
 
     // 1. Buscar user no BD (chama repository)
     const usuario = await findUserByEmail(email);
-    if (!usuario) throw new Error('Usuário não encontrado');
+    if (!usuario) throw new Error('Email Não Cadastrado ou Incorreto.');
 
     // 2. Buscar credenciais
     const credenciais = await findUserCredentials(usuario.id);

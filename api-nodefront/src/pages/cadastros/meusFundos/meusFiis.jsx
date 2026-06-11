@@ -9,7 +9,7 @@ import SkeletonTable from '../../../components/SkeletonTable/SkeletonTable';
 // Definição das colunas da tabela
 const colunasFiis = [
   { titulo: 'Ticker', acesso: 'ticker', width: '10%', align: 'center' },
-  { titulo: 'Nome do Fundo', acesso: 'nomeFundo', width: '45%', align: 'center' },
+  { titulo: 'Nome do Fundo', acesso: 'nomeFundo', width: '45%', align: 'left' },
   { titulo: 'CNPJ', acesso: 'cnpj', width: '18%', align: 'center' },
   { titulo: 'Seguimento', acesso: 'nomeSeguimento', width: '20%', align: 'center' }
 ];

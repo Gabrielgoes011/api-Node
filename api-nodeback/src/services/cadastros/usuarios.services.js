@@ -4,7 +4,9 @@ import {
   checkEmailRepository,
   checkCpfRepository,
   cadastrarUserRepository,
-  countUserRepository
+  countUserRepository,
+  isAtivoRepository,
+  onOffUserRepository
 } from "../../repositories/cadastros/usuarios.repositories.js";
 
 //  #region => Service para listar os usuários cadastrados
@@ -117,9 +119,42 @@ async function countUserService() {
 }
 //#endregion
 
+//region => Service para inativar ou reativar usuário
+async function onOffUserService(id) {
+
+  //chama a função do repositório para inativar ou reativar o usuário
+  const isAtivo = await isAtivoRepository(id);
+
+  if (!isAtivo) {
+    throw new Error('Usuário não encontrado.');
+  }
+
+  //let para o novo valor do status do usuário
+  let newValue;
+
+  //pega o valor se esta ativo ou inativo para passar o valor contrario para a query
+  if (isAtivo.ativo === true) {
+    newValue = false;
+  } else {
+    newValue = true;
+  }
+
+  //chama a função do repositório para inativar ou reativar o usuário
+  const onOffUser = await onOffUserRepository(newValue, id);
+
+  return onOffUser;
+}
+//#endregion
+
+
+
+
+
+
 export {
   listarUsuariosService,
   cadastrarUserService,
-  countUserService
+  countUserService,
+  onOffUserService
 }
 

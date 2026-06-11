@@ -5,6 +5,7 @@ import { loginController } from '../../controllers/login.controller.js';
 
 //rota de login
 router.post('/auth/login', loginController);
-//header 
+//body 
+// { "email": "email", "senha": "senha" }
 
 export default router;

@@ -35,6 +35,7 @@ async function checkEmailRepository(email) {
       WHERE email = $1
   `, [email]);
 
+
   return resultadoEmail.rows.length > 0;
 }
 
@@ -110,29 +111,73 @@ async function countUserRepository() {
   const db = await openDb();
 
   //Executa a consulta SQL para listar os usuários
-    const resultadoAtivo = await db.query(`
+  const resultadoAtivo = await db.query(`
         SELECT COUNT(id) AS totalUsers
         FROM usuarios
         WHERE ativo = true
     `);
 
-    const resultadoInativo = await db.query(`
+  const resultadoInativo = await db.query(`
         SELECT COUNT(id) AS totalUsers
         FROM usuarios
         WHERE ativo = false
 
     `);
-    const resultadoTotal = await db.query(`
+  const resultadoTotal = await db.query(`
         SELECT COUNT(id) AS totalUsers
         FROM usuarios
     `);
 
   //retorna os resultados da consulta
   return {
-     ativos: resultadoAtivo.rows[0].totalusers,
-     inativos: resultadoInativo.rows[0].totalusers, 
-     total: resultadoTotal.rows[0].totalusers
-    };
+    ativos: resultadoAtivo.rows[0].totalusers,
+    inativos: resultadoInativo.rows[0].totalusers,
+    total: resultadoTotal.rows[0].totalusers
+  };
+}
+
+//#region => query para desativar ou reativar usuário
+async function isAtivoRepository(id) {
+
+  //abre a conexão com o banco de dados
+  const db = await openDb();
+
+  //excuta query para verificar o status atual e se existe
+  const result = await db.query(`
+      SELECT id, ativo 
+      FROM usuarios
+      WHERE id = $1 `, [id]
+  );
+
+  //retorna o resultado da consulta como booleano para o service
+  return result.rows[0] || null;
+
+}
+
+
+//2º passo: se o usuário existir, inativa ou reativa o usuário
+async function onOffUserRepository(newValue, id) {
+
+  //abre a conexão com o banco de dados
+  const db = await openDb();
+console.log(id, newValue);
+  //executa a query para inativar ou reativar o usuário
+  const result = await db.query(`
+      UPDATE usuarios
+      SET ativo = $1
+      WHERE id = $2
+    `, [newValue, id]);
+
+  //verifica se a atualização foi bem-sucedida
+  if (result.rowCount === 0) {
+    throw new Error('Não foi possível atualizar o status.');
+  }
+
+  //retorna o resultado da update
+  return {
+    success: result.rowCount > 0,
+    ativo: newValue
+  }
 }
 
 //#endregion
@@ -142,6 +187,7 @@ export {
   checkEmailRepository,
   checkCpfRepository,
   cadastrarUserRepository,
-  countUserRepository
+  countUserRepository,
+  isAtivoRepository,
+  onOffUserRepository
 }
-
