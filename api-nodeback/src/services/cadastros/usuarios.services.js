@@ -28,12 +28,7 @@ async function listarUsuariosService(blvalor) {
   //Chama a função do repositório para listar os usuários
   const listarUsuarios = await listarUsuariosRepository(blvalor);
 
-  //verifica se a lista de usuários está vazia
-  if (listarUsuarios.length === 0) {
-    return [], 'Nenhum usuário encontrado com o status informado';
-  }
-
-  //retorna lista de usuários
+  //retorna lista de usuários (vazia quando não houver registros com o status informado)
   return listarUsuarios;
 }
 //#endregion

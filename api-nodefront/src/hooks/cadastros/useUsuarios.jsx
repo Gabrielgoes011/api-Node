@@ -87,13 +87,25 @@ export const useUsuarios = () => {
   };
 
   const handleInactivateUser = async (user) => {
-    toastInfo('⚙️ Funcionalidade em desenvolvimento...');
-    return;
+    try {
+      await usuariosService.inativarReativar(user.id);
+      toastSuccess('Usuário inativado com sucesso!');
+      await getUsers();
+      await getDashboard();
+    } catch (error) {
+      handleError(error);
+    }
   };
 
   const handleReactivateUser = async (user) => {
-    toastInfo('⚙️ Funcionalidade em desenvolvimento...');
-    return;
+    try {
+      await usuariosService.inativarReativar(user.id);
+      toastSuccess('Usuário reativado com sucesso!');
+      await getUsers();
+      await getDashboard();
+    } catch (error) {
+      handleError(error);
+    }
   };
 
   const handleOpenCreate = () => {

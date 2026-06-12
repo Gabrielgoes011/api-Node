@@ -4,8 +4,7 @@ export const usuariosService = {
   listarTodos: async (status = 'on') => {
     try {
       const res = await api.get(`/users?status=${status}`);
-      if (!Array.isArray(res.data)) throw new Error('Resposta da API não é um array');
-      return res.data;
+      return Array.isArray(res.data) ? res.data : [];
     } catch (error) { throw error; }
   },
   criar: async (usuarioData) => {
@@ -20,12 +19,15 @@ export const usuariosService = {
       return res.data;
     } catch (error) { throw error; }
   },
+  //#region - Inativa ou Reativa User
+  
   inativarReativar: async (id) => {
     try {
-      const res = await api.put(`/inativaUser/${id}`);
+      const res = await api.put(`/users/on-off/${id}`);
       return res.data;
     } catch (error) { throw error; }
   },
+  //#endregion
   contar: async () => {
     try {
       const res = await api.get('/users/dash/count');

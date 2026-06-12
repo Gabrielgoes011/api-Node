@@ -106,12 +106,16 @@ export function handleResponse(response, customMsg = null) {
 //   try { ... } catch (error) { handleError(error); }
 // ─────────────────────────────────────────────────────────────────────────────
 export function handleError(error, customMsg = null) {
-  // Sem resposta do servidor (rede, CORS, servidor offline)
+  // Sem resposta HTTP do servidor
   if (!error.response) {
     if (error.code === 'ECONNABORTED') {
       toast.error(customMsg || DEFAULT_MESSAGES.timeout);
-    } else {
+    } else if (error.request) {
+      // Requisição foi feita, mas o servidor não respondeu (rede, CORS, offline)
       toast.error(customMsg || DEFAULT_MESSAGES.network);
+    } else {
+      // Erro lançado no próprio front (ex: validação de formato da resposta)
+      toast.error(customMsg || error.message || DEFAULT_MESSAGES.unknown);
     }
     return;
   }
