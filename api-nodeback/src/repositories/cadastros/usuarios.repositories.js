@@ -99,7 +99,7 @@ async function cadastrarUserRepository(dados) {
   catch (error) {
     //Em caso de erro, desfaz a transação
     await db.query('ROLLBACK');
-    return error;
+    throw error;
   }
 }
 //#endregion

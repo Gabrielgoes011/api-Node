@@ -8,6 +8,7 @@ import {
   isAtivoRepository,
   onOffUserRepository
 } from "../../repositories/cadastros/usuarios.repositories.js";
+import { converterDataParaPostgres } from "../../utils/dateUtils.js";
 
 //  #region => Service para listar os usuários cadastrados
 async function listarUsuariosService(blvalor) {
@@ -83,10 +84,16 @@ async function cadastrarUserService(dados) {
   //passa criptografia para a senha
   const hash = await bcrypt.hash(senhaPadrao, 10);
 
+  // Converte a data do formato DD/MM/YYYY para YYYY-MM-DD para o PostgreSQL
+  let dataNascimentoFormatada = dados.dataNascimento;
+  if (dataNascimentoFormatada) {
+    dataNascimentoFormatada = converterDataParaPostgres(dataNascimentoFormatada);
+  }
+
   //prepara os dados para cadastro
   const dadosCadastro = {
     nome: dados.nome,
-    dataNascimento: dados.dataNascimento,
+    dataNascimento: dataNascimentoFormatada,
     email: dados.email,
     cpf: dados.cpf,
     password: hash
@@ -152,4 +159,3 @@ export {
   countUserService,
   onOffUserService
 }
-
